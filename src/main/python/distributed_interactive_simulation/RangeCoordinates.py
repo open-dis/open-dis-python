@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# Various coordinate system transform utilities. DIS uses 
+# Various coordinate system transform utilities. DIS uses
 # an Earth-Centered, Earth-Fixed coordinate system, with the
 # origin at the center of the (WGS84) earth, positive x out
 # at the equator and prime meridian, z out through the north
@@ -151,7 +151,7 @@ class GPS:
             x0, y0, z0 = 0, 0, 0
 
         x, y, z = self.lla2ecef(lla)
-        
+
         return (x - x0, y - y0, z -z0)
 
     def ecef2lla(self, ecef, tolerance=1e-9):
@@ -339,7 +339,7 @@ if __name__ == "__main__":
     lla = (34. + 0/60. + 0.00174/3600.,
         -117. - 20./60. - 0.84965/3600.,
         251.702)
-    print "lla: ", lla
+    print("lla: {}".format(lla))
     ecef = gps.lla2ecef(lla)
-    print "ecef: ", ecef
-    print "lla: ", gps.ecef2lla(ecef)
+    print("ecef: {}".format(ecef))
+    print("lla: {}".format(gps.ecef2lla(ecef)))

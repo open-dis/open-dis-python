@@ -3,7 +3,7 @@
 #
 
 class DataQueryDatumSpecification( object ):
-"""List of fixed and variable datum records. Section 6.2.17 
+"""List of fixed and variable datum records. Section 6.2.17
 """
 
     def __init__(self):
@@ -698,7 +698,7 @@ class ServiceRequestPdu( LogisticsFamilyPdu ):
 
 
 class MinefieldIdentifier( object ):
-"""The unique designation of a minefield Section 6.2.56 
+"""The unique designation of a minefield Section 6.2.56
 """
 
     def __init__(self):
@@ -776,7 +776,7 @@ class RadioType( object ):
 
 
 class NamedLocationIdentification( object ):
-"""Information about the discrete positional relationship of the part entity with respect to the its host entity Section 6.2.62 
+"""Information about the discrete positional relationship of the part entity with respect to the its host entity Section 6.2.62
 """
 
     def __init__(self):
@@ -844,7 +844,7 @@ class CommentPdu( SimulationManagementFamilyPdu ):
 
 
 class ModulationParameters( object ):
-"""Modulation parameters associated with a specific radio system. INCOMPLETE. 6.2.58 
+"""Modulation parameters associated with a specific radio system. INCOMPLETE. 6.2.58
 """
 
     def __init__(self):
@@ -1788,7 +1788,7 @@ class ChangeOptions( object ):
 
 
 class LiveSimulationAddress( object ):
-"""A simulation's designation associated with all Live Entity IDs contained in Live Entity PDUs. Section 6.2.55 
+"""A simulation's designation associated with all Live Entity IDs contained in Live Entity PDUs. Section 6.2.55
 """
 
     def __init__(self):
@@ -2227,7 +2227,7 @@ class TotalRecordSets( object ):
 
 
 class MineEntityIdentifier( object ):
-"""The unique designation of a mine contained in the Minefield Data PDU. No espdus are issued for mine entities.  Section 6.2.55 
+"""The unique designation of a mine contained in the Minefield Data PDU. No espdus are issued for mine entities.  Section 6.2.55
 """
 
     def __init__(self):
@@ -2389,7 +2389,7 @@ class RadioCommunicationsFamilyPdu( Pdu ):
 
 
 class DatumSpecification( object ):
-"""List of fixed and variable datum records. Section 6.2.18 
+"""List of fixed and variable datum records. Section 6.2.18
 """
 
     def __init__(self):
@@ -2586,7 +2586,7 @@ class IOCommunicationsNode( object ):
 
 
 class ModulationType( object ):
-"""Information about the type of modulation used for radio transmission. 6.2.59 
+"""Information about the type of modulation used for radio transmission. 6.2.59
 """
 
     def __init__(self):
@@ -2652,7 +2652,7 @@ class LinearSegmentParameter( object ):
 
 
 class SimulationAddress( object ):
-"""A Simulation Address record shall consist of the Site Identification number and the Application Identification number. Section 6.2.79 
+"""A Simulation Address record shall consist of the Site Identification number and the Application Identification number. Section 6.2.79
 """
 
     def __init__(self):
@@ -3651,7 +3651,7 @@ class EntityType( object ):
 
 
 class Munition( object ):
-"""An entity's munition (e.g., bomb, missile) information shall be represented by one or more Munition records. For each type or location of munition, this record shall specify the type, location, quantity and status of munitions that an entity contains. Section 6.2.60 
+"""An entity's munition (e.g., bomb, missile) information shall be represented by one or more Munition records. For each type or location of munition, this record shall specify the type, location, quantity and status of munitions that an entity contains. Section 6.2.60
 """
 
     def __init__(self):
@@ -3797,7 +3797,7 @@ class AngularVelocityVector( object ):
 
 
 class AggregateMarking( object ):
-"""Specifies the character set used in the first byte, followed by up to 31 characters of text data. Section 6.2.4. 
+"""Specifies the character set used in the first byte, followed by up to 31 characters of text data. Section 6.2.4.
 """
 
     def __init__(self):
@@ -3994,7 +3994,7 @@ class EntityStatePdu( EntityInformationFamilyPdu ):
 
 
 class MunitionReload( object ):
-"""indicate weapons (munitions) previously communicated via the Munition record. Section 6.2.61 
+"""indicate weapons (munitions) previously communicated via the Munition record. Section 6.2.61
 """
 
     def __init__(self):
@@ -4922,7 +4922,7 @@ class PropulsionSystemData( object ):
 
 
 class LiveEntityIdentifier( object ):
-"""The unique designation of each entity in an event or exercise that is contained in a Live Entity PDU. Section 6.2.54 
+"""The unique designation of each entity in an event or exercise that is contained in a Live Entity PDU. Section 6.2.54
 """
 
     def __init__(self):
