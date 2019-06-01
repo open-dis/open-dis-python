@@ -3,11 +3,11 @@
 #
 
 class DataQueryDatumSpecification( object ):
-"""List of fixed and variable datum records. Section 6.2.17
-"""
+    """List of fixed and variable datum records. Section 6.2.17
+    """
 
     def __init__(self):
-    """ Initializer for DataQueryDatumSpecification"""
+            """ Initializer for DataQueryDatumSpecification"""
             super(DataQueryDatumSpecification, self).__init__()
             self.numberOfFixedDatums = 0
             """ Number of fixed datums"""
@@ -19,21 +19,21 @@ class DataQueryDatumSpecification( object ):
             """ variable length list variable datum IDs"""
 
     def _pack(self):
-        print pack
+        print("pack")
 
 
     def _unpack(self):
 
-        print unpack
+        print("unpack")
 
 
 
 class StartResumeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
-"""Section 5.3.12.3: Start resume simulation, relaible. COMPLETE
-"""
+    """Section 5.3.12.3: Start resume simulation, relaible. COMPLETE
+    """
 
     def __init__(self):
-    """ Initializer for StartResumeReliablePdu"""
+            """ Initializer for StartResumeReliablePdu"""
             super(StartResumeReliablePdu, self).__init__()
             realWorldTime = ClockTime();
             """ time in real world for this operation to happen"""
