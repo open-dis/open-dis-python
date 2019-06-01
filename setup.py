@@ -16,7 +16,7 @@ setup(name='distributed_interactive_simulation',
       url='https://github.com/open-dis/open-dis-python',
       license='BSD',
       keywords = "dis distributed interactive simulation",
-      packages=['.', 'distributed_interactive_simulation', 'dis_io'],
+      packages=['distributed_interactive_simulation', 'dis_io'],
       long_description=read('README.md'),
       classifiers=[
          "Development Status :: 3 - Alpha",
