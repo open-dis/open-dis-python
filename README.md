@@ -19,7 +19,13 @@ python3 setup.py install --user
 
 ## Running
 
-To run a receiver:
+First install application dependencies.
+
+```bash
+pip install -r requirements.txt
+```
+
+Run a receiver:
 
 ```bash
 cd dis_network_example 
