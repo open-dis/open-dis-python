@@ -40,6 +40,8 @@ python3 dis_udp.py
 
 You should also see the traffic on the net in Wireshark on your localhost interface.
 
+Press `Ctrl+\` to stop the process.
+
 ### Git Submodules
 
 This uses a git submodule to hold a XML description of they protocol messages. If
