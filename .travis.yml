@@ -1,3 +1,4 @@
   language: python
   script:
-    - pytest
+    # check syntax of all files
+    - python -m py_compile */*.py
