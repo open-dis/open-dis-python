@@ -242,12 +242,14 @@ class PduStream( object ):
 
         self.description = [0]*512
         for idx in range(0, 512):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.description[  idx  ] = val
 
         self.name = [0]*256
         for idx in range(0, 256):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.name[  idx  ] = val
 
         self.startTime = inputStream.read_long();
@@ -362,7 +364,8 @@ class DeadReckoningParameters( object ):
         self.deadReckoningAlgorithm = inputStream.read_unsigned_byte();
         self.parameters = [0]*15
         for idx in range(0, 15):
-            val = inputStream.read_unsigned_byte
+            val = inputStream.read_unsigned_byte()
+
             self.parameters[  idx  ] = val
 
         self.entityLinearAcceleration.parse(inputStream)
@@ -695,7 +698,8 @@ class FourByteChunk( object ):
 
         self.otherParameters = [0]*4
         for idx in range(0, 4):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.otherParameters[  idx  ] = val
 
 
@@ -737,7 +741,8 @@ class OneByteChunk( object ):
 
         self.otherParameters = [0]*1
         for idx in range(0, 1):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.otherParameters[  idx  ] = val
 
 
@@ -1225,7 +1230,8 @@ class EightByteChunk( object ):
 
         self.otherParameters = [0]*8
         for idx in range(0, 8):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.otherParameters[  idx  ] = val
 
 
@@ -1427,7 +1433,8 @@ class EntityMarking( object ):
         self.characterSet = inputStream.read_unsigned_byte();
         self.characters = [0]*11
         for idx in range(0, 11):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.characters[  idx  ] = val
 
 
@@ -1493,7 +1500,8 @@ class TwoByteChunk( object ):
 
         self.otherParameters = [0]*2
         for idx in range(0, 2):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.otherParameters[  idx  ] = val
 
 
@@ -2689,7 +2697,8 @@ class IFFFundamentalParameterData( object ):
         self.applicableModes = inputStream.read_unsigned_byte();
         self.systemSpecificData = [0]*3
         for idx in range(0, 3):
-            val = inputStream.read_unsigned_byte
+            val = inputStream.read_unsigned_byte()
+
             self.systemSpecificData[  idx  ] = val
 
 
@@ -3024,7 +3033,8 @@ class AggregateMarking( object ):
         self.characterSet = inputStream.read_unsigned_byte();
         self.characters = [0]*31
         for idx in range(0, 31):
-            val = inputStream.read_unsigned_byte
+            val = inputStream.read_unsigned_byte()
+
             self.characters[  idx  ] = val
 
 
@@ -6014,7 +6024,8 @@ class FastEntityStatePdu( EntityInformationFamilyPdu ):
         self.deadReckoningAlgorithm = inputStream.read_unsigned_byte();
         self.otherParameters = [0]*15
         for idx in range(0, 15):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.otherParameters[  idx  ] = val
 
         self.xAcceleration = inputStream.read_float();
@@ -6025,7 +6036,8 @@ class FastEntityStatePdu( EntityInformationFamilyPdu ):
         self.zAngularVelocity = inputStream.read_float();
         self.marking = [0]*12
         for idx in range(0, 12):
-            val = inputStream.read_byte
+            val = inputStream.read_byte()
+
             self.marking[  idx  ] = val
 
         self.capabilities = inputStream.read_int();
