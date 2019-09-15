@@ -9,10 +9,8 @@ import time
 import sys
 
 
-from dis_io.DataInputStream import DataInputStream
-from dis_io.DataOutputStream import DataOutputStream
-
-
+from distributed_interactive_simulation.DataInputStream import DataInputStream
+from distributed_interactive_simulation.DataOutputStream import DataOutputStream
 from distributed_interactive_simulation.dis7 import *
 from distributed_interactive_simulation.RangeCoordinates import GPS
 import distributed_interactive_simulation.PduFactory as pduFactory

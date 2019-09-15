@@ -12,12 +12,9 @@ import time
 import sys
 
 
-sys.path.append("../dis_io")
-sys.path.append("../distributed_interactive_simulation")
 
-from dis_io.DataInputStream import DataInputStream
-from dis_io.DataOutputStream import DataOutputStream
-
+from distributed_interactive_simulation.DataInputStream import DataInputStream
+from distributed_interactive_simulation.DataOutputStream import DataOutputStream
 from distributed_interactive_simulation.dis7 import EntityStatePdu
 from io import BytesIO
 from distributed_interactive_simulation.RangeCoordinates import GPS
