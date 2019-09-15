@@ -1,4 +1,3 @@
-#! /usr/bin/python
 __author__ = "mcgredo"
 __date__ = "$Jun 25, 2015 11:31:42 AM$"
 
@@ -29,7 +28,3 @@ def createPdu(data):
   # print("Unable to find a PDU corresponding to PduType {}".format(pduType))
 
   return None
-
-
-if __name__ == "__main__":
-    print("Hello World")
