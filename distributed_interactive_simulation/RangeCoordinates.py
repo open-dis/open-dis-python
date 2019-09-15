@@ -9,11 +9,9 @@
 # on the WGS84 globe. This utility does that. (It's swiped from
 # the net, specifically the stoqs project at MBARI)
 
-__author__ = "mcgredo"
-__date__ = "$Jun 25, 2015 10:23:43 AM$"
+__author__ = ""
+__credits = "https://github.com/GAVLab/fhwa2_viz/blob/master/fhwa2_gui/src/util.py"
 
-#!/usr/bin/env python
-# See https://github.com/GAVLab/fhwa2_viz/blob/master/fhwa2_gui/src/util.py
 """
 Container for general GPS functions and classes
 Functions:
