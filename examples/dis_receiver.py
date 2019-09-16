@@ -10,7 +10,7 @@ import array
 
 from distributed_interactive_simulation.dis7 import *
 from distributed_interactive_simulation.RangeCoordinates import GPS
-import distributed_interactive_simulation.PduFactory as pduFactory
+from distributed_interactive_simulation.PduFactory import createPdu
 
 UDP_PORT = 3001
 
@@ -25,7 +25,7 @@ def recv():
     data, addr = udpSocket.recvfrom(1024) # buffer size in bytes
     print("Received {} bytes".format(len(data)))
 
-    aPdu = pduFactory.createPdu(data);
+    aPdu = createPdu(data);
     if aPdu.pduType == 1: #PduTypeDecoders.EntityStatePdu:
         loc = (aPdu.entityLocation.x, aPdu.entityLocation.y, aPdu.entityLocation.z)
         lla = gps.ecef2lla(loc)
