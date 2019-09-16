@@ -2,8 +2,6 @@
 #This code is licensed under the BSD software license
 #
 
-#import distributed_interactive_simulation.DataInputStream
-#import distributed_interactive_simulation.DataOutputStream
 
 def getPdu(inputStream):
    x = inputStream.read_unsigned_byte()
