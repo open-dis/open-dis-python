@@ -3,4 +3,5 @@
     # check syntax of all files
     - python -m py_compile */*.py
     # run unit tests
+    - python setup.py install --user
     - cd tests && python -m unittest discover
