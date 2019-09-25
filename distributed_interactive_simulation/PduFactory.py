@@ -5,6 +5,7 @@ from distributed_interactive_simulation.DataInputStream import DataInputStream
 from distributed_interactive_simulation.dis7 import *
 from io import BytesIO
 import binascii
+import io
 
 PduTypeDecoders = {
        1 : EntityStatePdu
@@ -88,4 +89,11 @@ def createPdu(data):
     memoryStream = BytesIO(data)
     inputStream = DataInputStream(memoryStream)
 
+    return getPdu(inputStream)
+
+
+def createPduFromFilePath(filePath):
+    """ Utility written for unit tests, but could have other uses too."""
+    f = io.open(filePath, "rb")
+    inputStream = DataInputStream(f)
     return getPdu(inputStream)

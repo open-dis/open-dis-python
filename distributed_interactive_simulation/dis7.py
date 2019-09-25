@@ -35,12 +35,12 @@ class DataQueryDatumSpecification( object ):
         self.numberOfFixedDatums = inputStream.read_unsigned_int();
         self.numberOfVariableDatums = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfFixedDatums):
-            element = null()
+            element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatumIDList.append(element)
 
         for idx in range(0, self.numberOfVariableDatums):
-            element = null()
+            element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumIDList.append(element)
 
@@ -1852,12 +1852,12 @@ class DatumSpecification( object ):
         self.numberOfFixedDatums = inputStream.read_unsigned_int();
         self.numberOfVariableDatums = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfFixedDatums):
-            element = null()
+            element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatumIDList.append(element)
 
         for idx in range(0, self.numberOfVariableDatums):
-            element = null()
+            element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumIDList.append(element)
 
@@ -6440,10 +6440,14 @@ class CommentPdu( SimulationManagementFamilyPdu ):
         self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
         self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfFixedDatumRecords):
-            self.fixedDatums.append(getPdu(inputStream))
+            element = FixedDatum()
+            element.parse(inputStream)
+            self.fixedDatums.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
-            self.variableDatums.append(getPdu(inputStream))
+            element = VariableDatum()
+            element.parse(inputStream)
+            self.variableDatums.append(element)
 
 
 
@@ -6700,12 +6704,12 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
         self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
         self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfFixedDatumRecords):
-            element = null()
+            element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatums.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
-            element = null()
+            element = VariableDatum()
             element.parse(inputStream)
             self.variableDatums.append(element)
 
@@ -6824,12 +6828,12 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
         self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
         self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfFixedDatumRecords):
-            element = null()
+            element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatums.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
-            element = null()
+            element = VariableDatum()
             element.parse(inputStream)
             self.variableDatums.append(element)
 
@@ -7415,12 +7419,12 @@ class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
         self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfFixedDatumRecords):
-            element = null()
+            element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
-            element = null()
+            element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
@@ -7519,12 +7523,12 @@ class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
         self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfFixedDatumRecords):
-            element = null()
+            element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
-            element = null()
+            element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 

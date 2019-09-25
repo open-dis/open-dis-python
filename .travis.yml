@@ -2,3 +2,5 @@
   script:
     # check syntax of all files
     - python -m py_compile */*.py
+    # run unit tests
+    - cd tests && python -m unittest discover
