@@ -1,11 +1,10 @@
-#! /usr/bin/python
+#!python
 
 __author__ = "DMcG"
 __date__ = "$Jun 23, 2015 10:27:29 AM$"
 
 import socket
 import time
-import sys
 
 from io import BytesIO
 

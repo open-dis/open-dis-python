@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!python
 
 __author__ = "mcgredo"
 __date__ = "$Jun 25, 2015 12:10:26 PM$"
