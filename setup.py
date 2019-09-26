@@ -18,6 +18,7 @@ setup(name='distributed_interactive_simulation',
       keywords = "dis distributed interactive simulation",
       packages=['distributed_interactive_simulation'],
       long_description=read('README.md'),
+      install_requires=['numpy'],
       classifiers=[
          "Development Status :: 3 - Alpha",
          "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
