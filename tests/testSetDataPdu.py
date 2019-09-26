@@ -1,7 +1,9 @@
 #!python
 
 import unittest
-import io
+import io, sys
+
+sys.path.append('..') # find our library in parent folder
 
 from distributed_interactive_simulation.dis7 import *
 from distributed_interactive_simulation.PduFactory import *
