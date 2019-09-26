@@ -37,3 +37,13 @@ python3 dis_sender.py
 You should also see the traffic on the net in Wireshark on your localhost interface.
 
 Press `Ctrl+\` to stop the process.
+
+## Documentation
+
+You can auto generate API docs from the project source code:
+```bash
+pip install pdoc
+pdoc --html --html-dir docs opendis
+```
+
+The docs will be generated in the `docs/opendis` folder.
