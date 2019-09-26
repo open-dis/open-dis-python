@@ -8,7 +8,7 @@ from setuptools import setup
 def read(fname):
    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-setup(name='distributed_interactive_simulation',
+setup(name='opendis',
       version='1.0',
       author='DMcG',
       author_email='mcgredo@nps.edu',
@@ -16,7 +16,7 @@ setup(name='distributed_interactive_simulation',
       url='https://github.com/open-dis/open-dis-python',
       license='BSD',
       keywords = "dis distributed interactive simulation",
-      packages=['distributed_interactive_simulation'],
+      packages=['opendis'],
       long_description=read('README.md'),
       install_requires=['numpy'],
       classifiers=[

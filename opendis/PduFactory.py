@@ -1,8 +1,8 @@
 __author__ = "mcgredo"
 __date__ = "$Jun 25, 2015 11:31:42 AM$"
 
-from distributed_interactive_simulation.DataInputStream import DataInputStream
-from distributed_interactive_simulation.dis7 import *
+from .DataInputStream import DataInputStream
+from .dis7 import *
 from io import BytesIO
 import binascii
 import io

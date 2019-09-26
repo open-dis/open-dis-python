@@ -8,9 +8,9 @@ import time
 import sys
 import array
 
-from distributed_interactive_simulation.dis7 import *
-from distributed_interactive_simulation.RangeCoordinates import GPS
-from distributed_interactive_simulation.PduFactory import createPdu
+from opendis.dis7 import *
+from opendis.RangeCoordinates import GPS
+from opendis.PduFactory import createPdu
 
 UDP_PORT = 3001
 

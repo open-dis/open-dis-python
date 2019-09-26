@@ -8,9 +8,9 @@ import time
 
 from io import BytesIO
 
-from distributed_interactive_simulation.DataOutputStream import DataOutputStream
-from distributed_interactive_simulation.dis7 import EntityStatePdu
-from distributed_interactive_simulation.RangeCoordinates import GPS
+from opendis.DataOutputStream import DataOutputStream
+from opendis.dis7 import EntityStatePdu
+from opendis.RangeCoordinates import GPS
 
 UDP_PORT = 3001
 DESTINATION_ADDRESS = "192.168.2.11"

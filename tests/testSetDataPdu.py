@@ -3,8 +3,8 @@
 import unittest
 import io
 
-from distributed_interactive_simulation.dis7 import *
-from distributed_interactive_simulation.PduFactory import *
+from opendis.dis7 import *
+from opendis.PduFactory import *
 
 class TestSetDataPdu(unittest.TestCase):
 
