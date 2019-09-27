@@ -3628,14 +3628,22 @@ class VariableDatum( object ):
         """ Type of variable datum to be transmitted. 32 bit enumeration defined in EBV"""
         self.variableDatumLength = 0
         """ Length, IN BITS, of the variable datum."""
-        self.variableDatumBits = 0
+        self.variableData = []
         """ Variable datum. This can be any number of bits long, depending on the datum."""
+
+    def datumPaddingSizeInBits(self):
+        padding = 0
+        remainder = self.variableDatumLength % 64
+        if remainder != 0:
+            padding = 64 - remainder
+        return padding
 
     def serialize(self, outputStream):
         """serialize the class """
         outputStream.write_unsigned_int(self.variableDatumID);
         outputStream.write_unsigned_int(self.variableDatumLength);
-        outputStream.write_unsigned_int(self.variableDatumBits);
+        for x in range(self.variableDatumLength // 8): # length is in bits
+            outputStream.write_byte(self.variableData[x])
 
 
     def parse(self, inputStream):
@@ -3643,7 +3651,13 @@ class VariableDatum( object ):
 
         self.variableDatumID = inputStream.read_unsigned_int();
         self.variableDatumLength = inputStream.read_unsigned_int();
-        self.variableDatumBits = inputStream.read_unsigned_int();
+        for x in range(self.variableDatumLength // 8): # length is in bits
+            self.variableData.append(inputStream.read_byte());
+
+        # Skip over padding
+        # "This field shall be padded at the end to make the length a multiple of 64-bits."
+        for x in range(self.datumPaddingSizeInBits() // 8):
+            inputStream.read_byte()
 
 
 

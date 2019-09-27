@@ -25,8 +25,7 @@ class TestSetDataPdu(unittest.TestCase):
         datum = pdu.variableDatums[0]
         self.assertEqual(1, datum.variableDatumID)
         self.assertEqual(64, datum.variableDatumLength)
-        #vdbits = atum.variableDatumBits
-        #self.assertEqual("allunits", )
+        self.assertEqual(b'allunits', bytes(datum.variableData))
 
     def test_parse_multi_variable_datums(self):
         pdu = createPduFromFilePath("SetDataPdu-multi-variable-datums.raw")
