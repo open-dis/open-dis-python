@@ -4140,7 +4140,7 @@ class EntityStateUpdatePdu( EntityInformationFamilyPdu ):
         self.entityOrientation.parse(inputStream)
         self.entityAppearance = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfVariableParameters):
-            element = null()
+            element = VariableParameter()
             element.parse(inputStream)
             self.variableParameters.append(element)
 
@@ -5223,7 +5223,7 @@ class EntityStatePdu( EntityInformationFamilyPdu ):
         self.marking.parse(inputStream)
         self.capabilities = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfVariableParameters):
-            element = null()
+            element = VariableParameter()
             element.parse(inputStream)
             self.variableParameters.append(element)
 
@@ -6042,7 +6042,7 @@ class FastEntityStatePdu( EntityInformationFamilyPdu ):
 
         self.capabilities = inputStream.read_int();
         for idx in range(0, self.numberOfVariableParameters):
-            element = null()
+            element = VariableParameter()
             element.parse(inputStream)
             self.variableParameters.append(element)
 
@@ -6666,7 +6666,7 @@ class DetonationPdu( WarfareFamilyPdu ):
         self.numberOfVariableParameters = inputStream.read_unsigned_byte();
         self.pad = inputStream.read_unsigned_short();
         for idx in range(0, self.numberOfVariableParameters):
-            element = null()
+            element = VariableParameter()
             element.parse(inputStream)
             self.variableParameters.append(element)
 
