@@ -14,7 +14,7 @@ From source:
 pip install .
 ```
 
-For developers of this library:
+For developers of this library (This installs a symlink to the sources so they can be edited and referenced in `tests` and `examples` without a reinstall):
 ```bash
 pip install -e .
 ```
