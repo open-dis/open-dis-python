@@ -17,19 +17,24 @@ UDP_PORT = 3001
 udpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udpSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 udpSocket.bind(("", UDP_PORT))
+udpSocket.settimeout(3) # exit if we get nothing in this many seconds
+
 print("Created UDP socket {}".format(UDP_PORT))
 
 gps = GPS();
 
 def recv():
-    data, addr = udpSocket.recvfrom(1024) # buffer size in bytes
-    print("Received {} bytes".format(len(data)))
+    data = udpSocket.recv(1024) # buffer size in bytes
 
     aPdu = createPdu(data);
+
+    print("Received Pdu type {}, {} bytes".format(aPdu.pduType, len(data)), flush=True)
+
     if aPdu.pduType == 1: #PduTypeDecoders.EntityStatePdu:
         loc = (aPdu.entityLocation.x, aPdu.entityLocation.y, aPdu.entityLocation.z)
         lla = gps.ecef2lla(loc)
         print("Pdu location is {} {} {}".format(lla[0], lla[1], lla[2]))
 
 
-recv()
+while True:
+    recv()
