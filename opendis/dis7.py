@@ -116,9 +116,7 @@ class IFFData( object ):
         outputStream.write_unsigned_int(self.recordType);
         outputStream.write_unsigned_short( len(self.iffData));
         for anObj in self.iffData:
-            anObj.serialize(outputStream)
-
-
+            outputStream.write_unsigned_byte(anObj)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -126,9 +124,8 @@ class IFFData( object ):
         self.recordType = inputStream.read_unsigned_int();
         self.recordLength = inputStream.read_unsigned_short();
         for idx in range(0, self.recordLength):
-            element = null()
-            element.parse(inputStream)
-            self.iffData.append(element)
+            val = inputStream.read_unsigned_byte()
+            self.iffData.append(val)
 
 
 
