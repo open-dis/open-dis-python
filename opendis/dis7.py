@@ -982,19 +982,15 @@ class RecordQuerySpecification( object ):
         """serialize the class """
         outputStream.write_unsigned_int( len(self.records));
         for anObj in self.records:
-            anObj.serialize(outputStream)
-
-
+            outputstream.write_unsigned_int(anObj)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.numberOfRecords = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfRecords):
-            element = null()
-            element.parse(inputStream)
-            self.records.append(element)
-
+            val = inputstream.read_unsigned_int()
+            self.records.append(val)
 
 
 
