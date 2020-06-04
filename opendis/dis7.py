@@ -117,13 +117,16 @@ class IFFData( object ):
         outputStream.write_unsigned_short( len(self.iffData));
         for anObj in self.iffData:
             outputStream.write_unsigned_byte(anObj)
+        
+        """ TODO add padding to end on 32-bit boundary 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.recordType = inputStream.read_unsigned_int();
         self.recordLength = inputStream.read_unsigned_short();
-        for idx in range(0, self.recordLength):
+        """ The record length includes the length of record type field (32 bits) and record length field (16 bits) so we subtract 6 bytes total for those.
+        for idx in range(0, self.recordLength - 6):
             val = inputStream.read_unsigned_byte()
             self.iffData.append(val)
 
