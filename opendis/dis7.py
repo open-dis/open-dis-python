@@ -788,14 +788,12 @@ class IffDataSpecification( object ):
         for anObj in self.iffDataRecords:
             anObj.serialize(outputStream)
 
-
-
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.numberOfIffDataRecords = inputStream.read_unsigned_short();
         for idx in range(0, self.numberOfIffDataRecords):
-            element = null()
+            element = IFFData()
             element.parse(inputStream)
             self.iffDataRecords.append(element)
 
