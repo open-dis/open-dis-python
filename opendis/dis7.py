@@ -116,19 +116,19 @@ class IFFData( object ):
         outputStream.write_unsigned_int(self.recordType);
         outputStream.write_unsigned_short( len(self.iffData));
         for anObj in self.iffData:
-            anObj.serialize(outputStream)
-
-
+            outputStream.write_unsigned_byte(anObj)
+        
+        """ TODO add padding to end on 32-bit boundary """
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.recordType = inputStream.read_unsigned_int();
         self.recordLength = inputStream.read_unsigned_short();
-        for idx in range(0, self.recordLength):
-            element = null()
-            element.parse(inputStream)
-            self.iffData.append(element)
+        """ The record length includes the length of record type field (32 bits) and record length field (16 bits) so we subtract 6 bytes total for those. """
+        for idx in range(0, self.recordLength - 6):
+            val = inputStream.read_unsigned_byte()
+            self.iffData.append(val)
 
 
 
@@ -791,14 +791,12 @@ class IffDataSpecification( object ):
         for anObj in self.iffDataRecords:
             anObj.serialize(outputStream)
 
-
-
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.numberOfIffDataRecords = inputStream.read_unsigned_short();
         for idx in range(0, self.numberOfIffDataRecords):
-            element = null()
+            element = IFFData()
             element.parse(inputStream)
             self.iffDataRecords.append(element)
 
@@ -982,19 +980,15 @@ class RecordQuerySpecification( object ):
         """serialize the class """
         outputStream.write_unsigned_int( len(self.records));
         for anObj in self.records:
-            anObj.serialize(outputStream)
-
-
+            outputstream.write_unsigned_int(anObj)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.numberOfRecords = inputStream.read_unsigned_int();
         for idx in range(0, self.numberOfRecords):
-            element = null()
-            element.parse(inputStream)
-            self.records.append(element)
-
+            val = inputstream.read_unsigned_int()
+            self.records.append(val)
 
 
 
