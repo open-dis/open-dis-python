@@ -27,7 +27,7 @@ class TestEntityStatePdu(unittest.TestCase):
         self.assertEqual(1, pdu.forceId)
 
         # Articulation Parameters
-        self.assertEqual(0, pdu.articulationParameters.size)
+        self.assertEqual(0, pdu.numberOfVariableParameters)
 
         # Entity Type (aka DIS Enumeration)
         self.assertEqual(1, pdu.entityType.entityKind)
