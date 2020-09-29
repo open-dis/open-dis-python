@@ -44,7 +44,7 @@ class TestEntityStatePdu(unittest.TestCase):
         self.assertEqual(39, pdu.alternativeEntityType.country)
         self.assertEqual(7, pdu.alternativeEntityType.category)
         self.assertEqual(2, pdu.alternativeEntityType.subcategory)
-        self.assertEqual(1, pdu.alternativeEntityType.spec)
+        self.assertEqual(1, pdu.alternativeEntityType.specific)
         self.assertEqual(0, pdu.alternativeEntityType.extra)
 
         # Entity Linear Velocity
