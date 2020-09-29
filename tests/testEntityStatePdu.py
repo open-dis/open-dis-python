@@ -53,14 +53,14 @@ class TestEntityStatePdu(unittest.TestCase):
         self.assertEqual(0, pdu.entityLinearVelocity.z, 0)
 
         # Entity Location
-        self.assertEqual(4374082.80485589, pdu.entityLocation.x, 0.001)
-        self.assertEqual(1667679.95730107, pdu.entityLocation.y, 0.001)
-        self.assertEqual(4318284.36890269, pdu.entityLocation.z, 0.001)
+        self.assertAlmostEqual(4374082.80485589, pdu.entityLocation.x)
+        self.assertAlmostEqual(1667679.95730107, pdu.entityLocation.y)
+        self.assertAlmostEqual(4318284.36890269, pdu.entityLocation.z)
 
         # Entity Orientation
-        self.assertEqual(1.93505, pdu.entityOrientation.psi, 0.001)
-        self.assertEqual(0, pdu.entityOrientation.theta, 0.001)
-        self.assertEqual(-2.31924, pdu.entityOrientation.phi, 0.001)
+        self.assertAlmostEqual(1.93505, pdu.entityOrientation.psi)
+        self.assertAlmostEqual(0, pdu.entityOrientation.theta)
+        self.assertAlmostEqual(-2.31924, pdu.entityOrientation.phi)
 
         # Entity Appearance
         self.assertEqual(0, pdu.entityAppearance_paintScheme)
