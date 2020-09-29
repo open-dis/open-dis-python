@@ -14,7 +14,7 @@ class TestEntityStatePdu(unittest.TestCase):
         self.assertEqual(7, pdu.exerciseID)
         self.assertEqual(1, pdu.pduType)
         self.assertEqual(1, pdu.protocolFamily)
-        "self.assertEqual(0, pdu.timestamp)
+        #self.assertEqual(0, pdu.timestamp)
         self.assertEqual(144, pdu.length)
         self.assertEqual(0, pdu.padding)
 
