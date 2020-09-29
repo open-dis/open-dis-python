@@ -73,5 +73,6 @@ class TestEntityStatePdu(unittest.TestCase):
         # Entity Marking
         self.assertEqual("26        ", pdu.marking.characters.decode("utf-8")
 
+
 if __name__ == '__main__':
     unittest.main()
