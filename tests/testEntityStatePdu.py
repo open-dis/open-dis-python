@@ -60,7 +60,7 @@ class TestEntityStatePdu(unittest.TestCase):
         # Entity Orientation
         self.assertAlmostEqual(1.93505, pdu.entityOrientation.psi, 5)
         self.assertAlmostEqual(0, pdu.entityOrientation.theta)
-        self.assertAlmostEqual(-2.31924, pdu.entityOrientation.phi)
+        self.assertAlmostEqual(-2.31924, pdu.entityOrientation.phi, 5)
 
         # Entity Appearance
         self.assertEqual(0, pdu.entityAppearance_paintScheme)
