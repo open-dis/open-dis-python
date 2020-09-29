@@ -10,13 +10,13 @@ class TestEntityStatePdu(unittest.TestCase):
 
     def test_parse(self):
         pdu = createPduFromFilePath("EntityStatePdu-26.raw")
-        self.assertEqual(6, pdu.protocolVersion)
-        self.assertEqual(7, pdu.exerciseID)
-        self.assertEqual(1, pdu.pduType)
-        self.assertEqual(1, pdu.protocolFamily)
-        #self.assertEqual(0, pdu.timestamp)
-        self.assertEqual(144, pdu.length)
-        self.assertEqual(0, pdu.padding)
+        pdu.assertEqual(6, pdu.protocolVersion)
+        pdu.assertEqual(7, pdu.exerciseID)
+        pdu.assertEqual(1, pdu.pduType)
+        pdu.assertEqual(1, pdu.protocolFamily)
+        #pdu.assertEqual(0, pdu.timestamp)
+        pdu.assertEqual(144, pdu.length)
+        pdu.assertEqual(0, pdu.padding)
 
         # Entity ID
         self.assertEqual(42, espdu.entityID.site)
