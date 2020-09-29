@@ -35,7 +35,7 @@ class TestEntityStatePdu(unittest.TestCase):
         self.assertEqual(39, pdu.entityType.country)
         self.assertEqual(7, pdu.entityType.category)
         self.assertEqual(2, pdu.entityType.subcategory)
-        self.assertEqual(1, pdu.entityType.spec)
+        self.assertEqual(1, pdu.entityType.specific)
         self.assertEqual(0, pdu.entityType.extra)
 
         # Alternative Entity Type
