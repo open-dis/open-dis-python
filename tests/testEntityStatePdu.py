@@ -71,7 +71,7 @@ class TestEntityStatePdu(unittest.TestCase):
         # TODO self.assertEqual(???, pdu.deadReckoningParameters)
         
         # Entity Marking
-        self.assertEqual("26        ", bytes(pdu.marking.characters).decode("ascii"))
+        self.assertEqual("26", bytes(pdu.marking.characters).decode("ascii"))
 
 
 if __name__ == '__main__':
