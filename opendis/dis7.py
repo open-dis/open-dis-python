@@ -1340,7 +1340,7 @@ class EntityMarking( object ):
         """ The characters"""
         
     # convenience method to return the marking as a string, truncated of padding.
-    def charactersString(self)
+    def charactersString(self):
         return bytes(filter(None, self.characters)).decode("utf-8")
 
     def serialize(self, outputStream):
