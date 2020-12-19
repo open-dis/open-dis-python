@@ -1709,6 +1709,11 @@ class EEFundamentalParameterData( object ):
         """ Average repetition frequency of the emission in hertz."""
         self.pulseWidth = 0
         """ Average pulse width  of the emission in microseconds."""
+        self.beamAzimuthCenter = 0
+        self.beamAzimuthSweep = 0
+        self.beamElevationCenter = 0
+        self.beamElevationSweep = 0
+        self.beamSweepSync = 0
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -1717,6 +1722,11 @@ class EEFundamentalParameterData( object ):
         outputStream.write_float(self.effectiveRadiatedPower);
         outputStream.write_float(self.pulseRepetitionFrequency);
         outputStream.write_float(self.pulseWidth);
+        outputStream.write_float(self.beamAzimuthCenter);
+        outputStream.write_float(self.beamAzimuthSweep);
+        outputStream.write_float(self.beamElevationCenter);
+        outputStream.write_float(self.beamElevationSweep);
+        outputStream.write_float(self.beamSweepSync);
 
 
     def parse(self, inputStream):
@@ -1727,7 +1737,11 @@ class EEFundamentalParameterData( object ):
         self.effectiveRadiatedPower = inputStream.read_float();
         self.pulseRepetitionFrequency = inputStream.read_float();
         self.pulseWidth = inputStream.read_float();
-
+        self.beamAzimuthCenter = inputStream.read_float();
+        self.beamAzimuthSweep = inputStream.read_float();
+        self.beamElevationCenter = inputStream.read_float();
+        self.beamElevationSweep = inputStream.read_float();
+        self.beamSweepSync = inputStream.read_float();
 
 
 class JammingTechnique( object ):
@@ -5332,16 +5346,6 @@ class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
         """ This field shall be used to indicate if the data in the PDU represents a state update or just data that has changed since issuance of the last Electromagnetic Emission PDU [relative to the identified entity and emission system(s)]."""
         self.numberOfSystems = 0
         """ This field shall specify the number of emission systems being described in the current PDU."""
-        self.paddingForEmissionsPdu = 0
-        """ padding"""
-        self.systemDataLength = 0
-        """  this field shall specify the length of this emitter system's data in 32-bit words."""
-        self.numberOfBeams = 0
-        """ the number of beams being described in the current PDU for the emitter system being described. """
-        self.emitterSystem = EmitterSystem();
-        """  information about a particular emitter system and shall be represented by an Emitter System record (see 6.2.23)."""
-        self.location = Vector3Float();
-        """ the location of the antenna beam source with respect to the emitting entity's coordinate system. This location shall be the origin of the emitter coordinate system that shall have the same orientation as the entity coordinate system. This field shall be represented by an Entity Coordinate Vector record see 6.2.95 """
         self.systems = []
         """ Electronic emmissions systems THIS IS WRONG. It has the WRONG class type and will cause problems in any marshalling."""
         self.pduType = 23
@@ -5357,13 +5361,9 @@ class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
         outputStream.write_unsigned_byte(self.stateUpdateIndicator);
         outputStream.write_unsigned_byte( len(self.systems));
         outputStream.write_unsigned_short(self.paddingForEmissionsPdu);
-        outputStream.write_unsigned_byte(self.systemDataLength);
-        outputStream.write_unsigned_byte(self.numberOfBeams);
-        self.emitterSystem.serialize(outputStream)
-        self.location.serialize(outputStream)
+
         for anObj in self.systems:
             anObj.serialize(outputStream)
-
 
 
     def parse(self, inputStream):
@@ -5375,16 +5375,69 @@ class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
         self.stateUpdateIndicator = inputStream.read_unsigned_byte();
         self.numberOfSystems = inputStream.read_unsigned_byte();
         self.paddingForEmissionsPdu = inputStream.read_unsigned_short();
-        self.systemDataLength = inputStream.read_unsigned_byte();
-        self.numberOfBeams = inputStream.read_unsigned_byte();
-        self.emitterSystem.parse(inputStream)
-        self.location.parse(inputStream)
+
         for idx in range(0, self.numberOfSystems):
-            element = null()
+            element = EmissionSystemRecord()
             element.parse(inputStream)
             self.systems.append(element)
 
 
+class EmissionSystemRecord():
+    def __init__(self):
+        self.systemDataLength = 0
+        """  this field shall specify the length of this emitter system's data in 32-bit words."""
+        self.numberOfBeams = 0
+        """ the number of beams being described in the current PDU for the emitter system being described. """
+        self.paddingForEmissionsPdu = 0
+        """ padding"""
+        self.emitterSystem = EmitterSystem();
+        """  information about a particular emitter system and shall be represented by an Emitter System record (see 6.2.23)."""
+        self.location = Vector3Float();
+        """ the location of the antenna beam source with respect to the emitting entity's coordinate system. This location shall be the origin of the emitter coordinate system that shall have the same orientation as the entity coordinate system. This field shall be represented by an Entity Coordinate Vector record see 6.2.95 """
+
+        self.beamDataLength = 0
+        self.beamIDNumber = 0
+        self.beamParameterIndex = 0
+        self.fundamentalParameterData = EEFundamentalParameterData()
+        self.beamFunction = 0
+        self.numberOfTargetsInTrackJam = 0
+        self.highDensityTrackJam = 0
+        self.jammingModeSequence = 0
+        self.trackJamRecord = TrackJamData();
+
+    def serialize(self, outputStream):
+        outputStream.write_unsigned_byte(self.systemDataLength);
+        outputStream.write_unsigned_byte(self.numberOfBeams);
+        outputStream.write_unsigned_short(0);
+        self.emitterSystem.serialize(outputStream)
+        self.location.serialize(outputStream)
+        outputStream.read_unsigned_byte(self.beamDataLength);
+        outputStream.read_unsigned_byte(self.beamIDNumber);
+        outputStream.read_unsigned_short(self.beamParameterIndex);
+        self.fundamentalParameterData.serialize(outputStream);
+        outputStream.read_unsigned_byte(self.beamFunction);
+        outputStream.read_unsigned_byte(self.numberOfTargetsInTrackJam);
+        outputStream.read_unsigned_byte(self.highDensityTrackJam);
+        outputStream.read_unsigned_byte(0); # 8 bit padding
+        outputStream.read_unsigned_int(self.jammingModeSequence);
+        self.trackJamRecord.serialize(outputStream);
+
+    def parse(self, inputStream):
+        self.systemDataLength = inputStream.read_unsigned_byte();
+        self.numberOfBeams = inputStream.read_unsigned_byte();
+        inputStream.read_unsigned_short(); # 16 bit padding
+        self.emitterSystem.parse(inputStream)
+        self.location.parse(inputStream)
+        self.beamDataLength = inputStream.read_unsigned_byte();
+        self.beamIDNumber = inputStream.read_unsigned_byte();
+        self.beamParameterIndex = inputStream.read_unsigned_short();
+        self.fundamentalParameterData.parse(inputStream);
+        self.beamFunction = inputStream.read_unsigned_byte();
+        self.numberOfTargetsInTrackJam = inputStream.read_unsigned_byte();
+        self.highDensityTrackJam = inputStream.read_unsigned_byte();
+        inputStream.read_unsigned_byte(); # 8 bit padding
+        self.jammingModeSequence = inputStream.read_unsigned_int();
+        self.trackJamRecord.parse(inputStream);
 
 
 class ResupplyOfferPdu( LogisticsFamilyPdu ):
