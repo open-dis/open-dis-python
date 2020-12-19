@@ -5333,7 +5333,7 @@ class TransmitterPdu( RadioCommunicationsFamilyPdu ):
 
 
 class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
-    """Section 5.3.7.1. Information about active electronic warfare (EW) emissions and active EW countermeasures shall be communicated using an Electromagnetic Emission PDU. NOT COMPLETE"""
+    """Section 5.3.7.1. Information about active electronic warfare (EW) emissions and active EW countermeasures shall be communicated using an Electromagnetic Emission PDU."""
 
     def __init__(self):
         """ Initializer for ElectronicEmissionsPdu"""
@@ -5408,7 +5408,7 @@ class EmissionSystemRecord():
     def serialize(self, outputStream):
         outputStream.write_unsigned_byte(self.systemDataLength);
         outputStream.write_unsigned_byte(self.numberOfBeams);
-        outputStream.write_unsigned_short(0);
+        outputStream.write_unsigned_short(0); # 16 bit padding
         self.emitterSystem.serialize(outputStream)
         self.location.serialize(outputStream)
         outputStream.read_unsigned_byte(self.beamDataLength);
