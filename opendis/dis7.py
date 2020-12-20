@@ -5320,15 +5320,13 @@ class TransmitterPdu( RadioCommunicationsFamilyPdu ):
         self.padding2 = inputStream.read_unsigned_short();
         self.padding3 = inputStream.read_unsigned_byte();
         for idx in range(0, self.modulationParameterCount):
-            element = null()
-            element.parse(inputStream)
+            element = inputStream.read_unsigned_short();
             self.modulationParametersList.append(element)
 
         for idx in range(0, self.antennaPatternCount):
-            element = null()
+            element = BeamAntennaPattern()
             element.parse(inputStream)
             self.antennaPatternList.append(element)
-
 
 
 
