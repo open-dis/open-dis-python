@@ -7127,6 +7127,11 @@ class SignalPdu( RadioCommunicationsFamilyPdu ):
     def __init__(self):
         """ Initializer for SignalPdu"""
         super(SignalPdu, self).__init__()
+
+        self.entityID = EntityID()
+
+        self.radioID = 0
+
         self.encodingScheme = 0
         """ encoding scheme used, and enumeration"""
         self.tdlType = 0
@@ -7145,10 +7150,12 @@ class SignalPdu( RadioCommunicationsFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( SignalPdu, self ).serialize(outputStream)
+        self.entityID.serialize(outputStream)
+        outputStream.write_unsigned_short(self.radioID);
         outputStream.write_unsigned_short(self.encodingScheme);
         outputStream.write_unsigned_short(self.tdlType);
         outputStream.write_unsigned_int(self.sampleRate);
-        outputStream.write_short( len(self.data));
+        outputStream.write_short( len(self.data) * 8);
         outputStream.write_short(self.samples);
         for anObj in self.data:
             anObj.serialize(outputStream)
@@ -7159,14 +7166,15 @@ class SignalPdu( RadioCommunicationsFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( SignalPdu, self).parse(inputStream)
+        self.entityID.parse(inputStream)
+        self.radioID = inputStream.read_unsigned_short();
         self.encodingScheme = inputStream.read_unsigned_short();
         self.tdlType = inputStream.read_unsigned_short();
         self.sampleRate = inputStream.read_unsigned_int();
         self.dataLength = inputStream.read_short();
         self.samples = inputStream.read_short();
-        for idx in range(0, self.dataLength):
-            element = null()
-            element.parse(inputStream)
+        for idx in range(0, self.dataLength // 8):
+            element = inputStream.read_byte()
             self.data.append(element)
 
 
