@@ -5403,7 +5403,7 @@ class EmissionSystemRecord():
         self.numberOfTargetsInTrackJam = 0
         self.highDensityTrackJam = 0
         self.jammingModeSequence = 0
-        self.trackJamRecord = TrackJamData();
+        self.trackJamRecords = [];
 
     def serialize(self, outputStream):
         outputStream.write_unsigned_byte(self.systemDataLength);
@@ -5420,7 +5420,9 @@ class EmissionSystemRecord():
         outputStream.read_unsigned_byte(self.highDensityTrackJam);
         outputStream.read_unsigned_byte(0); # 8 bit padding
         outputStream.read_unsigned_int(self.jammingModeSequence);
-        self.trackJamRecord.serialize(outputStream);
+
+        for anObj in self.trackJamRecords:
+            anObj.serialize(outputStream)
 
     def parse(self, inputStream):
         self.systemDataLength = inputStream.read_unsigned_byte();
@@ -5437,7 +5439,11 @@ class EmissionSystemRecord():
         self.highDensityTrackJam = inputStream.read_unsigned_byte();
         inputStream.read_unsigned_byte(); # 8 bit padding
         self.jammingModeSequence = inputStream.read_unsigned_int();
-        self.trackJamRecord.parse(inputStream);
+
+        for idx in range(0, self.numberOfTargetsInTrackJam):
+            element = TrackJamData()
+            element.parse(inputStream)
+            self.trackJamRecords.append(element)
 
 
 class ResupplyOfferPdu( LogisticsFamilyPdu ):

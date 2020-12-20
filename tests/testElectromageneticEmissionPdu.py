@@ -51,11 +51,11 @@ class TestElectromagneticEmissionPdu(unittest.TestCase):
         self.assertEqual(0, pdu.systems[0].highDensityTrackJam)
         self.assertEqual(0, pdu.systems[0].jammingModeSequence)
 
-        self.assertEqual(23, pdu.systems[0].trackJamRecord.entityID.siteID)
-        self.assertEqual(1, pdu.systems[0].trackJamRecord.entityID.applicationID)
-        self.assertEqual(1, pdu.systems[0].trackJamRecord.entityID.entityID)
-        self.assertEqual(0, pdu.systems[0].trackJamRecord.emitterNumber)
-        self.assertEqual(0, pdu.systems[0].trackJamRecord.beamNumber)
+        self.assertEqual(23, pdu.systems[0].trackJamRecords[0].entityID.siteID)
+        self.assertEqual(1, pdu.systems[0].trackJamRecords[0].entityID.applicationID)
+        self.assertEqual(1, pdu.systems[0].trackJamRecords[0].entityID.entityID)
+        self.assertEqual(0, pdu.systems[0].trackJamRecords[0].emitterNumber)
+        self.assertEqual(0, pdu.systems[0].trackJamRecords[0].beamNumber)
         
 
 if __name__ == '__main__':
