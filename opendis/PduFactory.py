@@ -96,4 +96,6 @@ def createPduFromFilePath(filePath):
     """ Utility written for unit tests, but could have other uses too."""
     f = io.open(filePath, "rb")
     inputStream = DataInputStream(f)
-    return getPdu(inputStream)
+    pdu = getPdu(inputStream)
+    f.close()
+    return pdu
