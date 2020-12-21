@@ -4429,10 +4429,6 @@ class CreateEntityPdu( SimulationManagementFamilyPdu ):
     def __init__(self):
         """ Initializer for CreateEntityPdu"""
         super(CreateEntityPdu, self).__init__()
-        self.originatingID = EntityID();
-        """ Identifier for the request"""
-        self.receivingID = EntityID();
-        """ Identifier for the request"""
         self.requestID = 0
         """ Identifier for the request.  See 6.2.75"""
         self.pduType = 11
@@ -4441,8 +4437,6 @@ class CreateEntityPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( CreateEntityPdu, self ).serialize(outputStream)
-        self.originatingID.serialize(outputStream)
-        self.receivingID.serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
 
 
@@ -4450,8 +4444,6 @@ class CreateEntityPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( CreateEntityPdu, self).parse(inputStream)
-        self.originatingID.parse(inputStream)
-        self.receivingID.parse(inputStream)
         self.requestID = inputStream.read_unsigned_int();
 
 
@@ -4542,10 +4534,6 @@ class RemoveEntityPdu( SimulationManagementFamilyPdu ):
     def __init__(self):
         """ Initializer for RemoveEntityPdu"""
         super(RemoveEntityPdu, self).__init__()
-        self.originatingID = EntityID();
-        """ Identifier for originating entity(or simulation)"""
-        self.receivingID = EntityID();
-        """ Identifier for the receiving entity(or simulation)"""
         self.requestID = 0
         """ This field shall identify the specific and unique start/resume request being made by the SM"""
         self.pduType = 12
@@ -4554,8 +4542,6 @@ class RemoveEntityPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( RemoveEntityPdu, self ).serialize(outputStream)
-        self.originatingID.serialize(outputStream)
-        self.receivingID.serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
 
 
@@ -4563,8 +4549,6 @@ class RemoveEntityPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( RemoveEntityPdu, self).parse(inputStream)
-        self.originatingID.parse(inputStream)
-        self.receivingID.parse(inputStream)
         self.requestID = inputStream.read_unsigned_int();
 
 
@@ -4738,10 +4722,6 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
     def __init__(self):
         """ Initializer for ActionRequestPdu"""
         super(ActionRequestPdu, self).__init__()
-        self.originatingID = EntityID();
-        """ Identifier for originating entity(or simulation)"""
-        self.receivingID = EntityID();
-        """ Identifier for the receiving entity(or simulation)"""
         self.requestID = 0
         """ identifies the request being made by the simulaton manager"""
         self.actionID = 0
@@ -4760,8 +4740,6 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( ActionRequestPdu, self ).serialize(outputStream)
-        self.originatingID.serialize(outputStream)
-        self.receivingID.serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
         outputStream.write_unsigned_int(self.actionID);
         outputStream.write_unsigned_int( len(self.fixedDatums));
@@ -4778,8 +4756,6 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( ActionRequestPdu, self).parse(inputStream)
-        self.originatingID.parse(inputStream)
-        self.receivingID.parse(inputStream)
         self.requestID = inputStream.read_unsigned_int();
         self.actionID = inputStream.read_unsigned_int();
         self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
@@ -4803,10 +4779,6 @@ class AcknowledgePdu( SimulationManagementFamilyPdu ):
     def __init__(self):
         """ Initializer for AcknowledgePdu"""
         super(AcknowledgePdu, self).__init__()
-        self.originatingID = EntityID();
-        """ Identifier for originating entity(or simulation)"""
-        self.receivingID = EntityID();
-        """ Identifier for the receiving entity(or simulation)"""
         self.acknowledgeFlag = 0
         """ type of message being acknowledged"""
         self.responseFlag = 0
@@ -4819,8 +4791,6 @@ class AcknowledgePdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( AcknowledgePdu, self ).serialize(outputStream)
-        self.originatingID.serialize(outputStream)
-        self.receivingID.serialize(outputStream)
         outputStream.write_unsigned_short(self.acknowledgeFlag);
         outputStream.write_unsigned_short(self.responseFlag);
         outputStream.write_unsigned_int(self.requestID);
@@ -4830,8 +4800,6 @@ class AcknowledgePdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( AcknowledgePdu, self).parse(inputStream)
-        self.originatingID.parse(inputStream)
-        self.receivingID.parse(inputStream)
         self.acknowledgeFlag = inputStream.read_unsigned_short();
         self.responseFlag = inputStream.read_unsigned_short();
         self.requestID = inputStream.read_unsigned_int();
@@ -5032,10 +5000,6 @@ class StopFreezePdu( SimulationManagementFamilyPdu ):
     def __init__(self):
         """ Initializer for StopFreezePdu"""
         super(StopFreezePdu, self).__init__()
-        self.originatingID = EntityID();
-        """ Identifier for originating entity(or simulation)"""
-        self.receivingID = EntityID();
-        """ Identifier for the receiving entity(or simulation)"""
         self.realWorldTime = ClockTime();
         """ real-world(UTC) time at which the entity shall stop or freeze in the exercise"""
         self.reason = 0
@@ -5052,8 +5016,6 @@ class StopFreezePdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( StopFreezePdu, self ).serialize(outputStream)
-        self.originatingID.serialize(outputStream)
-        self.receivingID.serialize(outputStream)
         self.realWorldTime.serialize(outputStream)
         outputStream.write_unsigned_byte(self.reason);
         outputStream.write_unsigned_byte(self.frozenBehavior);
@@ -5065,8 +5027,6 @@ class StopFreezePdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( StopFreezePdu, self).parse(inputStream)
-        self.originatingID.parse(inputStream)
-        self.receivingID.parse(inputStream)
         self.realWorldTime.parse(inputStream)
         self.reason = inputStream.read_unsigned_byte();
         self.frozenBehavior = inputStream.read_unsigned_byte();
@@ -5180,10 +5140,6 @@ class StartResumePdu( SimulationManagementFamilyPdu ):
     def __init__(self):
         """ Initializer for StartResumePdu"""
         super(StartResumePdu, self).__init__()
-        self.originatingID = EntityID();
-        """ Identifier for originating entity(or simulation)"""
-        self.receivingID = EntityID();
-        """ Identifier for the receiving entity(or simulation)"""
         self.realWorldTime = ClockTime();
         """ This field shall specify the real-world time (UTC) at which the entity is to start/resume in the exercise. This information shall be used by the participating simulation applications to start/resume an exercise synchronously. This field shall be represented by a Clock Time record (see 6.2.16)."""
         self.simulationTime = ClockTime();
@@ -5196,8 +5152,6 @@ class StartResumePdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( StartResumePdu, self ).serialize(outputStream)
-        self.originatingID.serialize(outputStream)
-        self.receivingID.serialize(outputStream)
         self.realWorldTime.serialize(outputStream)
         self.simulationTime.serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
@@ -5207,8 +5161,6 @@ class StartResumePdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( StartResumePdu, self).parse(inputStream)
-        self.originatingID.parse(inputStream)
-        self.receivingID.parse(inputStream)
         self.realWorldTime.parse(inputStream)
         self.simulationTime.parse(inputStream)
         self.requestID = inputStream.read_unsigned_int();
@@ -6761,10 +6713,6 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
     def __init__(self):
         """ Initializer for ActionResponsePdu"""
         super(ActionResponsePdu, self).__init__()
-        self.originatingID = EntityID();
-        """ Identifier for originating entity(or simulation)"""
-        self.receivingID = EntityID();
-        """ Identifier for the receiving entity(or simulation)"""
         self.requestID = 0
         """ Request ID that is unique"""
         self.requestStatus = 0
@@ -6783,8 +6731,6 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( ActionResponsePdu, self ).serialize(outputStream)
-        self.originatingID.serialize(outputStream)
-        self.receivingID.serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
         outputStream.write_unsigned_int(self.requestStatus);
         outputStream.write_unsigned_int( len(self.fixedDatums));
@@ -6801,8 +6747,6 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( ActionResponsePdu, self).parse(inputStream)
-        self.originatingID.parse(inputStream)
-        self.receivingID.parse(inputStream)
         self.requestID = inputStream.read_unsigned_int();
         self.requestStatus = inputStream.read_unsigned_int();
         self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
