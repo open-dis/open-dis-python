@@ -117,7 +117,7 @@ class IFFData( object ):
         outputStream.write_unsigned_short( len(self.iffData));
         for anObj in self.iffData:
             outputStream.write_unsigned_byte(anObj)
-        
+
         """ TODO add padding to end on 32-bit boundary """
 
     def parse(self, inputStream):
@@ -1338,7 +1338,7 @@ class EntityMarking( object ):
         """ The character set"""
         self.characters =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         """ The characters"""
-        
+
     # convenience method to return the marking as a string, truncated of padding.
     def charactersString(self):
         return bytes(filter(None, self.characters)).decode("utf-8")
@@ -3596,6 +3596,10 @@ class VariableDatum( object ):
         outputStream.write_unsigned_int(self.variableDatumLength);
         for x in range(self.variableDatumLength // 8): # length is in bits
             outputStream.write_byte(self.variableData[x])
+
+        #send padding
+        for x in range(self.datumPaddingSizeInBits() // 8):
+            outputStream.write_byte(0)
 
 
     def parse(self, inputStream):
@@ -7509,5 +7513,3 @@ class IsPartOfPdu( EntityManagementFamilyPdu ):
         self.partLocation.parse(inputStream)
         self.namedLocationID.parse(inputStream)
         self.partEntityType.parse(inputStream)
-
-
