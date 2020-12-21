@@ -37,7 +37,7 @@ def send():
     data = memoryStream.getvalue()
 
     udpSocket.sendto(data, (DESTINATION_ADDRESS, UDP_PORT))
-    print("Sent espdu. {} bytes".format(len(data)))
+    print("Sent ESPDU. {} bytes".format(len(data)))
 
 
 send()

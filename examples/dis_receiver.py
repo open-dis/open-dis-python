@@ -18,7 +18,7 @@ udpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udpSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 udpSocket.bind(("", UDP_PORT))
 
-print("Created UDP socket {}".format(UDP_PORT))
+print("Listening for DIS on UDP socket {}".format(UDP_PORT))
 
 gps = GPS();
 
@@ -32,7 +32,7 @@ def recv():
     if aPdu.pduType == 1: #PduTypeDecoders.EntityStatePdu:
         loc = (aPdu.entityLocation.x, aPdu.entityLocation.y, aPdu.entityLocation.z)
         lla = gps.ecef2lla(loc)
-        print("Pdu location is {} {} {}".format(lla[0], lla[1], lla[2]))
+        print("ESPDU. Id: {}, Location {} {} {}".format(aPdu.entityID.entityID, lla[0], lla[1], lla[2]))
 
 
 while True:

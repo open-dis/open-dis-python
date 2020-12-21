@@ -63,11 +63,9 @@ PduTypeDecoders = {
 
 
 def getPdu(inputStream):
-    # The PDU type enumeration is in the 3rd slot
-    inputStream.read_unsigned_byte()
-    inputStream.read_unsigned_byte()
+    inputStream.stream.seek(2, 0) # Skip ahead to PDU type enum field
     pduType = inputStream.read_byte()
-    inputStream.stream.seek(-3, 1) # rewind
+    inputStream.stream.seek(0, 0) # Rewind to start
 
     if pduType in PduTypeDecoders.keys():
         Decoder = PduTypeDecoders[pduType]
