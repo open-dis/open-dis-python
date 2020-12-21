@@ -24,15 +24,15 @@ gps = GPS();
 
 def recv():
     data = udpSocket.recv(1024) # buffer size in bytes
+    pdu = createPdu(data);
+    pduTypeName = pdu.__class__.__name__
 
-    aPdu = createPdu(data);
-
-    print("Received Pdu type {}, {} bytes".format(aPdu.pduType, len(data)), flush=True)
-
-    if aPdu.pduType == 1: #PduTypeDecoders.EntityStatePdu:
-        loc = (aPdu.entityLocation.x, aPdu.entityLocation.y, aPdu.entityLocation.z)
+    if pdu.pduType == 1: #PduTypeDecoders.EntityStatePdu:
+        loc = (pdu.entityLocation.x, pdu.entityLocation.y, pdu.entityLocation.z)
         lla = gps.ecef2lla(loc)
-        print("ESPDU. Id: {}, Location {} {} {}".format(aPdu.entityID.entityID, lla[0], lla[1], lla[2]))
+        print("Received {}. Id: {}, Location: {} {} {}".format(pduTypeName, pdu.entityID.entityID, lla[0], lla[1], lla[2]))
+    else:
+        print("Received {}, {} bytes".format(pduTypeName, len(data)), flush=True)
 
 
 while True:
