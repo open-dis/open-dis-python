@@ -13,7 +13,7 @@ from opendis.dis7 import EntityStatePdu
 from opendis.RangeCoordinates import GPS
 
 UDP_PORT = 3001
-DESTINATION_ADDRESS = "192.168.2.11"
+DESTINATION_ADDRESS = "127.0.0.1"
 
 udpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udpSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)

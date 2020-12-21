@@ -17,7 +17,6 @@ UDP_PORT = 3001
 udpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udpSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 udpSocket.bind(("", UDP_PORT))
-udpSocket.settimeout(3) # exit if we get nothing in this many seconds
 
 print("Created UDP socket {}".format(UDP_PORT))
 
