@@ -5282,14 +5282,33 @@ class TransmitterPdu( RadioCommunicationsFamilyPdu ):
         self.modulationParameterCount = inputStream.read_unsigned_byte();
         self.padding2 = inputStream.read_unsigned_short();
         self.padding3 = inputStream.read_unsigned_byte();
-        for idx in range(0, self.modulationParameterCount):
-            element = inputStream.read_unsigned_short();
-            self.modulationParametersList.append(element)
 
-        for idx in range(0, self.antennaPatternCount):
-            element = BeamAntennaPattern()
-            element.parse(inputStream)
-            self.antennaPatternList.append(element)
+        """ Vendor product MACE from BattleSpace Inc, only uses 1 byte per modulation param """
+        """ SISO Spec dictates it should be 2 bytes """
+        """ Instead of dumpping the packet we can make an assumption that some vendors use 1 byte per param """
+        """ Although we will still send out 2 bytes per param as per spec """
+        endsize = self.antennaPatternCount * 39
+        mod_bytes = 2
+        
+        if ( self.modulationParameterCount > 0 ) :
+            curr = inputStream.stream.tell()
+            remaining = inputStream.stream.read(None)
+            mod_bytes = (len(remaining) - endsize) / self.modulationParameterCount
+            inputStream.stream.seek(curr, 0)
+ 
+        if ( mod_bytes > 2 ) :
+            print("Malformed Packet")
+        else:
+            for idx in range(0, self.modulationParameterCount):
+                if mod_bytes == 2 :
+                   element = inputStream.read_unsigned_short();
+                else :
+                   element = inputStream.read_unsigned_byte();
+                self.modulationParametersList.append(element)
+            for idx in range(0, self.antennaPatternCount):
+                element = BeamAntennaPattern()
+                element.parse(inputStream)
+                self.antennaPatternList.append(element)
 
 
 
