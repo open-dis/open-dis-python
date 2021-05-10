@@ -1339,6 +1339,13 @@ class EntityMarking( object ):
         self.characters =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         """ The characters"""
 
+    def setString(self, new_str):
+        for idx in range(0, 11):
+          if idx < len(new_str):
+            self.characters[idx] = ord(new_str[idx])
+          else: 
+            self.characters[idx] = 0
+
     # convenience method to return the marking as a string, truncated of padding.
     def charactersString(self):
         return bytes(filter(None, self.characters)).decode("utf-8")
