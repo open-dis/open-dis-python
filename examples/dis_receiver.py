@@ -30,7 +30,8 @@ def recv():
     if pdu.pduType == 1: #PduTypeDecoders.EntityStatePdu:
         loc = (pdu.entityLocation.x, pdu.entityLocation.y, pdu.entityLocation.z)
         lla = gps.ecef2lla(loc)
-        print("Received {}. Id: {}, Location: {} {} {}".format(pduTypeName, pdu.entityID.entityID, lla[0], lla[1], lla[2]))
+        y,p,r = gps.eulers2local(pdu.entityOrientation, lla )
+        print("Received {}. Id: {}, Location: {} {} {} Yaw: {} Pitch: {} Roll: {}".format(pduTypeName, pdu.entityID.entityID, lla[0], lla[1], lla[2], y, p, r))
     else:
         print("Received {}, {} bytes".format(pduTypeName, len(data)), flush=True)
 

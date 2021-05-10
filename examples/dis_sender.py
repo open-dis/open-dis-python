@@ -25,6 +25,7 @@ def send():
     pdu.entityID.entityID = 42
     pdu.entityID.siteID = 17
     pdu.entityID.applicationID = 23
+    pdu.marking.setString('Igor3d')
 
     montereyLocation = gps.lla2ecef((36.6, -121.9, 1) ) # lat lon altitude of Monterey, CA, USA.
     pdu.entityLocation.x = montereyLocation[0]
