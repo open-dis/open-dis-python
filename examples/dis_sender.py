@@ -36,8 +36,9 @@ def send():
     pdu.serialize(outputStream)
     data = memoryStream.getvalue()
 
-    udpSocket.sendto(data, (DESTINATION_ADDRESS, UDP_PORT))
-    print("Sent {}. {} bytes".format(pdu.__class__.__name__, len(data)))
-
+    while True:
+        udpSocket.sendto(data, (DESTINATION_ADDRESS, UDP_PORT))
+        print("Sent {}. {} bytes".format(pdu.__class__.__name__, len(data)))
+        time.sleep(60)
 
 send()
