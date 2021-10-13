@@ -5335,20 +5335,8 @@ class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
             element.parse(inputStream)
             self.systems.append(element)
 
-
-class EmissionSystemRecord():
+class EmissionSystemBeamRecord():
     def __init__(self):
-        self.systemDataLength = 0
-        """  this field shall specify the length of this emitter system's data in 32-bit words."""
-        self.numberOfBeams = 0
-        """ the number of beams being described in the current PDU for the emitter system being described. """
-        self.paddingForEmissionsPdu = 0
-        """ padding"""
-        self.emitterSystem = EmitterSystem();
-        """  information about a particular emitter system and shall be represented by an Emitter System record (see 6.2.23)."""
-        self.location = Vector3Float();
-        """ the location of the antenna beam source with respect to the emitting entity's coordinate system. This location shall be the origin of the emitter coordinate system that shall have the same orientation as the entity coordinate system. This field shall be represented by an Entity Coordinate Vector record see 6.2.95 """
-
         self.beamDataLength = 0
         self.beamIDNumber = 0
         self.beamParameterIndex = 0
@@ -5360,11 +5348,6 @@ class EmissionSystemRecord():
         self.trackJamRecords = [];
 
     def serialize(self, outputStream):
-        outputStream.write_unsigned_byte(self.systemDataLength);
-        outputStream.write_unsigned_byte(self.numberOfBeams);
-        outputStream.write_unsigned_short(0); # 16 bit padding
-        self.emitterSystem.serialize(outputStream)
-        self.location.serialize(outputStream)
         outputStream.read_unsigned_byte(self.beamDataLength);
         outputStream.read_unsigned_byte(self.beamIDNumber);
         outputStream.read_unsigned_short(self.beamParameterIndex);
@@ -5379,11 +5362,6 @@ class EmissionSystemRecord():
             anObj.serialize(outputStream)
 
     def parse(self, inputStream):
-        self.systemDataLength = inputStream.read_unsigned_byte();
-        self.numberOfBeams = inputStream.read_unsigned_byte();
-        inputStream.read_unsigned_short(); # 16 bit padding
-        self.emitterSystem.parse(inputStream)
-        self.location.parse(inputStream)
         self.beamDataLength = inputStream.read_unsigned_byte();
         self.beamIDNumber = inputStream.read_unsigned_byte();
         self.beamParameterIndex = inputStream.read_unsigned_short();
@@ -5399,6 +5377,39 @@ class EmissionSystemRecord():
             element.parse(inputStream)
             self.trackJamRecords.append(element)
 
+class EmissionSystemRecord():
+    def __init__(self):
+        self.systemDataLength = 0
+        """  this field shall specify the length of this emitter system's data in 32-bit words."""
+        self.numberOfBeams = 0
+        """ the number of beams being described in the current PDU for the emitter system being described. """
+        self.paddingForEmissionsPdu = 0
+        """ padding"""
+        self.emitterSystem = EmitterSystem();
+        """  information about a particular emitter system and shall be represented by an Emitter System record (see 6.2.23)."""
+        self.location = Vector3Float();
+        """ the location of the antenna beam source with respect to the emitting entity's coordinate system. This location shall be the origin of the emitter coordinate system that shall have the same orientation as the entity coordinate system. This field shall be represented by an Entity Coordinate Vector record see 6.2.95 """
+        self.beamRecords = [];
+
+    def serialize(self, outputStream):
+        outputStream.write_unsigned_byte(self.systemDataLength);
+        outputStream.write_unsigned_byte(self.numberOfBeams);
+        outputStream.write_unsigned_short(0); # 16 bit padding
+        self.emitterSystem.serialize(outputStream)
+        self.location.serialize(outputStream)
+        for anObj in self.beamRecords:
+            anObj.serialize(outputStream)
+
+    def parse(self, inputStream):
+        self.systemDataLength = inputStream.read_unsigned_byte();
+        self.numberOfBeams = inputStream.read_unsigned_byte();
+        inputStream.read_unsigned_short(); # 16 bit padding
+        self.emitterSystem.parse(inputStream)
+        self.location.parse(inputStream)
+        for idx in range(0, self.numberOfBeams):
+            element = EmissionSystemBeamRecord()
+            element.parse(inputStream)
+            self.beamRecords.append(element)
 
 class ResupplyOfferPdu( LogisticsFamilyPdu ):
     """Information used to communicate the offer of supplies by a supplying entity to a receiving entity. Section 7.4.3 COMPLETE"""
