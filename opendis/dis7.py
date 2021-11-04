@@ -7114,8 +7114,8 @@ class SignalPdu( RadioCommunicationsFamilyPdu ):
         outputStream.write_unsigned_int(self.sampleRate);
         outputStream.write_short( len(self.data) * 8);
         outputStream.write_short(self.samples);
-        for anObj in self.data:
-            anObj.serialize(outputStream)
+        for b in self.data:
+            outputStream.write_byte(b)
 
 
 
