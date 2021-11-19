@@ -5348,15 +5348,15 @@ class EmissionSystemBeamRecord():
         self.trackJamRecords = [];
 
     def serialize(self, outputStream):
-        outputStream.read_unsigned_byte(self.beamDataLength);
-        outputStream.read_unsigned_byte(self.beamIDNumber);
-        outputStream.read_unsigned_short(self.beamParameterIndex);
+        outputStream.write_unsigned_byte(self.beamDataLength);
+        outputStream.write_unsigned_byte(self.beamIDNumber);
+        outputStream.write_unsigned_short(self.beamParameterIndex);
         self.fundamentalParameterData.serialize(outputStream);
-        outputStream.read_unsigned_byte(self.beamFunction);
-        outputStream.read_unsigned_byte(self.numberOfTargetsInTrackJam);
-        outputStream.read_unsigned_byte(self.highDensityTrackJam);
-        outputStream.read_unsigned_byte(0); # 8 bit padding
-        outputStream.read_unsigned_int(self.jammingModeSequence);
+        outputStream.write_unsigned_byte(self.beamFunction);
+        outputStream.write_unsigned_byte(self.numberOfTargetsInTrackJam);
+        outputStream.write_unsigned_byte(self.highDensityTrackJam);
+        outputStream.write_unsigned_byte(0); # 8 bit padding
+        outputStream.write_unsigned_int(self.jammingModeSequence);
 
         for anObj in self.trackJamRecords:
             anObj.serialize(outputStream)
