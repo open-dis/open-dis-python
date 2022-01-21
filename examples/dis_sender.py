@@ -5,11 +5,14 @@ __date__ = "$Jun 23, 2015 10:27:29 AM$"
 
 import socket
 import time
-
+import sys, os
 from io import BytesIO
 
+# add the parent directory rather than installing via setup.py
+sys.path.append(os.path.join(sys.path[0],'..'))
+
+from opendis.pythonDis import EntityStatePdu
 from opendis.DataOutputStream import DataOutputStream
-from opendis.dis7 import EntityStatePdu
 from opendis.RangeCoordinates import GPS
 
 UDP_PORT = 3001

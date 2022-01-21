@@ -1,8 +1,8 @@
 __author__ = "mcgredo"
 __date__ = "$Jun 25, 2015 11:31:42 AM$"
 
-from .DataInputStream import DataInputStream
-from .dis7 import *
+import DataInputStream
+from pythonDis import *
 from io import BytesIO
 import binascii
 import io
@@ -85,7 +85,7 @@ def createPdu(data):
         output: a python DIS pdu instance of the correct class"""
 
     memoryStream = BytesIO(data)
-    inputStream = DataInputStream(memoryStream)
+    inputStream = DataInputStream.DataInputStream(memoryStream)
 
     return getPdu(inputStream)
 
