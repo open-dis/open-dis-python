@@ -27,7 +27,7 @@ Classes:
     WGS84 - constant parameters for GPS class
 """
 #Import required packages
-from math import sqrt, pi, sin, cos, tan, atan, atan2
+from math import sqrt, pi, sin, cos, tan, atan, atan2, asin
 from numpy import array, dot
 #from numarray import array, dot, zeros, Float64
 
@@ -329,6 +329,65 @@ class GPS:
         elif 64 <= lat < 72: return 'W'
         elif 72 <= lat < 80: return 'X'
         else: return 'Z'
+
+    """ Convert Euler psi, theta, phi to yaw pitch roll for given LLA geoCoord"""
+    """ yar, pitch, roll in degress will be returned """
+    def eulers2local( self, eulers, geoCoords ) :
+    
+        """ Calculate the trig functions of the lat/long """
+        sin_lat = sin( deg2rad(geoCoords[0]) )
+        cos_lat = cos( deg2rad(geoCoords[0]) )
+        sin_lon = sin( deg2rad(geoCoords[1]) )
+        cos_lon = cos( deg2rad(geoCoords[1]) )
+    
+        """ Calculate combined trig functions for lat/long """
+        sin_sin = sin_lat * sin_lon
+        sin_cos = sin_lat * cos_lon
+        cos_sin = cos_lat * sin_lon
+        cos_cos = cos_lat * cos_lon
+    
+        """ Calculate the trig functions of the Euler angles """
+        sinPsi   = sin( eulers.psi   )
+        cosPsi   = cos( eulers.psi   )
+        sinTheta = sin( eulers.theta )
+        cosTheta = cos( eulers.theta )
+        sinPhi   = sin( eulers.phi   )
+        cosPhi   = cos( eulers.phi   )
+    
+        """ Calculate local pitch """
+        pitch = asin(   cos_cos*cosTheta*cosPsi + cos_sin*cosTheta*sinPsi - sin_lat*sinTheta )
+    
+        """Calculate local yaw"""
+        cosThetaCosPsi = cosTheta * cosPsi
+        cosThetaSinPsi = cosTheta * sinPsi
+    
+        B_sub_11 =  - sin_lon*cosThetaCosPsi + cos_lon*cosThetaSinPsi
+        B_sub_12 =  - sin_cos*cosThetaCosPsi - sin_sin*cosThetaSinPsi - cos_lat*sinTheta
+    
+        yaw = atan2( B_sub_11, B_sub_12 )
+    
+        """Normalize yaw to 0 to 2pi"""
+        if( yaw < 0.0 ):
+             yaw = yaw + (2 * pi)  
+    
+        """Calculate local roll"""
+        cosPhiSinPsi = cosPhi * sinPsi
+        cosPhiCosPsi = cosPhi * cosPsi
+        sinPhiSinPsi = sinPhi * sinPsi
+        sinPhiCosPsi = sinPhi * cosPsi
+    
+        B_sub_23 = -(  cos_cos*(-cosPhiSinPsi + (sinTheta*sinPhiCosPsi) ) \
+                     + cos_sin*( cosPhiCosPsi + (sinTheta*sinPhiSinPsi) ) \
+                     + sin_lat*( sinPhi*cosTheta) )
+    
+        B_sub_33 = -(  cos_cos*( sinPhiSinPsi + (sinTheta*cosPhiCosPsi) ) \
+                     + cos_sin*(-sinPhiCosPsi + (sinTheta*cosPhiSinPsi) ) \
+                     + sin_lat*( cosPhi*cosTheta) )
+    
+        roll = atan2( B_sub_23, B_sub_33 )
+    
+        return rad2deg(yaw), rad2deg(pitch), rad2deg(roll)
+
 
 
 if __name__ == "__main__":
