@@ -15,7 +15,7 @@ from opendis.PduFactory import createPdu
 UDP_PORT = 3001
 
 udpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-udpSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+udpSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 udpSocket.bind(("", UDP_PORT))
 
 print("Listening for DIS on UDP socket {}".format(UDP_PORT))
