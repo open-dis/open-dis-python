@@ -6911,7 +6911,7 @@ class ReceiverPdu( RadioCommunicationsFamilyPdu ):
         """ encoding scheme used, and enumeration"""
         self.padding1 = 0
         """ padding"""
-        self.receivedPoser = 0
+        self.receivedPower = 0
         """ received power"""
         self.transmitterEntityId = EntityID();
         """ ID of transmitter"""
@@ -6925,7 +6925,7 @@ class ReceiverPdu( RadioCommunicationsFamilyPdu ):
         super( ReceiverPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_short(self.receiverState);
         outputStream.write_unsigned_short(self.padding1);
-        outputStream.write_float(self.receivedPoser);
+        outputStream.write_float(self.receivedPower);
         self.transmitterEntityId.serialize(outputStream)
         outputStream.write_unsigned_short(self.transmitterRadioId);
 
@@ -6936,7 +6936,7 @@ class ReceiverPdu( RadioCommunicationsFamilyPdu ):
         super( ReceiverPdu, self).parse(inputStream)
         self.receiverState = inputStream.read_unsigned_short();
         self.padding1 = inputStream.read_unsigned_short();
-        self.receivedPoser = inputStream.read_float();
+        self.receivedPower = inputStream.read_float();
         self.transmitterEntityId.parse(inputStream)
         self.transmitterRadioId = inputStream.read_unsigned_short();
 
