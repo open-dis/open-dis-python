@@ -1,6 +1,6 @@
 ## open-dis-python
 
-[![Build Status](https://travis-ci.org/open-dis/open-dis-python.svg?branch=master)](https://travis-ci.org/open-dis/open-dis-python)
+[![Build Status](https://app.travis-ci.com/open-dis/open-dis-python.svg?branch=master)](https://app.travis-ci.com/open-dis/open-dis-python)
 [![PyPI Version](https://shields.mitmproxy.org/pypi/v/opendis.svg)](https://pypi.org/project/opendis/)
 
 A Python 3 implementation of the Distributed Interactive Simulation (DIS) 7 standard.
