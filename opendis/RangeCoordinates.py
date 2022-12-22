@@ -14,22 +14,38 @@ __credits = "https://github.com/GAVLab/fhwa2_viz/blob/master/fhwa2_gui/src/util.
 
 """
 Container for general GPS functions and classes
+
 Functions:
     deg2rad
     rad2deg
+    isEven
     euclideanDistance
     gpsWeekCheck
     keplerE
+
 Classes:
     GPS - includes functions:
-        lla2ecef
         ecef2lla
-    WGS84 - constant parameters for GPS class
+        ecef2ned
+        ecef2pae
+        ecef2utm
+        ecefvec2nedvec
+        eulers2local
+        lla2ecef
+        lla2gcc
+        lla2utm
+        ned2ecef
+        ned2pae
+        rotate_3x3
+        transpose
+        utmLetterDesignator
+
+    WGS84 - constant parameters for GPS class - includes function:
+        g0
 """
 #Import required packages
 from math import sqrt, pi, sin, cos, tan, atan, atan2, asin
-from numpy import array, dot
-#from numarray import array, dot, zeros, Float64
+from numpy import array, dot, identity
 
 #def diag(l):
 #    length = len(l)
@@ -120,37 +136,6 @@ class GPS:
     fL1 = fGPS * 1.54e6
     fL2 = fGPS * 1.2e6
 
-    def lla2ecef(self, lla):
-        """Convert lat, lon, alt to Earth-centered, Earth-fixed coordinates.
-        Input: lla - (lat, lon, alt) in (decimal degrees, decimal degees, m)
-        Output: ecef - (x, y, z) in (m, m, m)
-        """
-        #Decompose the input
-        lat = deg2rad(lla[0])
-        lon = deg2rad(lla[1])
-        alt = lla[2]
-        #Calculate length of the normal to the ellipsoid
-        N = self.wgs84.a / sqrt(1 - (self.wgs84.e * sin(lat))**2)
-        #Calculate ecef coordinates
-        x = (N + alt) * cos(lat) * cos(lon)
-        y = (N + alt) * cos(lat) * sin(lon)
-        z = (N * (1 - self.wgs84.e**2) + alt) * sin(lat)
-        #Return the ecef coordinates
-        return (x, y, z)
-
-    def lla2gcc(self, lla, geoOrigin=''):
-        """
-        Same as lls2ecef, but accepts an X3D-style geoOrigin string for subtraction of it in ecef (gcc) cooridinates
-        """
-        if geoOrigin:
-            lon0, lat0, a0 = [float(c) for c in geoOrigin.split()]
-            x0, y0, z0 = self.lla2ecef((lat0, lon0, a0))
-        else:
-            x0, y0, z0 = 0, 0, 0
-
-        x, y, z = self.lla2ecef(lla)
-
-        return (x - x0, y - y0, z -z0)
 
     def ecef2lla(self, ecef, tolerance=1e-9):
         """Convert Earth-centered, Earth-fixed coordinates to lat, lon, alt.
@@ -179,6 +164,7 @@ class GPS:
         #Return the lla coordinates
         return (rad2deg(lat), rad2deg(lon), alt)
 
+
     def ecef2ned(self, ecef, origin):
         """Converts ecef coordinates into local tangent plane where the
         origin is the origin in ecef coordinates.
@@ -194,31 +180,6 @@ class GPS:
                     [-cos(lat)*cos(lon), -cos(lat)*sin(lon), -sin(lat)]])
         return list(dot(Re2t, array(ecef) - array(origin)))
 
-    def ned2ecef(self, ned, origin):
-        """Converts ned local tangent plane coordinates into ecef coordinates
-        using origin as the ecef point of tangency.
-        Input: ned - (north, east, down) in (m, m, m)
-            origin - (x0, y0, z0) in (m, m, m)
-        Output: ecef - (x, y, z) in (m, m, m)
-        """
-        llaOrigin = self.ecef2lla(origin)
-        lat = deg2rad(llaOrigin[0])
-        lon = deg2rad(llaOrigin[1])
-        Rt2e = array([[-sin(lat)*cos(lon), -sin(lon), -cos(lat)*cos(lon)],
-                    [-sin(lat)*sin(lon), cos(lon), -cos(lat)*sin(lon)],
-                    [cos(lat), 0., -sin(lat)]])
-        return list(dot(Rt2e, array(ned)) + array(origin))
-
-    def ned2pae(self, ned):
-        """Converts the local north, east, down coordinates into range, azimuth,
-        and elevation angles
-        Input: ned - (north, east, down) in (m, m, m)
-        Output: pae - (p, alpha, epsilon) in (m, degrees, degrees)
-        """
-        p = euclideanDistance(ned)
-        alpha = atan2(ned[1], ned[0])
-        epsilon = atan2(-ned[2], sqrt(ned[0]**2 + ned[1]**2))
-        return [p, rad2deg(alpha), rad2deg(epsilon)]
 
     def ecef2pae(self, ecef, origin):
         """Converts the ecef coordinates into a tangent plane with the origin
@@ -231,10 +192,129 @@ class GPS:
         ned = self.ecef2ned(ecef, origin)
         return self.ned2pae(ned)
 
+
     def ecef2utm(self, ecef):
         lla = self.ecef2lla(ecef)
         utm, info = self.lla2utm(lla)
         return utm, info
+
+
+    def ecefvec2nedvec(self, lat, lon):
+        """
+        Returns the rotation matrix to translate coordinate systems between
+        ECEF and NED.
+        
+        Inputs: latitude and longitude in radians
+
+        Outputs: the unit vector matrix of the NED coordinate system with
+        respect to the ECEF coordinate system:
+
+            np.array( [ [ N0, N1, N2],
+                        [ E0, E1, E2],
+                        [ D0, D1, D2]
+                      ]
+                    )
+        """
+
+        return array([[-sin(lat)*cos(lon), -sin(lat)*sin(lon), cos(lat) ],
+                      [-sin(lon)         , cos(lon)          , 0        ],
+                      [-cos(lat)*cos(lon), -cos(lat)*sin(lon), -sin(lat)]
+                     ]
+                    )
+
+
+    """ Convert Euler psi, theta, phi to yaw pitch roll for given LLA geoCoord"""
+    """ yar, pitch, roll in degress will be returned """
+    def eulers2local( self, eulers, geoCoords ) :
+    
+        """ Calculate the trig functions of the lat/long """
+        sin_lat = sin( deg2rad(geoCoords[0]) )
+        cos_lat = cos( deg2rad(geoCoords[0]) )
+        sin_lon = sin( deg2rad(geoCoords[1]) )
+        cos_lon = cos( deg2rad(geoCoords[1]) )
+    
+        """ Calculate combined trig functions for lat/long """
+        sin_sin = sin_lat * sin_lon
+        sin_cos = sin_lat * cos_lon
+        cos_sin = cos_lat * sin_lon
+        cos_cos = cos_lat * cos_lon
+    
+        """ Calculate the trig functions of the Euler angles """
+        sinPsi   = sin( eulers.psi   )
+        cosPsi   = cos( eulers.psi   )
+        sinTheta = sin( eulers.theta )
+        cosTheta = cos( eulers.theta )
+        sinPhi   = sin( eulers.phi   )
+        cosPhi   = cos( eulers.phi   )
+    
+        """ Calculate local pitch """
+        pitch = asin(   cos_cos*cosTheta*cosPsi + cos_sin*cosTheta*sinPsi - sin_lat*sinTheta )
+    
+        """Calculate local yaw"""
+        cosThetaCosPsi = cosTheta * cosPsi
+        cosThetaSinPsi = cosTheta * sinPsi
+    
+        B_sub_11 =  - sin_lon*cosThetaCosPsi + cos_lon*cosThetaSinPsi
+        B_sub_12 =  - sin_cos*cosThetaCosPsi - sin_sin*cosThetaSinPsi - cos_lat*sinTheta
+    
+        yaw = atan2( B_sub_11, B_sub_12 )
+    
+        """Normalize yaw to 0 to 2pi"""
+        if( yaw < 0.0 ):
+             yaw = yaw + (2 * pi)  
+    
+        """Calculate local roll"""
+        cosPhiSinPsi = cosPhi * sinPsi
+        cosPhiCosPsi = cosPhi * cosPsi
+        sinPhiSinPsi = sinPhi * sinPsi
+        sinPhiCosPsi = sinPhi * cosPsi
+    
+        B_sub_23 = -(  cos_cos*(-cosPhiSinPsi + (sinTheta*sinPhiCosPsi) ) \
+                     + cos_sin*( cosPhiCosPsi + (sinTheta*sinPhiSinPsi) ) \
+                     + sin_lat*( sinPhi*cosTheta) )
+    
+        B_sub_33 = -(  cos_cos*( sinPhiSinPsi + (sinTheta*cosPhiCosPsi) ) \
+                     + cos_sin*(-sinPhiCosPsi + (sinTheta*cosPhiSinPsi) ) \
+                     + sin_lat*( cosPhi*cosTheta) )
+    
+        roll = atan2( B_sub_23, B_sub_33 )
+    
+        return rad2deg(yaw), rad2deg(pitch), rad2deg(roll)
+
+
+    def lla2ecef(self, lla):
+        """Convert lat, lon, alt to Earth-centered, Earth-fixed coordinates.
+        Input: lla - (lat, lon, alt) in (decimal degrees, decimal degees, m)
+        Output: ecef - (x, y, z) in (m, m, m)
+        """
+        #Decompose the input
+        lat = deg2rad(lla[0])
+        lon = deg2rad(lla[1])
+        alt = lla[2]
+        #Calculate length of the normal to the ellipsoid
+        N = self.wgs84.a / sqrt(1 - (self.wgs84.e * sin(lat))**2)
+        #Calculate ecef coordinates
+        x = (N + alt) * cos(lat) * cos(lon)
+        y = (N + alt) * cos(lat) * sin(lon)
+        z = (N * (1 - self.wgs84.e**2) + alt) * sin(lat)
+        #Return the ecef coordinates
+        return (x, y, z)
+
+
+    def lla2gcc(self, lla, geoOrigin=''):
+        """
+        Same as lls2ecef, but accepts an X3D-style geoOrigin string for subtraction of it in ecef (gcc) cooridinates
+        """
+        if geoOrigin:
+            lon0, lat0, a0 = [float(c) for c in geoOrigin.split()]
+            x0, y0, z0 = self.lla2ecef((lat0, lon0, a0))
+        else:
+            x0, y0, z0 = 0, 0, 0
+
+        x, y, z = self.lla2ecef(lla)
+
+        return (x - x0, y - y0, z -z0)
+
 
     def lla2utm(self, lla):
         """Converts lat, lon, alt to Universal Transverse Mercator coordinates
@@ -306,6 +386,150 @@ class GPS:
         info = [zone, k]
         return utm, info
 
+
+    def llarpy2ecef(self, lat, lon, alt, roll, pitch, yaw):
+        """
+        Convert an entities latitude, longitude, altitude, pitch, roll, and yaw
+        into DIS standard ECEF coordinates and Euler angles.
+
+        Inputs:
+            lat   : latitude of the entity in radians
+            lon   : longitude of the entity in radians
+            alt   : altitude of the entity in meters
+            roll  : roll of the entity in radians
+            pitch : pitch of the entity in radians
+            yaw   : yaw (heading) of the entity in radians
+
+        Output:
+            (X, Y, Z, psi, theta, phi) where:
+              X     : entities ECEF X coordinate in meters
+              Y     : entities ECEF Y coordinate in meters
+              Z     : entities ECEF Z coordinate in meters
+              psi   : entities rotation around the ECEF Z axis
+              theta : entities rotation around the ECEF Y axis
+              phi   : entities rotation around the ECEF X axis
+        """
+
+        # get ECEF X, Y, Z from lat, lon, alt
+        X, Y, Z = self.lla2ecef((rad2deg(lat), rad2deg(lon), alt))
+
+        # get the local NED unit vectors wrt the ECEF coordinate system
+        a0 = self.ecefvec2nedvec(lat, lon)
+
+        # Note: N = x0, E = y0, D = z0
+        x0 = a0[0]
+        y0 = a0[1]
+        z0 = a0[2]
+
+        # first rotation array, z0 by yaw rads
+        rot_array_1 = self.rotate_3x3(yaw, z0)
+
+        # rotate
+        x1 = dot(rot_array_1, x0)
+        y1 = dot(rot_array_1, y0)
+        z1 = dot(rot_array_1, z0)
+
+        # second rotation array, y1 by pitch rads
+        rot_array_2 = self.rotate_3x3(pitch, y1)
+
+        # rotate
+        x2 = dot(rot_array_2, x1)
+        y2 = dot(rot_array_2, y1)
+        z2 = dot(rot_array_2, z1)
+
+        # third rotation array, x2 by roll rads
+        rot_array_3 = self.rotate_3x3(roll, x2)
+
+        # rotate
+        x3 = dot(rot_array_3, x2)
+        y3 = dot(rot_array_3, y2)
+        z3 = dot(rot_array_3, z2)
+
+        # define ECEF unit vectors
+        X0 = array([1, 0, 0])
+        Y0 = array([0, 1, 0])
+        Z0 = array([0, 0, 1])
+
+        # calculate psi and theta
+        psi = atan2( dot(x3, Y0), dot(x3, X0) )
+        theta = atan2( -dot(x3, Z0), sqrt( (dot(x3, X0)) ** 2 + (dot(x3, Y0)) **2 ) )
+
+        # calculate phi
+        Y2 = dot(self.rotate_3x3(psi, Z0), Y0)
+        Z2 = dot(self.rotate_3x3(theta, Y2), Z0)
+
+        phi = atan2( dot(y3, Z2), dot(y3, Y2))
+
+        return (X, Y, Z, psi, theta, phi)
+
+
+    def ned2ecef(self, ned, origin):
+        """Converts ned local tangent plane coordinates into ecef coordinates
+        using origin as the ecef point of tangency.
+        Input: ned - (north, east, down) in (m, m, m)
+            origin - (x0, y0, z0) in (m, m, m)
+        Output: ecef - (x, y, z) in (m, m, m)
+        """
+        llaOrigin = self.ecef2lla(origin)
+        lat = deg2rad(llaOrigin[0])
+        lon = deg2rad(llaOrigin[1])
+        Rt2e = array([[-sin(lat)*cos(lon), -sin(lon), -cos(lat)*cos(lon)],
+                    [-sin(lat)*sin(lon), cos(lon), -cos(lat)*sin(lon)],
+                    [cos(lat), 0., -sin(lat)]])
+        return list(dot(Rt2e, array(ned)) + array(origin))
+
+    def ned2pae(self, ned):
+        """Converts the local north, east, down coordinates into range, azimuth,
+        and elevation angles
+        Input: ned - (north, east, down) in (m, m, m)
+        Output: pae - (p, alpha, epsilon) in (m, degrees, degrees)
+        """
+        p = euclideanDistance(ned)
+        alpha = atan2(ned[1], ned[0])
+        epsilon = atan2(-ned[2], sqrt(ned[0]**2 + ned[1]**2))
+        return [p, rad2deg(alpha), rad2deg(epsilon)]
+
+
+    def rotate_3x3(self, theta, normal_vec):
+        """
+        Returns a rotation matrix to rotate a 3x3 matrix theta degrees around
+        normal_vec axis of rotation. Theta is in rads and normal vec is a 3x1
+        matrix pointing along the axis of rotation.
+
+        Example: get the rotation matrix to rotate a vector 30 degrees around the
+                 z-axis:
+
+                    rot_mat = rotate_3x3(30 * pi / 180, np.array([[0], [0], [1]]))
+
+        Note: dot product a vector with the result of this function to perform
+              the rotation.
+        """
+
+        n_v_t = normal_vec.transpose()
+
+        n_x = array([[      0  , -normal_vec[2], normal_vec[1] ],
+                     [normal_vec[2] ,       0  , -normal_vec[0]],
+                     [-normal_vec[1], normal_vec[0] ,   0      ]
+                    ]
+                   )
+
+
+        I = identity(3)
+
+        nnt = normal_vec * self.transpose(normal_vec)
+
+        return (1 - cos(theta)) * nnt + cos(theta) * I + sin(theta) * n_x
+
+
+    def transpose(self, arr):
+        """ 
+        numpy doesn't want to transpose a 3x1 vector into a 1x3 vector. So
+        we'll do it ourselves.
+        """
+
+        return array( [[arr[0]], [arr[1]], [arr[2]]])
+
+
     def utmLetterDesignator(self, lat):
         """Returns the latitude zone of the UTM coordinates"""
         if -80 <= lat < -72: return 'C'
@@ -329,65 +553,6 @@ class GPS:
         elif 64 <= lat < 72: return 'W'
         elif 72 <= lat < 80: return 'X'
         else: return 'Z'
-
-    """ Convert Euler psi, theta, phi to yaw pitch roll for given LLA geoCoord"""
-    """ yar, pitch, roll in degress will be returned """
-    def eulers2local( self, eulers, geoCoords ) :
-    
-        """ Calculate the trig functions of the lat/long """
-        sin_lat = sin( deg2rad(geoCoords[0]) )
-        cos_lat = cos( deg2rad(geoCoords[0]) )
-        sin_lon = sin( deg2rad(geoCoords[1]) )
-        cos_lon = cos( deg2rad(geoCoords[1]) )
-    
-        """ Calculate combined trig functions for lat/long """
-        sin_sin = sin_lat * sin_lon
-        sin_cos = sin_lat * cos_lon
-        cos_sin = cos_lat * sin_lon
-        cos_cos = cos_lat * cos_lon
-    
-        """ Calculate the trig functions of the Euler angles """
-        sinPsi   = sin( eulers.psi   )
-        cosPsi   = cos( eulers.psi   )
-        sinTheta = sin( eulers.theta )
-        cosTheta = cos( eulers.theta )
-        sinPhi   = sin( eulers.phi   )
-        cosPhi   = cos( eulers.phi   )
-    
-        """ Calculate local pitch """
-        pitch = asin(   cos_cos*cosTheta*cosPsi + cos_sin*cosTheta*sinPsi - sin_lat*sinTheta )
-    
-        """Calculate local yaw"""
-        cosThetaCosPsi = cosTheta * cosPsi
-        cosThetaSinPsi = cosTheta * sinPsi
-    
-        B_sub_11 =  - sin_lon*cosThetaCosPsi + cos_lon*cosThetaSinPsi
-        B_sub_12 =  - sin_cos*cosThetaCosPsi - sin_sin*cosThetaSinPsi - cos_lat*sinTheta
-    
-        yaw = atan2( B_sub_11, B_sub_12 )
-    
-        """Normalize yaw to 0 to 2pi"""
-        if( yaw < 0.0 ):
-             yaw = yaw + (2 * pi)  
-    
-        """Calculate local roll"""
-        cosPhiSinPsi = cosPhi * sinPsi
-        cosPhiCosPsi = cosPhi * cosPsi
-        sinPhiSinPsi = sinPhi * sinPsi
-        sinPhiCosPsi = sinPhi * cosPsi
-    
-        B_sub_23 = -(  cos_cos*(-cosPhiSinPsi + (sinTheta*sinPhiCosPsi) ) \
-                     + cos_sin*( cosPhiCosPsi + (sinTheta*sinPhiSinPsi) ) \
-                     + sin_lat*( sinPhi*cosTheta) )
-    
-        B_sub_33 = -(  cos_cos*( sinPhiSinPsi + (sinTheta*cosPhiCosPsi) ) \
-                     + cos_sin*(-sinPhiCosPsi + (sinTheta*cosPhiSinPsi) ) \
-                     + sin_lat*( cosPhi*cosTheta) )
-    
-        roll = atan2( B_sub_23, B_sub_33 )
-    
-        return rad2deg(yaw), rad2deg(pitch), rad2deg(roll)
-
 
 
 if __name__ == "__main__":
