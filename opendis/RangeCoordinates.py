@@ -18,14 +18,12 @@ Container for general GPS functions and classes
 Functions:
     deg2rad
     rad2deg
-    isEven
     euclideanDistance
-    gpsWeekCheck
-    keplerE
 
 Classes:
     GPS - includes functions:
         ecef2lla
+        ecef2llarpy
         ecef2ned
         ecef2pae
         ecef2utm
@@ -34,6 +32,7 @@ Classes:
         lla2ecef
         lla2gcc
         lla2utm
+        llarpy2ecef
         ned2ecef
         ned2pae
         rotate_3x3
@@ -47,13 +46,6 @@ Classes:
 from math import sqrt, pi, sin, cos, tan, atan, atan2, asin
 from numpy import array, dot, identity
 
-#def diag(l):
-#    length = len(l)
-#    a = zeros((length, length), Float64)
-#    for index in range(length):
-#        a[index, index] = l[index]
-#    return a
-
 
 def deg2rad(deg):
     """Converts degrees to radians"""
@@ -63,11 +55,6 @@ def deg2rad(deg):
 def rad2deg(rad):
     """Converts radians to degrees"""
     return rad * 180 / pi
-
-
-def isEven(num):
-    """Boolean function returning true if num is even, false if not"""
-    return num%2 == 0
 
 
 def euclideanDistance(data, dataRef=None):
@@ -83,86 +70,165 @@ def euclideanDistance(data, dataRef=None):
     return sqrt(total)
 
 
-def gpsWeekCheck(t):
-    """Makes sure the time is in the interval [-302400 302400] seconds, which
-    corresponds to number of seconds in the GPS week"""
-    if t > 302400.:
-        t = t - 604800.
-    elif t < -302400.:
-        t = t + 604800.
-    return t
-
-
-def keplerE(M_k, ecc, tolerance=1e-12):
-    """Iteratively calculates E_k using Kepler's equation:
-    E_k = M_k + ecc * sin(E_k)"""
-    E_k = M_k
-    E_0 = E_k + tolerance * 10.
-    while abs(E_k - E_0) > tolerance:
-        E_0 = E_k
-        E_k = M_k + ecc * sin(E_k)
-    return E_k
-
-
 class WGS84:
     """General parameters defined by the WGS84 system"""
-    #Semimajor axis length (m)
+
+    # Semimajor axis length (m)
     a = 6378137.0
-    #Semiminor axis length (m)
+
+    # Semiminor axis length (m)
     b = 6356752.3142
-    #Ellipsoid flatness (unitless)
+
+    # Ellipsoid flatness (unitless)
     f = (a - b) / a
-    #Eccentricity (unitless)
+
+    # Eccentricity (unitless)
     e = sqrt(f * (2 - f))
-    #Speed of light (m/s)
+
+    # Speed of light (m/s)
     c = 299792458.
-    #Relativistic constant
+
+    # Relativistic constant
     F = -4.442807633e-10
-    #Earth's universal gravitational constant
+
+    # Earth's universal gravitational constant
     mu = 3.986005e14
-    #Earth rotation rate (rad/s)
+
+    # Earth rotation rate (rad/s)
     omega_ie = 7.2921151467e-5
 
     def g0(self, L):
-        """acceleration due to gravity at the elipsoid surface at latitude L"""
+        """
+        acceleration due to gravity at the ellipsoid surface at latitude L
+        
+        Note: this is not the WGS84 models for gravity at latitude,
+              it is an approximation from another source.     
+        """
         return 9.7803267715 * (1 + 0.001931851353 * sin(L)**2) / \
                         sqrt(1 - 0.0066943800229 * sin(L)**2)
 
 
 class GPS:
     """Working class for GPS module"""
-    wgs84 = WGS84()
-    fGPS = 1023
-    fL1 = fGPS * 1.54e6
-    fL2 = fGPS * 1.2e6
 
+    wgs84 = WGS84()
 
     def ecef2lla(self, ecef, tolerance=1e-9):
         """Convert Earth-centered, Earth-fixed coordinates to lat, lon, alt.
         Input: ecef - (x, y, z) in (m, m, m)
         Output: lla - (lat, lon, alt) in (decimal degrees, decimal degrees, m)
         """
-        #Decompose the input
+        # Decompose the input
         x = ecef[0]
         y = ecef[1]
         z = ecef[2]
-        #Calculate lon
+
+        # Calculate lon
         lon = atan2(y, x)
-        #Initialize the variables to calculate lat and alt
+
+        # Initialize the variables to calculate lat and alt
         alt = 0
         N = self.wgs84.a
         p = sqrt(x**2 + y**2)
         lat = 0
         previousLat = 90
-        #Iterate until tolerance is reached
+
+        # Special case for poles (note: any longitude value is valid here)
+        if x == 0 and y == 0:   
+            if z > 0:
+                return (90.00, 69.00, round(z - self.wgs84.b, 2))
+
+            elif z < 0:
+                return (-90.00, 69.00, round(-z - self.wgs84.b, 2))
+
+            else:
+                raise Exception("The Exact Center of the Earth has no lat/lon")
+
+        # Iterate until tolerance is reached
         while abs(lat - previousLat) >= tolerance:
             previousLat = lat
             sinLat = z / (N * (1 - self.wgs84.e**2) + alt)
             lat = atan((z + self.wgs84.e**2 * N * sinLat) / p)
             N = self.wgs84.a / sqrt(1 - (self.wgs84.e * sinLat)**2)
             alt = p / cos(lat) - N
-        #Return the lla coordinates
+
+        # Return the lla coordinates
         return (rad2deg(lat), rad2deg(lon), alt)
+
+
+    def ecef2llarpy(self, X, Y, Z, psi, theta, phi):
+        """
+        Convert an entities DIS standard ECEF coordinates and Euler angles into
+        latitude, longitude, altitude, pitch, roll, and yaw.
+
+        Inputs:
+            X     : entities ECEF X coordinate in meters
+            Y     : entities ECEF Y coordinate in meters
+            Z     : entities ECEF Z coordinate in meters
+            psi   : entities rotation around the ECEF Z axis
+            theta : entities rotation around the ECEF Y axis
+            phi   : entities rotation around the ECEF X axis
+
+        Output:
+            (lat, lon, alt, roll, pitch, yaw) where:
+              lat   : latitude of the entity in radians
+              lon   : longitude of the entity in radians
+              alt   : altitude of the entity in meters
+              roll  : roll of the entity in radians
+              pitch : pitch of the entity in radians
+              yaw   : yaw (heading) of the entity in radians
+        """
+
+        # get lat, lon, alt from ECEF X, Y, Z
+        lat, lon, alt = self.ecef2lla((X, Y, Z))
+
+        # Note: X = x0, Y = y0, Z = z0
+        x0 = array([1, 0, 0])
+        y0 = array([0, 1, 0])
+        z0 = array([0, 0, 1])
+
+        # first rotation array, z0 by psi rads
+        rot_array_1 = self.rotate_3x3(psi, z0)
+
+        # rotate
+        x1 = dot(rot_array_1, x0)
+        y1 = dot(rot_array_1, y0)
+        z1 = dot(rot_array_1, z0)
+
+        # second rotation array, y1 by theta rads
+        rot_array_2 = self.rotate_3x3(theta, y1)
+
+        # rotate
+        x2 = dot(rot_array_2, x1)
+        y2 = dot(rot_array_2, y1)
+        z2 = dot(rot_array_2, z1)
+
+        # third rotation array, x2 by phi rads
+        rot_array_3 = self.rotate_3x3(phi, x2)
+
+        # rotate
+        x3 = dot(rot_array_3, x2)
+        y3 = dot(rot_array_3, y2)
+        z3 = dot(rot_array_3, z2)
+
+        # get the local NED unit vectors wrt the ECEF coordinate system
+        a0 = self.ecefvec2nedvec(deg2rad(lat), deg2rad(lon))
+        X0 = a0[0]
+        Y0 = a0[1]
+        Z0 = a0[2]
+
+        # calculate yaw and pitch
+        yaw = atan2( dot(x3, Y0), dot(x3, X0) )
+        pitch = atan2( -dot(x3, Z0), sqrt( (dot(x3, X0)) ** 2 + (dot(x3, Y0)) **2 ) )
+
+        # calculate roll
+        Y2 = dot(self.rotate_3x3(yaw, Z0), Y0)
+        Z2 = dot(self.rotate_3x3(pitch, Y2), Z0)
+
+        roll = atan2( dot(y3, Z2), dot(y3, Y2))
+
+
+        return (deg2rad(lat), deg2rad(lon), alt, roll, pitch, yaw)
 
 
     def ecef2ned(self, ecef, origin):
@@ -223,87 +289,33 @@ class GPS:
                     )
 
 
-    """ Convert Euler psi, theta, phi to yaw pitch roll for given LLA geoCoord"""
-    """ yar, pitch, roll in degress will be returned """
-    def eulers2local( self, eulers, geoCoords ) :
-    
-        """ Calculate the trig functions of the lat/long """
-        sin_lat = sin( deg2rad(geoCoords[0]) )
-        cos_lat = cos( deg2rad(geoCoords[0]) )
-        sin_lon = sin( deg2rad(geoCoords[1]) )
-        cos_lon = cos( deg2rad(geoCoords[1]) )
-    
-        """ Calculate combined trig functions for lat/long """
-        sin_sin = sin_lat * sin_lon
-        sin_cos = sin_lat * cos_lon
-        cos_sin = cos_lat * sin_lon
-        cos_cos = cos_lat * cos_lon
-    
-        """ Calculate the trig functions of the Euler angles """
-        sinPsi   = sin( eulers.psi   )
-        cosPsi   = cos( eulers.psi   )
-        sinTheta = sin( eulers.theta )
-        cosTheta = cos( eulers.theta )
-        sinPhi   = sin( eulers.phi   )
-        cosPhi   = cos( eulers.phi   )
-    
-        """ Calculate local pitch """
-        pitch = asin(   cos_cos*cosTheta*cosPsi + cos_sin*cosTheta*sinPsi - sin_lat*sinTheta )
-    
-        """Calculate local yaw"""
-        cosThetaCosPsi = cosTheta * cosPsi
-        cosThetaSinPsi = cosTheta * sinPsi
-    
-        B_sub_11 =  - sin_lon*cosThetaCosPsi + cos_lon*cosThetaSinPsi
-        B_sub_12 =  - sin_cos*cosThetaCosPsi - sin_sin*cosThetaSinPsi - cos_lat*sinTheta
-    
-        yaw = atan2( B_sub_11, B_sub_12 )
-    
-        """Normalize yaw to 0 to 2pi"""
-        if( yaw < 0.0 ):
-             yaw = yaw + (2 * pi)  
-    
-        """Calculate local roll"""
-        cosPhiSinPsi = cosPhi * sinPsi
-        cosPhiCosPsi = cosPhi * cosPsi
-        sinPhiSinPsi = sinPhi * sinPsi
-        sinPhiCosPsi = sinPhi * cosPsi
-    
-        B_sub_23 = -(  cos_cos*(-cosPhiSinPsi + (sinTheta*sinPhiCosPsi) ) \
-                     + cos_sin*( cosPhiCosPsi + (sinTheta*sinPhiSinPsi) ) \
-                     + sin_lat*( sinPhi*cosTheta) )
-    
-        B_sub_33 = -(  cos_cos*( sinPhiSinPsi + (sinTheta*cosPhiCosPsi) ) \
-                     + cos_sin*(-sinPhiCosPsi + (sinTheta*cosPhiSinPsi) ) \
-                     + sin_lat*( cosPhi*cosTheta) )
-    
-        roll = atan2( B_sub_23, B_sub_33 )
-    
-        return rad2deg(yaw), rad2deg(pitch), rad2deg(roll)
-
-
     def lla2ecef(self, lla):
-        """Convert lat, lon, alt to Earth-centered, Earth-fixed coordinates.
+        """
+        Convert lat, lon, alt to Earth-centered, Earth-fixed coordinates.
         Input: lla - (lat, lon, alt) in (decimal degrees, decimal degees, m)
         Output: ecef - (x, y, z) in (m, m, m)
         """
-        #Decompose the input
+        # Decompose the input
         lat = deg2rad(lla[0])
         lon = deg2rad(lla[1])
         alt = lla[2]
-        #Calculate length of the normal to the ellipsoid
+
+        # Calculate length of the normal to the ellipsoid
         N = self.wgs84.a / sqrt(1 - (self.wgs84.e * sin(lat))**2)
-        #Calculate ecef coordinates
+
+        # Calculate ecef coordinates
         x = (N + alt) * cos(lat) * cos(lon)
         y = (N + alt) * cos(lat) * sin(lon)
         z = (N * (1 - self.wgs84.e**2) + alt) * sin(lat)
-        #Return the ecef coordinates
+
+        # Return the ecef coordinates
         return (x, y, z)
 
 
     def lla2gcc(self, lla, geoOrigin=''):
         """
-        Same as lls2ecef, but accepts an X3D-style geoOrigin string for subtraction of it in ecef (gcc) cooridinates
+        Same as lls2ecef, but accepts an X3D-style geoOrigin string for 
+        subtraction of it in ecef (gcc) cooridinates
         """
         if geoOrigin:
             lon0, lat0, a0 = [float(c) for c in geoOrigin.split()]
