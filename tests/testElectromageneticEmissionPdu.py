@@ -2,11 +2,16 @@
 
 import unittest
 import io
+import os
 
 from opendis.dis7 import *
 from opendis.PduFactory import *
 
 class TestElectromagneticEmissionPdu(unittest.TestCase):
+
+    def setUp(self):
+        testdir = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(testdir)
 
     def test_parse(self):
         pdu = createPduFromFilePath("ElectromagneticEmissionPdu-single-system.raw")

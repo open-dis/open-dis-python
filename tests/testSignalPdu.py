@@ -2,12 +2,17 @@
 
 import unittest
 import io
+import os
 
 from opendis.dis7 import *
 from opendis.PduFactory import *
 from opendis.DataOutputStream import DataOutputStream
 
 class TestSignalPdu(unittest.TestCase):
+
+    def setUp(self):
+        testdir = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(testdir)
 
     def test_parse_and_serialize(self):
         with open('SignalPdu.raw', 'rb') as f:

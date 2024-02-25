@@ -2,11 +2,16 @@
 
 import unittest
 import io
+import os
 
 from opendis.dis7 import *
 from opendis.PduFactory import *
 
 class TestEntityStatePdu(unittest.TestCase):
+
+    def setUp(self):
+        testdir = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(testdir)
 
     def test_parse(self):
         pdu = createPduFromFilePath("EntityStatePdu-26.raw")
