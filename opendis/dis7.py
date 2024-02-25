@@ -6,15 +6,19 @@
 class DataQueryDatumSpecification( object ):
     """List of fixed and variable datum records. Section 6.2.17 """
 
-    def __init__(self):
+    def __init__(self,
+                numberOfFixedDatums=0,
+                numberOfVariableDatums=0,
+                fixedDatumIDList=None,
+                variableDatumIDList=None):
         """ Initializer for DataQueryDatumSpecification"""
-        self.numberOfFixedDatums = 0
+        self.numberOfFixedDatums = numberOfFixedDatums
         """ Number of fixed datums"""
-        self.numberOfVariableDatums = 0
+        self.numberOfVariableDatums = numberOfVariableDatums
         """ Number of variable datums"""
-        self.fixedDatumIDList = []
+        self.fixedDatumIDList = fixedDatumIDList or []
         """ variable length list fixed datum IDs"""
-        self.variableDatumIDList = []
+        self.variableDatumIDList = variableDatumIDList or []
         """ variable length list variable datum IDs"""
 
     def serialize(self, outputStream):
@@ -1232,11 +1236,13 @@ class AggregateIdentifier( object ):
 class FixedDatum( object ):
     """Fixed Datum Record. Section 6.2.38"""
 
-    def __init__(self):
+    def __init__(self,
+                 fixedDatumID=0,
+                 fixedDatumValue=0):
         """ Initializer for FixedDatum"""
-        self.fixedDatumID = 0
+        self.fixedDatumID = fixedDatumID
         """ ID of the fixed datum, an enumeration"""
-        self.fixedDatumValue = 0
+        self.fixedDatumValue = fixedDatumValue
         """ Value for the fixed datum"""
 
     def serialize(self, outputStream):
@@ -3581,13 +3587,16 @@ class RecordSpecification( object ):
 class VariableDatum( object ):
     """the variable datum type, the datum length, and the value for that variable datum type. NOT COMPLETE. Section 6.2.93"""
 
-    def __init__(self):
+    def __init__(self,
+                 variableDatumID=0,
+                 variableDatumLength=0,
+                 variableData=None):
         """ Initializer for VariableDatum"""
-        self.variableDatumID = 0
+        self.variableDatumID = variableDatumID
         """ Type of variable datum to be transmitted. 32 bit enumeration defined in EBV"""
-        self.variableDatumLength = 0
+        self.variableDatumLength = variableDatumLength
         """ Length, IN BITS, of the variable datum."""
-        self.variableData = []
+        self.variableData = variableData or []
         """ Variable datum. This can be any number of bits long, depending on the datum."""
 
     def datumPaddingSizeInBits(self):
