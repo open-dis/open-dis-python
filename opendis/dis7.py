@@ -23,8 +23,8 @@ class DataQueryDatumSpecification( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int( len(self.fixedDatumIDList));
-        outputStream.write_unsigned_int( len(self.variableDatumIDList));
+        outputStream.write_unsigned_int( len(self.fixedDatumIDList))
+        outputStream.write_unsigned_int( len(self.variableDatumIDList))
         for anObj in self.fixedDatumIDList:
             anObj.serialize(outputStream)
 
@@ -36,8 +36,8 @@ class DataQueryDatumSpecification( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -71,19 +71,19 @@ class RadioIdentifier( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.siteNumber);
-        outputStream.write_unsigned_short(self.applicationNumber);
-        outputStream.write_unsigned_short(self.referenceNumber);
-        outputStream.write_unsigned_short(self.radioNumber);
+        outputStream.write_unsigned_short(self.siteNumber)
+        outputStream.write_unsigned_short(self.applicationNumber)
+        outputStream.write_unsigned_short(self.referenceNumber)
+        outputStream.write_unsigned_short(self.radioNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.siteNumber = inputStream.read_unsigned_short();
-        self.applicationNumber = inputStream.read_unsigned_short();
-        self.referenceNumber = inputStream.read_unsigned_short();
-        self.radioNumber = inputStream.read_unsigned_short();
+        self.siteNumber = inputStream.read_unsigned_short()
+        self.applicationNumber = inputStream.read_unsigned_short()
+        self.referenceNumber = inputStream.read_unsigned_short()
+        self.radioNumber = inputStream.read_unsigned_short()
 
 
 
@@ -97,13 +97,13 @@ class RequestID( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.requestID = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -124,8 +124,8 @@ class IFFData( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short( len(self.iffData));
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short( len(self.iffData))
         for anObj in self.iffData:
             outputStream.write_unsigned_byte(anObj)
 
@@ -134,8 +134,8 @@ class IFFData( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
         """ The record length includes the length of record type field (32 bits) and record length field (16 bits) so we subtract 6 bytes total for those. """
         for idx in range(0, self.recordLength - 6):
             val = inputStream.read_unsigned_byte()
@@ -168,20 +168,20 @@ class MunitionDescriptor( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.munitionType.serialize(outputStream)
-        outputStream.write_unsigned_short(self.warhead);
-        outputStream.write_unsigned_short(self.fuse);
-        outputStream.write_unsigned_short(self.quantity);
-        outputStream.write_unsigned_short(self.rate);
+        outputStream.write_unsigned_short(self.warhead)
+        outputStream.write_unsigned_short(self.fuse)
+        outputStream.write_unsigned_short(self.quantity)
+        outputStream.write_unsigned_short(self.rate)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.munitionType.parse(inputStream)
-        self.warhead = inputStream.read_unsigned_short();
-        self.fuse = inputStream.read_unsigned_short();
-        self.quantity = inputStream.read_unsigned_short();
-        self.rate = inputStream.read_unsigned_short();
+        self.warhead = inputStream.read_unsigned_short()
+        self.fuse = inputStream.read_unsigned_short()
+        self.quantity = inputStream.read_unsigned_short()
+        self.rate = inputStream.read_unsigned_short()
 
 
 
@@ -195,20 +195,20 @@ class MinefieldSensorType( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.sensorType);
+        outputStream.write_unsigned_short(self.sensorType)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.sensorType = inputStream.read_unsigned_short();
+        self.sensorType = inputStream.read_unsigned_short()
 
 
 
 class GroupID( object ):
     """Unique designation of a group of entities contained in the isGroupOfPdu. Represents a group of entities rather than a single entity. Section 6.2.43"""
 
-    def __init__(self, SimulationAddress=None, groupNumber=0):
+    def __init__(self, simulationAddress=None, groupNumber=0):
         """ Initializer for GroupID"""
         self.simulationAddress = simulationAddress or EntityType()
         """ Simulation address (site and application number)"""
@@ -218,14 +218,14 @@ class GroupID( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.groupNumber);
+        outputStream.write_unsigned_short(self.groupNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.groupNumber = inputStream.read_unsigned_short();
+        self.groupNumber = inputStream.read_unsigned_short()
 
 
 
@@ -242,17 +242,17 @@ class LayerHeader( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.layerNumber);
-        outputStream.write_unsigned_byte(self.layerSpecificInformation);
-        outputStream.write_unsigned_short(self.length);
+        outputStream.write_unsigned_byte(self.layerNumber)
+        outputStream.write_unsigned_byte(self.layerSpecificInformation)
+        outputStream.write_unsigned_short(self.length)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.layerNumber = inputStream.read_unsigned_byte();
-        self.layerSpecificInformation = inputStream.read_unsigned_byte();
-        self.length = inputStream.read_unsigned_short();
+        self.layerNumber = inputStream.read_unsigned_byte()
+        self.layerSpecificInformation = inputStream.read_unsigned_byte()
+        self.length = inputStream.read_unsigned_short()
 
 
 
@@ -266,13 +266,13 @@ class UnsignedDISInteger( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.val);
+        outputStream.write_unsigned_int(self.val)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.val = inputStream.read_unsigned_int();
+        self.val = inputStream.read_unsigned_int()
 
 
 
@@ -296,9 +296,9 @@ class DeadReckoningParameters( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.deadReckoningAlgorithm);
+        outputStream.write_unsigned_byte(self.deadReckoningAlgorithm)
         for idx in range(0, 15):
-            outputStream.write_unsigned_byte( self.parameters[ idx ] );
+            outputStream.write_unsigned_byte( self.parameters[ idx ] )
 
         self.entityLinearAcceleration.serialize(outputStream)
         self.entityAngularVelocity.serialize(outputStream)
@@ -307,7 +307,7 @@ class DeadReckoningParameters( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.deadReckoningAlgorithm = inputStream.read_unsigned_byte();
+        self.deadReckoningAlgorithm = inputStream.read_unsigned_byte()
         self.parameters = [0]*15
         for idx in range(0, 15):
             val = inputStream.read_unsigned_byte()
@@ -329,13 +329,13 @@ class ProtocolMode( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.protocolMode);
+        outputStream.write_unsigned_short(self.protocolMode)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.protocolMode = inputStream.read_unsigned_short();
+        self.protocolMode = inputStream.read_unsigned_short()
 
 
 
@@ -376,43 +376,43 @@ class AngleDeception( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_short(self.padding);
-        outputStream.write_unsigned_byte(self.emitterNumber);
-        outputStream.write_unsigned_byte(self.beamNumber);
-        outputStream.write_unsigned_byte(self.stateIndicator);
-        outputStream.write_unsigned_byte(self.padding2);
-        outputStream.write_float(self.azimuthOffset);
-        outputStream.write_float(self.azimuthWidth);
-        outputStream.write_float(self.azimuthPullRate);
-        outputStream.write_float(self.azimuthPullAcceleration);
-        outputStream.write_float(self.elevationOffset);
-        outputStream.write_float(self.elevationWidth);
-        outputStream.write_float(self.elevationPullRate);
-        outputStream.write_float(self.elevationPullAcceleration);
-        outputStream.write_unsigned_int(self.padding3);
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_short(self.padding)
+        outputStream.write_unsigned_byte(self.emitterNumber)
+        outputStream.write_unsigned_byte(self.beamNumber)
+        outputStream.write_unsigned_byte(self.stateIndicator)
+        outputStream.write_unsigned_byte(self.padding2)
+        outputStream.write_float(self.azimuthOffset)
+        outputStream.write_float(self.azimuthWidth)
+        outputStream.write_float(self.azimuthPullRate)
+        outputStream.write_float(self.azimuthPullAcceleration)
+        outputStream.write_float(self.elevationOffset)
+        outputStream.write_float(self.elevationWidth)
+        outputStream.write_float(self.elevationPullRate)
+        outputStream.write_float(self.elevationPullAcceleration)
+        outputStream.write_unsigned_int(self.padding3)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
-        self.emitterNumber = inputStream.read_unsigned_byte();
-        self.beamNumber = inputStream.read_unsigned_byte();
-        self.stateIndicator = inputStream.read_unsigned_byte();
-        self.padding2 = inputStream.read_unsigned_byte();
-        self.azimuthOffset = inputStream.read_float();
-        self.azimuthWidth = inputStream.read_float();
-        self.azimuthPullRate = inputStream.read_float();
-        self.azimuthPullAcceleration = inputStream.read_float();
-        self.elevationOffset = inputStream.read_float();
-        self.elevationWidth = inputStream.read_float();
-        self.elevationPullRate = inputStream.read_float();
-        self.elevationPullAcceleration = inputStream.read_float();
-        self.padding3 = inputStream.read_unsigned_int();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
+        self.emitterNumber = inputStream.read_unsigned_byte()
+        self.beamNumber = inputStream.read_unsigned_byte()
+        self.stateIndicator = inputStream.read_unsigned_byte()
+        self.padding2 = inputStream.read_unsigned_byte()
+        self.azimuthOffset = inputStream.read_float()
+        self.azimuthWidth = inputStream.read_float()
+        self.azimuthPullRate = inputStream.read_float()
+        self.azimuthPullAcceleration = inputStream.read_float()
+        self.elevationOffset = inputStream.read_float()
+        self.elevationWidth = inputStream.read_float()
+        self.elevationPullRate = inputStream.read_float()
+        self.elevationPullAcceleration = inputStream.read_float()
+        self.padding3 = inputStream.read_unsigned_int()
 
 
 
@@ -450,29 +450,29 @@ class EntityAssociation( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.recordType);
-        outputStream.write_unsigned_byte(self.changeIndicator);
-        outputStream.write_unsigned_byte(self.associationStatus);
-        outputStream.write_unsigned_byte(self.associationType);
+        outputStream.write_unsigned_byte(self.recordType)
+        outputStream.write_unsigned_byte(self.changeIndicator)
+        outputStream.write_unsigned_byte(self.associationStatus)
+        outputStream.write_unsigned_byte(self.associationType)
         self.entityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.ownStationLocation);
-        outputStream.write_unsigned_byte(self.physicalConnectionType);
-        outputStream.write_unsigned_byte(self.groupMemberType);
-        outputStream.write_unsigned_short(self.groupNumber);
+        outputStream.write_unsigned_short(self.ownStationLocation)
+        outputStream.write_unsigned_byte(self.physicalConnectionType)
+        outputStream.write_unsigned_byte(self.groupMemberType)
+        outputStream.write_unsigned_short(self.groupNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte();
-        self.changeIndicator = inputStream.read_unsigned_byte();
-        self.associationStatus = inputStream.read_unsigned_byte();
-        self.associationType = inputStream.read_unsigned_byte();
+        self.recordType = inputStream.read_unsigned_byte()
+        self.changeIndicator = inputStream.read_unsigned_byte()
+        self.associationStatus = inputStream.read_unsigned_byte()
+        self.associationType = inputStream.read_unsigned_byte()
         self.entityID.parse(inputStream)
-        self.ownStationLocation = inputStream.read_unsigned_short();
-        self.physicalConnectionType = inputStream.read_unsigned_byte();
-        self.groupMemberType = inputStream.read_unsigned_byte();
-        self.groupNumber = inputStream.read_unsigned_short();
+        self.ownStationLocation = inputStream.read_unsigned_short()
+        self.physicalConnectionType = inputStream.read_unsigned_byte()
+        self.groupMemberType = inputStream.read_unsigned_byte()
+        self.groupNumber = inputStream.read_unsigned_short()
 
 
 
@@ -490,15 +490,15 @@ class VectoringNozzleSystem( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.horizontalDeflectionAngle);
-        outputStream.write_float(self.verticalDeflectionAngle);
+        outputStream.write_float(self.horizontalDeflectionAngle)
+        outputStream.write_float(self.verticalDeflectionAngle)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.horizontalDeflectionAngle = inputStream.read_float();
-        self.verticalDeflectionAngle = inputStream.read_float();
+        self.horizontalDeflectionAngle = inputStream.read_float()
+        self.verticalDeflectionAngle = inputStream.read_float()
 
 
 
@@ -532,37 +532,37 @@ class FalseTargetsAttribute( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_short(self.padding);
-        outputStream.write_unsigned_byte(self.emitterNumber);
-        outputStream.write_unsigned_byte(self.beamNumber);
-        outputStream.write_unsigned_byte(self.stateIndicator);
-        outputStream.write_unsigned_byte(self.padding2);
-        outputStream.write_unsigned_short(self.falseTargetCount);
-        outputStream.write_float(self.walkSpeed);
-        outputStream.write_float(self.walkAcceleration);
-        outputStream.write_float(self.maximumWalkDistance);
-        outputStream.write_float(self.keepTime);
-        outputStream.write_float(self.echoSpacing);
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_short(self.padding)
+        outputStream.write_unsigned_byte(self.emitterNumber)
+        outputStream.write_unsigned_byte(self.beamNumber)
+        outputStream.write_unsigned_byte(self.stateIndicator)
+        outputStream.write_unsigned_byte(self.padding2)
+        outputStream.write_unsigned_short(self.falseTargetCount)
+        outputStream.write_float(self.walkSpeed)
+        outputStream.write_float(self.walkAcceleration)
+        outputStream.write_float(self.maximumWalkDistance)
+        outputStream.write_float(self.keepTime)
+        outputStream.write_float(self.echoSpacing)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
-        self.emitterNumber = inputStream.read_unsigned_byte();
-        self.beamNumber = inputStream.read_unsigned_byte();
-        self.stateIndicator = inputStream.read_unsigned_byte();
-        self.padding2 = inputStream.read_unsigned_byte();
-        self.falseTargetCount = inputStream.read_unsigned_short();
-        self.walkSpeed = inputStream.read_float();
-        self.walkAcceleration = inputStream.read_float();
-        self.maximumWalkDistance = inputStream.read_float();
-        self.keepTime = inputStream.read_float();
-        self.echoSpacing = inputStream.read_float();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
+        self.emitterNumber = inputStream.read_unsigned_byte()
+        self.beamNumber = inputStream.read_unsigned_byte()
+        self.stateIndicator = inputStream.read_unsigned_byte()
+        self.padding2 = inputStream.read_unsigned_byte()
+        self.falseTargetCount = inputStream.read_unsigned_short()
+        self.walkSpeed = inputStream.read_float()
+        self.walkAcceleration = inputStream.read_float()
+        self.maximumWalkDistance = inputStream.read_float()
+        self.keepTime = inputStream.read_float()
+        self.echoSpacing = inputStream.read_float()
 
 
 
@@ -579,14 +579,14 @@ class MinefieldIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.minefieldNumber);
+        outputStream.write_unsigned_short(self.minefieldNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.minefieldNumber = inputStream.read_unsigned_short();
+        self.minefieldNumber = inputStream.read_unsigned_short()
 
 
 
@@ -617,25 +617,25 @@ class RadioType( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.entityKind);
-        outputStream.write_unsigned_byte(self.domain);
-        outputStream.write_unsigned_short(self.country);
-        outputStream.write_unsigned_byte(self.category);
-        outputStream.write_unsigned_byte(self.subcategory);
-        outputStream.write_unsigned_byte(self.specific);
-        outputStream.write_unsigned_byte(self.extra);
+        outputStream.write_unsigned_byte(self.entityKind)
+        outputStream.write_unsigned_byte(self.domain)
+        outputStream.write_unsigned_short(self.country)
+        outputStream.write_unsigned_byte(self.category)
+        outputStream.write_unsigned_byte(self.subcategory)
+        outputStream.write_unsigned_byte(self.specific)
+        outputStream.write_unsigned_byte(self.extra)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.entityKind = inputStream.read_unsigned_byte();
-        self.domain = inputStream.read_unsigned_byte();
-        self.country = inputStream.read_unsigned_short();
-        self.category = inputStream.read_unsigned_byte();
-        self.subcategory = inputStream.read_unsigned_byte();
-        self.specific = inputStream.read_unsigned_byte();
-        self.extra = inputStream.read_unsigned_byte();
+        self.entityKind = inputStream.read_unsigned_byte()
+        self.domain = inputStream.read_unsigned_byte()
+        self.country = inputStream.read_unsigned_short()
+        self.category = inputStream.read_unsigned_byte()
+        self.subcategory = inputStream.read_unsigned_byte()
+        self.specific = inputStream.read_unsigned_byte()
+        self.extra = inputStream.read_unsigned_byte()
 
 
 
@@ -651,15 +651,15 @@ class NamedLocationIdentification( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.stationName);
-        outputStream.write_unsigned_short(self.stationNumber);
+        outputStream.write_unsigned_short(self.stationName)
+        outputStream.write_unsigned_short(self.stationNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.stationName = inputStream.read_unsigned_short();
-        self.stationNumber = inputStream.read_unsigned_short();
+        self.stationName = inputStream.read_unsigned_short()
+        self.stationNumber = inputStream.read_unsigned_short()
 
 
 
@@ -674,7 +674,7 @@ class FourByteChunk( object ):
     def serialize(self, outputStream):
         """serialize the class """
         for idx in range(0, 4):
-            outputStream.write_byte( self.otherParameters[ idx ] );
+            outputStream.write_byte( self.otherParameters[ idx ] )
 
 
 
@@ -717,7 +717,7 @@ class OneByteChunk( object ):
     def serialize(self, outputStream):
         """serialize the class """
         for idx in range(0, 1):
-            outputStream.write_byte( self.otherParameters[ idx ] );
+            outputStream.write_byte( self.otherParameters[ idx ] )
 
 
 
@@ -744,17 +744,17 @@ class EulerAngles( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.psi);
-        outputStream.write_float(self.theta);
-        outputStream.write_float(self.phi);
+        outputStream.write_float(self.psi)
+        outputStream.write_float(self.theta)
+        outputStream.write_float(self.phi)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.psi = inputStream.read_float();
-        self.theta = inputStream.read_float();
-        self.phi = inputStream.read_float();
+        self.psi = inputStream.read_float()
+        self.theta = inputStream.read_float()
+        self.phi = inputStream.read_float()
 
 
 
@@ -807,41 +807,41 @@ class DirectedEnergyPrecisionAimpoint( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_short(self.padding);
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_short(self.padding)
         self.targetSpotLocation.serialize(outputStream)
         self.targetSpotEntityLocation.serialize(outputStream)
         self.targetSpotVelocity.serialize(outputStream)
         self.targetSpotAcceleration.serialize(outputStream)
         self.targetEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.targetComponentID);
-        outputStream.write_unsigned_byte(self.beamSpotType);
-        outputStream.write_float(self.beamSpotCrossSectionSemiMajorAxis);
-        outputStream.write_float(self.beamSpotCrossSectionSemiMinorAxis);
-        outputStream.write_float(self.beamSpotCrossSectionOrientationAngle);
-        outputStream.write_float(self.peakIrradiance);
-        outputStream.write_unsigned_int(self.padding2);
+        outputStream.write_unsigned_byte(self.targetComponentID)
+        outputStream.write_unsigned_byte(self.beamSpotType)
+        outputStream.write_float(self.beamSpotCrossSectionSemiMajorAxis)
+        outputStream.write_float(self.beamSpotCrossSectionSemiMinorAxis)
+        outputStream.write_float(self.beamSpotCrossSectionOrientationAngle)
+        outputStream.write_float(self.peakIrradiance)
+        outputStream.write_unsigned_int(self.padding2)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
         self.targetSpotLocation.parse(inputStream)
         self.targetSpotEntityLocation.parse(inputStream)
         self.targetSpotVelocity.parse(inputStream)
         self.targetSpotAcceleration.parse(inputStream)
         self.targetEntityID.parse(inputStream)
-        self.targetComponentID = inputStream.read_unsigned_byte();
-        self.beamSpotType = inputStream.read_unsigned_byte();
-        self.beamSpotCrossSectionSemiMajorAxis = inputStream.read_float();
-        self.beamSpotCrossSectionSemiMinorAxis = inputStream.read_float();
-        self.beamSpotCrossSectionOrientationAngle = inputStream.read_float();
-        self.peakIrradiance = inputStream.read_float();
-        self.padding2 = inputStream.read_unsigned_int();
+        self.targetComponentID = inputStream.read_unsigned_byte()
+        self.beamSpotType = inputStream.read_unsigned_byte()
+        self.beamSpotCrossSectionSemiMajorAxis = inputStream.read_float()
+        self.beamSpotCrossSectionSemiMinorAxis = inputStream.read_float()
+        self.beamSpotCrossSectionOrientationAngle = inputStream.read_float()
+        self.peakIrradiance = inputStream.read_float()
+        self.padding2 = inputStream.read_unsigned_int()
 
 
 
@@ -857,14 +857,14 @@ class IffDataSpecification( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short( len(self.iffDataRecords));
+        outputStream.write_unsigned_short( len(self.iffDataRecords))
         for anObj in self.iffDataRecords:
             anObj.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfIffDataRecords = inputStream.read_unsigned_short();
+        self.numberOfIffDataRecords = inputStream.read_unsigned_short()
         for idx in range(0, self.numberOfIffDataRecords):
             element = IFFData()
             element.parse(inputStream)
@@ -878,7 +878,7 @@ class OwnershipStatus( object ):
 
     def __init__(self, entityId=None, ownershipStatus=0):
         """ Initializer for OwnershipStatus"""
-        self.entityId = enntityId or EntityID()
+        self.entityId = entityId or EntityID()
         """ EntityID"""
         self.ownershipStatus = ownershipStatus
         """ The ownership and/or ownership conflict status of the entity represented by the Entity ID field."""
@@ -888,16 +888,16 @@ class OwnershipStatus( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.entityId.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.ownershipStatus);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_byte(self.ownershipStatus)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.entityId.parse(inputStream)
-        self.ownershipStatus = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.ownershipStatus = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -913,7 +913,7 @@ class BeamAntennaPattern( object ):
                  ex=0.0,
                  phase=0.0):
         """ Initializer for BeamAntennaPattern"""
-        self.beamDirection = EulerAngles();
+        self.beamDirection = EulerAngles()
         """ The rotation that transforms the reference coordinate sytem into the beam coordinate system. Either world coordinates or entity coordinates may be used as the reference coordinate system, as specified by the reference system field of the antenna pattern record."""
         self.azimuthBeamwidth = azimuthBeamwidth
         self.elevationBeamwidth = elevationBeamwidth
@@ -932,30 +932,30 @@ class BeamAntennaPattern( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.beamDirection.serialize(outputStream)
-        outputStream.write_float(self.azimuthBeamwidth);
-        outputStream.write_float(self.elevationBeamwidth);
-        outputStream.write_unsigned_byte(self.referenceSystem);
-        outputStream.write_unsigned_byte(self.padding1);
-        outputStream.write_unsigned_short(self.padding2);
-        outputStream.write_float(self.ez);
-        outputStream.write_float(self.ex);
-        outputStream.write_float(self.phase);
-        outputStream.write_unsigned_int(self.padding3);
+        outputStream.write_float(self.azimuthBeamwidth)
+        outputStream.write_float(self.elevationBeamwidth)
+        outputStream.write_unsigned_byte(self.referenceSystem)
+        outputStream.write_unsigned_byte(self.padding1)
+        outputStream.write_unsigned_short(self.padding2)
+        outputStream.write_float(self.ez)
+        outputStream.write_float(self.ex)
+        outputStream.write_float(self.phase)
+        outputStream.write_unsigned_int(self.padding3)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.beamDirection.parse(inputStream)
-        self.azimuthBeamwidth = inputStream.read_float();
-        self.elevationBeamwidth = inputStream.read_float();
-        self.referenceSystem = inputStream.read_unsigned_byte();
-        self.padding1 = inputStream.read_unsigned_byte();
-        self.padding2 = inputStream.read_unsigned_short();
-        self.ez = inputStream.read_float();
-        self.ex = inputStream.read_float();
-        self.phase = inputStream.read_float();
-        self.padding3 = inputStream.read_unsigned_int();
+        self.azimuthBeamwidth = inputStream.read_float()
+        self.elevationBeamwidth = inputStream.read_float()
+        self.referenceSystem = inputStream.read_unsigned_byte()
+        self.padding1 = inputStream.read_unsigned_byte()
+        self.padding2 = inputStream.read_unsigned_short()
+        self.ez = inputStream.read_float()
+        self.ex = inputStream.read_float()
+        self.phase = inputStream.read_float()
+        self.padding3 = inputStream.read_unsigned_int()
 
 
 
@@ -981,21 +981,21 @@ class AttachedParts( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.recordType);
-        outputStream.write_unsigned_byte(self.detachedIndicator);
-        outputStream.write_unsigned_short(self.partAttachedTo);
-        outputStream.write_unsigned_int(self.parameterType);
-        outputStream.write_long(self.parameterValue);
+        outputStream.write_unsigned_byte(self.recordType)
+        outputStream.write_unsigned_byte(self.detachedIndicator)
+        outputStream.write_unsigned_short(self.partAttachedTo)
+        outputStream.write_unsigned_int(self.parameterType)
+        outputStream.write_long(self.parameterValue)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte();
-        self.detachedIndicator = inputStream.read_unsigned_byte();
-        self.partAttachedTo = inputStream.read_unsigned_short();
-        self.parameterType = inputStream.read_unsigned_int();
-        self.parameterValue = inputStream.read_long();
+        self.recordType = inputStream.read_unsigned_byte()
+        self.detachedIndicator = inputStream.read_unsigned_byte()
+        self.partAttachedTo = inputStream.read_unsigned_short()
+        self.parameterType = inputStream.read_unsigned_int()
+        self.parameterValue = inputStream.read_long()
 
 
 
@@ -1011,15 +1011,15 @@ class VariableTransmitterParameters( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_int(self.recordLength);
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_int(self.recordLength)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_int();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_int()
 
 
 
@@ -1034,17 +1034,17 @@ class Attribute( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_long(self.recordSpecificFields);
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_long(self.recordSpecificFields)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.recordSpecificFields = inputStream.read_long();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.recordSpecificFields = inputStream.read_long()
 
 
 
@@ -1059,14 +1059,14 @@ class RecordQuerySpecification( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int( len(self.records));
+        outputStream.write_unsigned_int( len(self.records))
         for anObj in self.records:
             outputstream.write_unsigned_int(anObj)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfRecords = inputStream.read_unsigned_int();
+        self.numberOfRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfRecords):
             val = inputstream.read_unsigned_int()
             self.records.append(val)
@@ -1096,21 +1096,21 @@ class ArticulatedParts( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.recordType);
-        outputStream.write_unsigned_byte(self.changeIndicator);
-        outputStream.write_unsigned_short(self.partAttachedTo);
-        outputStream.write_unsigned_int(self.parameterType);
-        outputStream.write_long(self.parameterValue);
+        outputStream.write_unsigned_byte(self.recordType)
+        outputStream.write_unsigned_byte(self.changeIndicator)
+        outputStream.write_unsigned_short(self.partAttachedTo)
+        outputStream.write_unsigned_int(self.parameterType)
+        outputStream.write_long(self.parameterValue)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte();
-        self.changeIndicator = inputStream.read_unsigned_byte();
-        self.partAttachedTo = inputStream.read_unsigned_short();
-        self.parameterType = inputStream.read_unsigned_int();
-        self.parameterValue = inputStream.read_long();
+        self.recordType = inputStream.read_unsigned_byte()
+        self.changeIndicator = inputStream.read_unsigned_byte()
+        self.partAttachedTo = inputStream.read_unsigned_short()
+        self.parameterType = inputStream.read_unsigned_int()
+        self.parameterValue = inputStream.read_long()
 
 
 
@@ -1134,19 +1134,19 @@ class ObjectType( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.domain);
-        outputStream.write_unsigned_byte(self.objectKind);
-        outputStream.write_unsigned_byte(self.category);
-        outputStream.write_unsigned_byte(self.subcategory);
+        outputStream.write_unsigned_byte(self.domain)
+        outputStream.write_unsigned_byte(self.objectKind)
+        outputStream.write_unsigned_byte(self.category)
+        outputStream.write_unsigned_byte(self.subcategory)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.domain = inputStream.read_unsigned_byte();
-        self.objectKind = inputStream.read_unsigned_byte();
-        self.category = inputStream.read_unsigned_byte();
-        self.subcategory = inputStream.read_unsigned_byte();
+        self.domain = inputStream.read_unsigned_byte()
+        self.objectKind = inputStream.read_unsigned_byte()
+        self.category = inputStream.read_unsigned_byte()
+        self.subcategory = inputStream.read_unsigned_byte()
 
 
 
@@ -1167,8 +1167,8 @@ class Association( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.associationType);
-        outputStream.write_unsigned_byte(self.padding4);
+        outputStream.write_unsigned_byte(self.associationType)
+        outputStream.write_unsigned_byte(self.padding4)
         self.associatedEntityID.serialize(outputStream)
         self.associatedLocation.serialize(outputStream)
 
@@ -1176,8 +1176,8 @@ class Association( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.associationType = inputStream.read_unsigned_byte();
-        self.padding4 = inputStream.read_unsigned_byte();
+        self.associationType = inputStream.read_unsigned_byte()
+        self.padding4 = inputStream.read_unsigned_byte()
         self.associatedEntityID.parse(inputStream)
         self.associatedLocation.parse(inputStream)
 
@@ -1208,23 +1208,23 @@ class RecordSpecificationElement( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordID);
-        outputStream.write_unsigned_int(self.recordSetSerialNumber);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_short(self.recordCount);
-        outputStream.write_unsigned_short(self.recordValues);
-        outputStream.write_unsigned_byte(self.pad4);
+        outputStream.write_unsigned_int(self.recordID)
+        outputStream.write_unsigned_int(self.recordSetSerialNumber)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_short(self.recordCount)
+        outputStream.write_unsigned_short(self.recordValues)
+        outputStream.write_unsigned_byte(self.pad4)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordID = inputStream.read_unsigned_int();
-        self.recordSetSerialNumber = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.recordCount = inputStream.read_unsigned_short();
-        self.recordValues = inputStream.read_unsigned_short();
-        self.pad4 = inputStream.read_unsigned_byte();
+        self.recordID = inputStream.read_unsigned_int()
+        self.recordSetSerialNumber = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.recordCount = inputStream.read_unsigned_short()
+        self.recordValues = inputStream.read_unsigned_short()
+        self.pad4 = inputStream.read_unsigned_byte()
 
 
 
@@ -1239,7 +1239,7 @@ class EightByteChunk( object ):
     def serialize(self, outputStream):
         """serialize the class """
         for idx in range(0, 8):
-            outputStream.write_byte( self.otherParameters[ idx ] );
+            outputStream.write_byte( self.otherParameters[ idx ] )
 
 
 
@@ -1294,14 +1294,14 @@ class ObjectIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.objectNumber);
+        outputStream.write_unsigned_short(self.objectNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.objectNumber = inputStream.read_unsigned_short();
+        self.objectNumber = inputStream.read_unsigned_short()
 
 
 
@@ -1318,14 +1318,14 @@ class AggregateIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.aggregateID);
+        outputStream.write_unsigned_short(self.aggregateID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.aggregateID = inputStream.read_unsigned_short();
+        self.aggregateID = inputStream.read_unsigned_short()
 
 
 
@@ -1343,15 +1343,15 @@ class FixedDatum( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.fixedDatumID);
-        outputStream.write_unsigned_int(self.fixedDatumValue);
+        outputStream.write_unsigned_int(self.fixedDatumID)
+        outputStream.write_unsigned_int(self.fixedDatumValue)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.fixedDatumID = inputStream.read_unsigned_int();
-        self.fixedDatumValue = inputStream.read_unsigned_int();
+        self.fixedDatumID = inputStream.read_unsigned_int()
+        self.fixedDatumValue = inputStream.read_unsigned_int()
 
 
 
@@ -1378,21 +1378,21 @@ class VariableParameter( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.recordType);
-        outputStream.write_double(self.variableParameterFields1);
-        outputStream.write_unsigned_int(self.variableParameterFields2);
-        outputStream.write_unsigned_short(self.variableParameterFields3);
-        outputStream.write_unsigned_byte(self.variableParameterFields4);
+        outputStream.write_unsigned_byte(self.recordType)
+        outputStream.write_double(self.variableParameterFields1)
+        outputStream.write_unsigned_int(self.variableParameterFields2)
+        outputStream.write_unsigned_short(self.variableParameterFields3)
+        outputStream.write_unsigned_byte(self.variableParameterFields4)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte();
-        self.variableParameterFields1 = inputStream.read_double();
-        self.variableParameterFields2 = inputStream.read_unsigned_int();
-        self.variableParameterFields3 = inputStream.read_unsigned_short();
-        self.variableParameterFields4 = inputStream.read_unsigned_byte();
+        self.recordType = inputStream.read_unsigned_byte()
+        self.variableParameterFields1 = inputStream.read_double()
+        self.variableParameterFields2 = inputStream.read_unsigned_int()
+        self.variableParameterFields3 = inputStream.read_unsigned_short()
+        self.variableParameterFields4 = inputStream.read_unsigned_byte()
 
 
 
@@ -1424,15 +1424,15 @@ class LiveSimulationAddress( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.liveSiteNumber);
-        outputStream.write_unsigned_byte(self.liveApplicationNumber);
+        outputStream.write_unsigned_byte(self.liveSiteNumber)
+        outputStream.write_unsigned_byte(self.liveApplicationNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.liveSiteNumber = inputStream.read_unsigned_byte();
-        self.liveApplicationNumber = inputStream.read_unsigned_byte();
+        self.liveSiteNumber = inputStream.read_unsigned_byte()
+        self.liveApplicationNumber = inputStream.read_unsigned_byte()
 
 
 
@@ -1459,16 +1459,16 @@ class EntityMarking( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.characterSet);
+        outputStream.write_unsigned_byte(self.characterSet)
         for idx in range(0, 11):
-            outputStream.write_byte( self.characters[ idx ] );
+            outputStream.write_byte( self.characters[ idx ] )
 
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.characterSet = inputStream.read_unsigned_byte();
+        self.characterSet = inputStream.read_unsigned_byte()
         self.characters = [0]*11
         for idx in range(0, 11):
             val = inputStream.read_byte()
@@ -1504,23 +1504,23 @@ class UAFundamentalParameter( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.activeEmissionParameterIndex);
-        outputStream.write_unsigned_short(self.scanPattern);
-        outputStream.write_float(self.beamCenterAzimuthHorizontal);
-        outputStream.write_float(self.azimuthalBeamwidthHorizontal);
-        outputStream.write_float(self.beamCenterDepressionElevation);
-        outputStream.write_float(self.beamwidthDownElevation);
+        outputStream.write_unsigned_short(self.activeEmissionParameterIndex)
+        outputStream.write_unsigned_short(self.scanPattern)
+        outputStream.write_float(self.beamCenterAzimuthHorizontal)
+        outputStream.write_float(self.azimuthalBeamwidthHorizontal)
+        outputStream.write_float(self.beamCenterDepressionElevation)
+        outputStream.write_float(self.beamwidthDownElevation)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.activeEmissionParameterIndex = inputStream.read_unsigned_short();
-        self.scanPattern = inputStream.read_unsigned_short();
-        self.beamCenterAzimuthHorizontal = inputStream.read_float();
-        self.azimuthalBeamwidthHorizontal = inputStream.read_float();
-        self.beamCenterDepressionElevation = inputStream.read_float();
-        self.beamwidthDownElevation = inputStream.read_float();
+        self.activeEmissionParameterIndex = inputStream.read_unsigned_short()
+        self.scanPattern = inputStream.read_unsigned_short()
+        self.beamCenterAzimuthHorizontal = inputStream.read_float()
+        self.azimuthalBeamwidthHorizontal = inputStream.read_float()
+        self.beamCenterDepressionElevation = inputStream.read_float()
+        self.beamwidthDownElevation = inputStream.read_float()
 
 
 
@@ -1535,7 +1535,7 @@ class TwoByteChunk( object ):
     def serialize(self, outputStream):
         """serialize the class """
         for idx in range(0, 2):
-            outputStream.write_byte( self.otherParameters[ idx ] );
+            outputStream.write_byte( self.otherParameters[ idx ] )
 
 
 
@@ -1591,35 +1591,35 @@ class DirectedEnergyDamage( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_short(self.padding);
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_short(self.padding)
         self.damageLocation.serialize(outputStream)
-        outputStream.write_float(self.damageDiameter);
-        outputStream.write_float(self.temperature);
-        outputStream.write_unsigned_byte(self.componentIdentification);
-        outputStream.write_unsigned_byte(self.componentDamageStatus);
-        outputStream.write_unsigned_byte(self.componentVisualDamageStatus);
-        outputStream.write_unsigned_byte(self.componentVisualSmokeColor);
+        outputStream.write_float(self.damageDiameter)
+        outputStream.write_float(self.temperature)
+        outputStream.write_unsigned_byte(self.componentIdentification)
+        outputStream.write_unsigned_byte(self.componentDamageStatus)
+        outputStream.write_unsigned_byte(self.componentVisualDamageStatus)
+        outputStream.write_unsigned_byte(self.componentVisualSmokeColor)
         self.fireEventID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding2);
+        outputStream.write_unsigned_short(self.padding2)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
         self.damageLocation.parse(inputStream)
-        self.damageDiameter = inputStream.read_float();
-        self.temperature = inputStream.read_float();
-        self.componentIdentification = inputStream.read_unsigned_byte();
-        self.componentDamageStatus = inputStream.read_unsigned_byte();
-        self.componentVisualDamageStatus = inputStream.read_unsigned_byte();
-        self.componentVisualSmokeColor = inputStream.read_unsigned_byte();
+        self.damageDiameter = inputStream.read_float()
+        self.temperature = inputStream.read_float()
+        self.componentIdentification = inputStream.read_unsigned_byte()
+        self.componentDamageStatus = inputStream.read_unsigned_byte()
+        self.componentVisualDamageStatus = inputStream.read_unsigned_byte()
+        self.componentVisualSmokeColor = inputStream.read_unsigned_byte()
         self.fireEventID.parse(inputStream)
-        self.padding2 = inputStream.read_unsigned_short();
+        self.padding2 = inputStream.read_unsigned_short()
 
 
 
@@ -1643,18 +1643,18 @@ class ExplosionDescriptor( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.explodingObject.serialize(outputStream)
-        outputStream.write_unsigned_short(self.explosiveMaterial);
-        outputStream.write_unsigned_short(self.padding);
-        outputStream.write_float(self.explosiveForce);
+        outputStream.write_unsigned_short(self.explosiveMaterial)
+        outputStream.write_unsigned_short(self.padding)
+        outputStream.write_float(self.explosiveForce)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.explodingObject.parse(inputStream)
-        self.explosiveMaterial = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
-        self.explosiveForce = inputStream.read_float();
+        self.explosiveMaterial = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
+        self.explosiveForce = inputStream.read_float()
 
 
 
@@ -1670,15 +1670,15 @@ class ClockTime( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.hour);
-        outputStream.write_unsigned_int(self.timePastHour);
+        outputStream.write_unsigned_int(self.hour)
+        outputStream.write_unsigned_int(self.timePastHour)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.hour = inputStream.read_unsigned_int();
-        self.timePastHour = inputStream.read_unsigned_int();
+        self.hour = inputStream.read_unsigned_int()
+        self.timePastHour = inputStream.read_unsigned_int()
 
 
 
@@ -1699,17 +1699,17 @@ class SecondaryOperationalData( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.operationalData1);
-        outputStream.write_unsigned_byte(self.operationalData2);
-        outputStream.write_unsigned_short(self.numberOfIFFFundamentalParameterRecords);
+        outputStream.write_unsigned_byte(self.operationalData1)
+        outputStream.write_unsigned_byte(self.operationalData2)
+        outputStream.write_unsigned_short(self.numberOfIFFFundamentalParameterRecords)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.operationalData1 = inputStream.read_unsigned_byte();
-        self.operationalData2 = inputStream.read_unsigned_byte();
-        self.numberOfIFFFundamentalParameterRecords = inputStream.read_unsigned_short();
+        self.operationalData1 = inputStream.read_unsigned_byte()
+        self.operationalData2 = inputStream.read_unsigned_byte()
+        self.numberOfIFFFundamentalParameterRecords = inputStream.read_unsigned_short()
 
 
 
@@ -1741,25 +1741,25 @@ class EnvironmentType( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.entityKind);
-        outputStream.write_unsigned_byte(self.domain);
-        outputStream.write_unsigned_short(self.entityClass);
-        outputStream.write_unsigned_byte(self.category);
-        outputStream.write_unsigned_byte(self.subcategory);
-        outputStream.write_unsigned_byte(self.specific);
-        outputStream.write_unsigned_byte(self.extra);
+        outputStream.write_unsigned_byte(self.entityKind)
+        outputStream.write_unsigned_byte(self.domain)
+        outputStream.write_unsigned_short(self.entityClass)
+        outputStream.write_unsigned_byte(self.category)
+        outputStream.write_unsigned_byte(self.subcategory)
+        outputStream.write_unsigned_byte(self.specific)
+        outputStream.write_unsigned_byte(self.extra)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.entityKind = inputStream.read_unsigned_byte();
-        self.domain = inputStream.read_unsigned_byte();
-        self.entityClass = inputStream.read_unsigned_short();
-        self.category = inputStream.read_unsigned_byte();
-        self.subcategory = inputStream.read_unsigned_byte();
-        self.specific = inputStream.read_unsigned_byte();
-        self.extra = inputStream.read_unsigned_byte();
+        self.entityKind = inputStream.read_unsigned_byte()
+        self.domain = inputStream.read_unsigned_byte()
+        self.entityClass = inputStream.read_unsigned_short()
+        self.category = inputStream.read_unsigned_byte()
+        self.subcategory = inputStream.read_unsigned_byte()
+        self.specific = inputStream.read_unsigned_byte()
+        self.extra = inputStream.read_unsigned_byte()
 
 
 
@@ -1775,15 +1775,15 @@ class TotalRecordSets( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.totalRecordSets);
-        outputStream.write_unsigned_short(self.padding);
+        outputStream.write_unsigned_short(self.totalRecordSets)
+        outputStream.write_unsigned_short(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.totalRecordSets = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
+        self.totalRecordSets = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
 
 
 
@@ -1800,14 +1800,14 @@ class MineEntityIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.mineEntityNumber);
+        outputStream.write_unsigned_short(self.mineEntityNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.mineEntityNumber = inputStream.read_unsigned_short();
+        self.mineEntityNumber = inputStream.read_unsigned_short()
 
 
 
@@ -1823,15 +1823,15 @@ class Relationship( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.nature);
-        outputStream.write_unsigned_short(self.position);
+        outputStream.write_unsigned_short(self.nature)
+        outputStream.write_unsigned_short(self.position)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.nature = inputStream.read_unsigned_short();
-        self.position = inputStream.read_unsigned_short();
+        self.nature = inputStream.read_unsigned_short()
+        self.position = inputStream.read_unsigned_short()
 
 
 
@@ -1868,31 +1868,31 @@ class EEFundamentalParameterData( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.frequency);
-        outputStream.write_float(self.frequencyRange);
-        outputStream.write_float(self.effectiveRadiatedPower);
-        outputStream.write_float(self.pulseRepetitionFrequency);
-        outputStream.write_float(self.pulseWidth);
-        outputStream.write_float(self.beamAzimuthCenter);
-        outputStream.write_float(self.beamAzimuthSweep);
-        outputStream.write_float(self.beamElevationCenter);
-        outputStream.write_float(self.beamElevationSweep);
-        outputStream.write_float(self.beamSweepSync);
+        outputStream.write_float(self.frequency)
+        outputStream.write_float(self.frequencyRange)
+        outputStream.write_float(self.effectiveRadiatedPower)
+        outputStream.write_float(self.pulseRepetitionFrequency)
+        outputStream.write_float(self.pulseWidth)
+        outputStream.write_float(self.beamAzimuthCenter)
+        outputStream.write_float(self.beamAzimuthSweep)
+        outputStream.write_float(self.beamElevationCenter)
+        outputStream.write_float(self.beamElevationSweep)
+        outputStream.write_float(self.beamSweepSync)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.frequency = inputStream.read_float();
-        self.frequencyRange = inputStream.read_float();
-        self.effectiveRadiatedPower = inputStream.read_float();
-        self.pulseRepetitionFrequency = inputStream.read_float();
-        self.pulseWidth = inputStream.read_float();
-        self.beamAzimuthCenter = inputStream.read_float();
-        self.beamAzimuthSweep = inputStream.read_float();
-        self.beamElevationCenter = inputStream.read_float();
-        self.beamElevationSweep = inputStream.read_float();
-        self.beamSweepSync = inputStream.read_float();
+        self.frequency = inputStream.read_float()
+        self.frequencyRange = inputStream.read_float()
+        self.effectiveRadiatedPower = inputStream.read_float()
+        self.pulseRepetitionFrequency = inputStream.read_float()
+        self.pulseWidth = inputStream.read_float()
+        self.beamAzimuthCenter = inputStream.read_float()
+        self.beamAzimuthSweep = inputStream.read_float()
+        self.beamElevationCenter = inputStream.read_float()
+        self.beamElevationSweep = inputStream.read_float()
+        self.beamSweepSync = inputStream.read_float()
 
 
 class JammingTechnique( object ):
@@ -1907,19 +1907,19 @@ class JammingTechnique( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.kind);
-        outputStream.write_unsigned_byte(self.category);
-        outputStream.write_unsigned_byte(self.subcategory);
-        outputStream.write_unsigned_byte(self.specific);
+        outputStream.write_unsigned_byte(self.kind)
+        outputStream.write_unsigned_byte(self.category)
+        outputStream.write_unsigned_byte(self.subcategory)
+        outputStream.write_unsigned_byte(self.specific)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.kind = inputStream.read_unsigned_byte();
-        self.category = inputStream.read_unsigned_byte();
-        self.subcategory = inputStream.read_unsigned_byte();
-        self.specific = inputStream.read_unsigned_byte();
+        self.kind = inputStream.read_unsigned_byte()
+        self.category = inputStream.read_unsigned_byte()
+        self.subcategory = inputStream.read_unsigned_byte()
+        self.specific = inputStream.read_unsigned_byte()
 
 
 
@@ -1943,8 +1943,8 @@ class DatumSpecification( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int( len(self.fixedDatumIDList));
-        outputStream.write_unsigned_int( len(self.variableDatumIDList));
+        outputStream.write_unsigned_int( len(self.fixedDatumIDList))
+        outputStream.write_unsigned_int( len(self.variableDatumIDList))
         for anObj in self.fixedDatumIDList:
             anObj.serialize(outputStream)
 
@@ -1956,8 +1956,8 @@ class DatumSpecification( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -1998,11 +1998,11 @@ class DirectedEnergyAreaAimpoint( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_short(self.padding);
-        outputStream.write_unsigned_short( len(self.beamAntennaParameterList));
-        outputStream.write_unsigned_short( len(self.directedEnergyTargetEnergyDepositionRecordList));
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_short(self.padding)
+        outputStream.write_unsigned_short( len(self.beamAntennaParameterList))
+        outputStream.write_unsigned_short( len(self.directedEnergyTargetEnergyDepositionRecordList))
         for anObj in self.beamAntennaParameterList:
             anObj.serialize(outputStream)
 
@@ -2014,11 +2014,11 @@ class DirectedEnergyAreaAimpoint( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
-        self.beamAntennaPatternRecordCount = inputStream.read_unsigned_short();
-        self.directedEnergyTargetEnergyDepositionRecordCount = inputStream.read_unsigned_short();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
+        self.beamAntennaPatternRecordCount = inputStream.read_unsigned_short()
+        self.directedEnergyTargetEnergyDepositionRecordCount = inputStream.read_unsigned_short()
         for idx in range(0, self.beamAntennaPatternRecordCount):
             element = null()
             element.parse(inputStream)
@@ -2046,17 +2046,17 @@ class Vector3Float( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.x);
-        outputStream.write_float(self.y);
-        outputStream.write_float(self.z);
+        outputStream.write_float(self.x)
+        outputStream.write_float(self.y)
+        outputStream.write_float(self.z)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.x = inputStream.read_float();
-        self.y = inputStream.read_float();
-        self.z = inputStream.read_float();
+        self.x = inputStream.read_float()
+        self.y = inputStream.read_float()
+        self.z = inputStream.read_float()
 
 
 
@@ -2079,20 +2079,20 @@ class Expendable( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.expendable.serialize(outputStream)
-        outputStream.write_unsigned_int(self.station);
-        outputStream.write_unsigned_short(self.quantity);
-        outputStream.write_unsigned_byte(self.expendableStatus);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_int(self.station)
+        outputStream.write_unsigned_short(self.quantity)
+        outputStream.write_unsigned_byte(self.expendableStatus)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.expendable.parse(inputStream)
-        self.station = inputStream.read_unsigned_int();
-        self.quantity = inputStream.read_unsigned_short();
-        self.expendableStatus = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.station = inputStream.read_unsigned_int()
+        self.quantity = inputStream.read_unsigned_short()
+        self.expendableStatus = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -2111,20 +2111,20 @@ class IOCommunicationsNode( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_byte(self.communcationsNodeType);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_byte(self.communcationsNodeType)
+        outputStream.write_unsigned_byte(self.padding)
         self.communicationsNodeID.serialize(outputStream)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.communcationsNodeType = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.communcationsNodeType = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
         self.communicationsNodeID.parse(inputStream)
 
 
@@ -2149,19 +2149,19 @@ class ModulationType( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.spreadSpectrum);
-        outputStream.write_unsigned_short(self.majorModulation);
-        outputStream.write_unsigned_short(self.detail);
-        outputStream.write_unsigned_short(self.radioSystem);
+        outputStream.write_unsigned_short(self.spreadSpectrum)
+        outputStream.write_unsigned_short(self.majorModulation)
+        outputStream.write_unsigned_short(self.detail)
+        outputStream.write_unsigned_short(self.radioSystem)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.spreadSpectrum = inputStream.read_unsigned_short();
-        self.majorModulation = inputStream.read_unsigned_short();
-        self.detail = inputStream.read_unsigned_short();
-        self.radioSystem = inputStream.read_unsigned_short();
+        self.spreadSpectrum = inputStream.read_unsigned_short()
+        self.majorModulation = inputStream.read_unsigned_short()
+        self.detail = inputStream.read_unsigned_short()
+        self.radioSystem = inputStream.read_unsigned_short()
 
 
 
@@ -2205,33 +2205,33 @@ class LinearSegmentParameter( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.segmentNumber);
-        outputStream.write_unsigned_byte(self.segmentModification);
-        outputStream.write_unsigned_short(self.generalSegmentAppearance);
-        outputStream.write_unsigned_int(self.specificSegmentAppearance);
+        outputStream.write_unsigned_byte(self.segmentNumber)
+        outputStream.write_unsigned_byte(self.segmentModification)
+        outputStream.write_unsigned_short(self.generalSegmentAppearance)
+        outputStream.write_unsigned_int(self.specificSegmentAppearance)
         self.segmentLocation.serialize(outputStream)
         self.segmentOrientation.serialize(outputStream)
-        outputStream.write_float(self.segmentLength);
-        outputStream.write_float(self.segmentWidth);
-        outputStream.write_float(self.segmentHeight);
-        outputStream.write_float(self.segmentDepth);
-        outputStream.write_unsigned_int(self.padding);
+        outputStream.write_float(self.segmentLength)
+        outputStream.write_float(self.segmentWidth)
+        outputStream.write_float(self.segmentHeight)
+        outputStream.write_float(self.segmentDepth)
+        outputStream.write_unsigned_int(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.segmentNumber = inputStream.read_unsigned_byte();
-        self.segmentModification = inputStream.read_unsigned_byte();
-        self.generalSegmentAppearance = inputStream.read_unsigned_short();
-        self.specificSegmentAppearance = inputStream.read_unsigned_int();
+        self.segmentNumber = inputStream.read_unsigned_byte()
+        self.segmentModification = inputStream.read_unsigned_byte()
+        self.generalSegmentAppearance = inputStream.read_unsigned_short()
+        self.specificSegmentAppearance = inputStream.read_unsigned_int()
         self.segmentLocation.parse(inputStream)
         self.segmentOrientation.parse(inputStream)
-        self.segmentLength = inputStream.read_float();
-        self.segmentWidth = inputStream.read_float();
-        self.segmentHeight = inputStream.read_float();
-        self.segmentDepth = inputStream.read_float();
-        self.padding = inputStream.read_unsigned_int();
+        self.segmentLength = inputStream.read_float()
+        self.segmentWidth = inputStream.read_float()
+        self.segmentHeight = inputStream.read_float()
+        self.segmentDepth = inputStream.read_float()
+        self.padding = inputStream.read_unsigned_int()
 
 
 
@@ -2247,15 +2247,15 @@ class SimulationAddress( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.site);
-        outputStream.write_unsigned_short(self.application);
+        outputStream.write_unsigned_short(self.site)
+        outputStream.write_unsigned_short(self.application)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.site = inputStream.read_unsigned_short();
-        self.application = inputStream.read_unsigned_short();
+        self.site = inputStream.read_unsigned_short()
+        self.application = inputStream.read_unsigned_short()
 
 
 
@@ -2279,18 +2279,18 @@ class SystemIdentifier( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.systemType);
-        outputStream.write_unsigned_short(self.systemName);
-        outputStream.write_unsigned_short(self.systemMode);
+        outputStream.write_unsigned_short(self.systemType)
+        outputStream.write_unsigned_short(self.systemName)
+        outputStream.write_unsigned_short(self.systemMode)
         self.changeOptions.serialize(outputStream)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.systemType = inputStream.read_unsigned_short();
-        self.systemName = inputStream.read_unsigned_short();
-        self.systemMode = inputStream.read_unsigned_short();
+        self.systemType = inputStream.read_unsigned_short()
+        self.systemName = inputStream.read_unsigned_short()
+        self.systemMode = inputStream.read_unsigned_short()
         self.changeOptions.parse(inputStream)
 
 
@@ -2310,16 +2310,16 @@ class TrackJamData( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.entityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.emitterNumber);
-        outputStream.write_unsigned_byte(self.beamNumber);
+        outputStream.write_unsigned_byte(self.emitterNumber)
+        outputStream.write_unsigned_byte(self.beamNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.entityID.parse(inputStream)
-        self.emitterNumber = inputStream.read_unsigned_byte();
-        self.beamNumber = inputStream.read_unsigned_byte();
+        self.emitterNumber = inputStream.read_unsigned_byte()
+        self.beamNumber = inputStream.read_unsigned_byte()
 
 
 
@@ -2351,25 +2351,25 @@ class AggregateType( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.aggregateKind);
-        outputStream.write_unsigned_byte(self.domain);
-        outputStream.write_unsigned_short(self.country);
-        outputStream.write_unsigned_byte(self.category);
-        outputStream.write_unsigned_byte(self.subcategory);
-        outputStream.write_unsigned_byte(self.specificInfo);
-        outputStream.write_unsigned_byte(self.extra);
+        outputStream.write_unsigned_byte(self.aggregateKind)
+        outputStream.write_unsigned_byte(self.domain)
+        outputStream.write_unsigned_short(self.country)
+        outputStream.write_unsigned_byte(self.category)
+        outputStream.write_unsigned_byte(self.subcategory)
+        outputStream.write_unsigned_byte(self.specificInfo)
+        outputStream.write_unsigned_byte(self.extra)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.aggregateKind = inputStream.read_unsigned_byte();
-        self.domain = inputStream.read_unsigned_byte();
-        self.country = inputStream.read_unsigned_short();
-        self.category = inputStream.read_unsigned_byte();
-        self.subcategory = inputStream.read_unsigned_byte();
-        self.specificInfo = inputStream.read_unsigned_byte();
-        self.extra = inputStream.read_unsigned_byte();
+        self.aggregateKind = inputStream.read_unsigned_byte()
+        self.domain = inputStream.read_unsigned_byte()
+        self.country = inputStream.read_unsigned_short()
+        self.category = inputStream.read_unsigned_byte()
+        self.subcategory = inputStream.read_unsigned_byte()
+        self.specificInfo = inputStream.read_unsigned_byte()
+        self.extra = inputStream.read_unsigned_byte()
 
 
 
@@ -2427,21 +2427,21 @@ class BeamData( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.beamAzimuthCenter);
-        outputStream.write_float(self.beamAzimuthSweep);
-        outputStream.write_float(self.beamElevationCenter);
-        outputStream.write_float(self.beamElevationSweep);
-        outputStream.write_float(self.beamSweepSync);
+        outputStream.write_float(self.beamAzimuthCenter)
+        outputStream.write_float(self.beamAzimuthSweep)
+        outputStream.write_float(self.beamElevationCenter)
+        outputStream.write_float(self.beamElevationSweep)
+        outputStream.write_float(self.beamSweepSync)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.beamAzimuthCenter = inputStream.read_float();
-        self.beamAzimuthSweep = inputStream.read_float();
-        self.beamElevationCenter = inputStream.read_float();
-        self.beamElevationSweep = inputStream.read_float();
-        self.beamSweepSync = inputStream.read_float();
+        self.beamAzimuthCenter = inputStream.read_float()
+        self.beamAzimuthSweep = inputStream.read_float()
+        self.beamElevationCenter = inputStream.read_float()
+        self.beamElevationSweep = inputStream.read_float()
+        self.beamSweepSync = inputStream.read_float()
 
 
 
@@ -2467,21 +2467,21 @@ class EngineFuel( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.fuelQuantity);
-        outputStream.write_unsigned_byte(self.fuelMeasurementUnits);
-        outputStream.write_unsigned_byte(self.fuelType);
-        outputStream.write_unsigned_byte(self.fuelLocation);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_int(self.fuelQuantity)
+        outputStream.write_unsigned_byte(self.fuelMeasurementUnits)
+        outputStream.write_unsigned_byte(self.fuelType)
+        outputStream.write_unsigned_byte(self.fuelLocation)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.fuelQuantity = inputStream.read_unsigned_int();
-        self.fuelMeasurementUnits = inputStream.read_unsigned_byte();
-        self.fuelType = inputStream.read_unsigned_byte();
-        self.fuelLocation = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.fuelQuantity = inputStream.read_unsigned_int()
+        self.fuelMeasurementUnits = inputStream.read_unsigned_byte()
+        self.fuelType = inputStream.read_unsigned_byte()
+        self.fuelLocation = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -2508,29 +2508,29 @@ class IOEffect( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_byte(self.ioStatus);
-        outputStream.write_unsigned_byte(self.ioLinkType);
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_byte(self.ioStatus)
+        outputStream.write_unsigned_byte(self.ioLinkType)
         self.ioEffect.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.ioEffectDutyCycle);
-        outputStream.write_unsigned_short(self.ioEffectDuration);
-        outputStream.write_unsigned_short(self.ioProcess);
-        outputStream.write_unsigned_short(self.padding);
+        outputStream.write_unsigned_byte(self.ioEffectDutyCycle)
+        outputStream.write_unsigned_short(self.ioEffectDuration)
+        outputStream.write_unsigned_short(self.ioProcess)
+        outputStream.write_unsigned_short(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.ioStatus = inputStream.read_unsigned_byte();
-        self.ioLinkType = inputStream.read_unsigned_byte();
+        self.recordType = inputStream.read_unsigned_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.ioStatus = inputStream.read_unsigned_byte()
+        self.ioLinkType = inputStream.read_unsigned_byte()
         self.ioEffect.parse(inputStream)
-        self.ioEffectDutyCycle = inputStream.read_unsigned_byte();
-        self.ioEffectDuration = inputStream.read_unsigned_short();
-        self.ioProcess = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
+        self.ioEffectDutyCycle = inputStream.read_unsigned_byte()
+        self.ioEffectDuration = inputStream.read_unsigned_short()
+        self.ioProcess = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
 
 
 
@@ -2547,14 +2547,14 @@ class SimulationIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.referenceNumber);
+        outputStream.write_unsigned_short(self.referenceNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.referenceNumber = inputStream.read_unsigned_short();
+        self.referenceNumber = inputStream.read_unsigned_short()
 
 
 
@@ -2596,15 +2596,15 @@ class GridAxisDescriptorVariable( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_double(self.domainInitialXi);
-        outputStream.write_double(self.domainFinalXi);
-        outputStream.write_unsigned_short(self.domainPointsXi);
-        outputStream.write_unsigned_byte(self.interleafFactor);
-        outputStream.write_unsigned_byte(self.axisType);
-        outputStream.write_unsigned_short( len(self.xiValues));
-        outputStream.write_unsigned_short(self.initialIndex);
-        outputStream.write_double(self.coordinateScaleXi);
-        outputStream.write_double(self.coordinateOffsetXi);
+        outputStream.write_double(self.domainInitialXi)
+        outputStream.write_double(self.domainFinalXi)
+        outputStream.write_unsigned_short(self.domainPointsXi)
+        outputStream.write_unsigned_byte(self.interleafFactor)
+        outputStream.write_unsigned_byte(self.axisType)
+        outputStream.write_unsigned_short( len(self.xiValues))
+        outputStream.write_unsigned_short(self.initialIndex)
+        outputStream.write_double(self.coordinateScaleXi)
+        outputStream.write_double(self.coordinateOffsetXi)
         for anObj in self.xiValues:
             anObj.serialize(outputStream)
 
@@ -2613,15 +2613,15 @@ class GridAxisDescriptorVariable( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.domainInitialXi = inputStream.read_double();
-        self.domainFinalXi = inputStream.read_double();
-        self.domainPointsXi = inputStream.read_unsigned_short();
-        self.interleafFactor = inputStream.read_unsigned_byte();
-        self.axisType = inputStream.read_unsigned_byte();
-        self.numberOfPointsOnXiAxis = inputStream.read_unsigned_short();
-        self.initialIndex = inputStream.read_unsigned_short();
-        self.coordinateScaleXi = inputStream.read_double();
-        self.coordinateOffsetXi = inputStream.read_double();
+        self.domainInitialXi = inputStream.read_double()
+        self.domainFinalXi = inputStream.read_double()
+        self.domainPointsXi = inputStream.read_unsigned_short()
+        self.interleafFactor = inputStream.read_unsigned_byte()
+        self.axisType = inputStream.read_unsigned_byte()
+        self.numberOfPointsOnXiAxis = inputStream.read_unsigned_short()
+        self.initialIndex = inputStream.read_unsigned_short()
+        self.coordinateScaleXi = inputStream.read_double()
+        self.coordinateOffsetXi = inputStream.read_double()
         for idx in range(0, self.numberOfPointsOnXiAxis):
             element = null()
             element.parse(inputStream)
@@ -2643,14 +2643,14 @@ class SupplyQuantity( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.supplyType.serialize(outputStream)
-        outputStream.write_float(self.quantity);
+        outputStream.write_float(self.quantity)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.supplyType.parse(inputStream)
-        self.quantity = inputStream.read_float();
+        self.quantity = inputStream.read_float()
 
 
 
@@ -2674,8 +2674,8 @@ class SilentEntitySystem( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.numberOfEntities);
-        outputStream.write_unsigned_short( len(self.appearanceRecordList));
+        outputStream.write_unsigned_short(self.numberOfEntities)
+        outputStream.write_unsigned_short( len(self.appearanceRecordList))
         self.entityType.serialize(outputStream)
         for anObj in self.appearanceRecordList:
             anObj.serialize(outputStream)
@@ -2685,8 +2685,8 @@ class SilentEntitySystem( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfEntities = inputStream.read_unsigned_short();
-        self.numberOfAppearanceRecords = inputStream.read_unsigned_short();
+        self.numberOfEntities = inputStream.read_unsigned_short()
+        self.numberOfAppearanceRecords = inputStream.read_unsigned_short()
         self.entityType.parse(inputStream)
         for idx in range(0, self.numberOfAppearanceRecords):
             element = null()
@@ -2708,14 +2708,14 @@ class EventIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.eventNumber);
+        outputStream.write_unsigned_short(self.eventNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.eventNumber = inputStream.read_unsigned_short();
+        self.eventNumber = inputStream.read_unsigned_short()
 
 
 
@@ -2751,39 +2751,39 @@ class BlankingSector( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_int(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_short(self.padding);
-        outputStream.write_unsigned_byte(self.emitterNumber);
-        outputStream.write_unsigned_byte(self.beamNumber);
-        outputStream.write_unsigned_byte(self.stateIndicator);
-        outputStream.write_unsigned_byte(self.padding2);
-        outputStream.write_float(self.leftAzimuth);
-        outputStream.write_float(self.rightAzimuth);
-        outputStream.write_float(self.lowerElevation);
-        outputStream.write_float(self.upperElevation);
-        outputStream.write_float(self.residualPower);
-        outputStream.write_int(self.padding3);
-        outputStream.write_int(self.padding4);
+        outputStream.write_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_short(self.padding)
+        outputStream.write_unsigned_byte(self.emitterNumber)
+        outputStream.write_unsigned_byte(self.beamNumber)
+        outputStream.write_unsigned_byte(self.stateIndicator)
+        outputStream.write_unsigned_byte(self.padding2)
+        outputStream.write_float(self.leftAzimuth)
+        outputStream.write_float(self.rightAzimuth)
+        outputStream.write_float(self.lowerElevation)
+        outputStream.write_float(self.upperElevation)
+        outputStream.write_float(self.residualPower)
+        outputStream.write_int(self.padding3)
+        outputStream.write_int(self.padding4)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_int();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
-        self.emitterNumber = inputStream.read_unsigned_byte();
-        self.beamNumber = inputStream.read_unsigned_byte();
-        self.stateIndicator = inputStream.read_unsigned_byte();
-        self.padding2 = inputStream.read_unsigned_byte();
-        self.leftAzimuth = inputStream.read_float();
-        self.rightAzimuth = inputStream.read_float();
-        self.lowerElevation = inputStream.read_float();
-        self.upperElevation = inputStream.read_float();
-        self.residualPower = inputStream.read_float();
-        self.padding3 = inputStream.read_int();
-        self.padding4 = inputStream.read_int();
+        self.recordType = inputStream.read_int()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
+        self.emitterNumber = inputStream.read_unsigned_byte()
+        self.beamNumber = inputStream.read_unsigned_byte()
+        self.stateIndicator = inputStream.read_unsigned_byte()
+        self.padding2 = inputStream.read_unsigned_byte()
+        self.leftAzimuth = inputStream.read_float()
+        self.rightAzimuth = inputStream.read_float()
+        self.lowerElevation = inputStream.read_float()
+        self.upperElevation = inputStream.read_float()
+        self.residualPower = inputStream.read_float()
+        self.padding3 = inputStream.read_int()
+        self.padding4 = inputStream.read_int()
 
 
 
@@ -2807,11 +2807,11 @@ class LaunchedMunitionRecord( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.fireEventID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding);
+        outputStream.write_unsigned_short(self.padding)
         self.firingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding2);
+        outputStream.write_unsigned_short(self.padding2)
         self.targetEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding3);
+        outputStream.write_unsigned_short(self.padding3)
         self.targetLocation.serialize(outputStream)
 
 
@@ -2819,11 +2819,11 @@ class LaunchedMunitionRecord( object ):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.fireEventID.parse(inputStream)
-        self.padding = inputStream.read_unsigned_short();
+        self.padding = inputStream.read_unsigned_short()
         self.firingEntityID.parse(inputStream)
-        self.padding2 = inputStream.read_unsigned_short();
+        self.padding2 = inputStream.read_unsigned_short()
         self.targetEntityID.parse(inputStream)
-        self.padding3 = inputStream.read_unsigned_short();
+        self.padding3 = inputStream.read_unsigned_short()
         self.targetLocation.parse(inputStream)
 
 
@@ -2857,26 +2857,26 @@ class IFFFundamentalParameterData( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.erp);
-        outputStream.write_float(self.frequency);
-        outputStream.write_float(self.pgrf);
-        outputStream.write_float(self.pulseWidth);
-        outputStream.write_unsigned_int(self.burstLength);
-        outputStream.write_unsigned_byte(self.applicableModes);
+        outputStream.write_float(self.erp)
+        outputStream.write_float(self.frequency)
+        outputStream.write_float(self.pgrf)
+        outputStream.write_float(self.pulseWidth)
+        outputStream.write_unsigned_int(self.burstLength)
+        outputStream.write_unsigned_byte(self.applicableModes)
         for idx in range(0, 3):
-            outputStream.write_unsigned_byte( self.systemSpecificData[ idx ] );
+            outputStream.write_unsigned_byte( self.systemSpecificData[ idx ] )
 
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.erp = inputStream.read_float();
-        self.frequency = inputStream.read_float();
-        self.pgrf = inputStream.read_float();
-        self.pulseWidth = inputStream.read_float();
-        self.burstLength = inputStream.read_unsigned_int();
-        self.applicableModes = inputStream.read_unsigned_byte();
+        self.erp = inputStream.read_float()
+        self.frequency = inputStream.read_float()
+        self.pgrf = inputStream.read_float()
+        self.pulseWidth = inputStream.read_float()
+        self.burstLength = inputStream.read_unsigned_int()
+        self.applicableModes = inputStream.read_unsigned_byte()
         self.systemSpecificData = [0]*3
         for idx in range(0, 3):
             val = inputStream.read_unsigned_byte()
@@ -2924,31 +2924,31 @@ class FundamentalOperationalData( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.systemStatus);
-        outputStream.write_unsigned_byte(self.dataField1);
-        outputStream.write_unsigned_byte(self.informationLayers);
-        outputStream.write_unsigned_byte(self.dataField2);
-        outputStream.write_unsigned_short(self.parameter1);
-        outputStream.write_unsigned_short(self.parameter2);
-        outputStream.write_unsigned_short(self.parameter3);
-        outputStream.write_unsigned_short(self.parameter4);
-        outputStream.write_unsigned_short(self.parameter5);
-        outputStream.write_unsigned_short(self.parameter6);
+        outputStream.write_unsigned_byte(self.systemStatus)
+        outputStream.write_unsigned_byte(self.dataField1)
+        outputStream.write_unsigned_byte(self.informationLayers)
+        outputStream.write_unsigned_byte(self.dataField2)
+        outputStream.write_unsigned_short(self.parameter1)
+        outputStream.write_unsigned_short(self.parameter2)
+        outputStream.write_unsigned_short(self.parameter3)
+        outputStream.write_unsigned_short(self.parameter4)
+        outputStream.write_unsigned_short(self.parameter5)
+        outputStream.write_unsigned_short(self.parameter6)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.systemStatus = inputStream.read_unsigned_byte();
-        self.dataField1 = inputStream.read_unsigned_byte();
-        self.informationLayers = inputStream.read_unsigned_byte();
-        self.dataField2 = inputStream.read_unsigned_byte();
-        self.parameter1 = inputStream.read_unsigned_short();
-        self.parameter2 = inputStream.read_unsigned_short();
-        self.parameter3 = inputStream.read_unsigned_short();
-        self.parameter4 = inputStream.read_unsigned_short();
-        self.parameter5 = inputStream.read_unsigned_short();
-        self.parameter6 = inputStream.read_unsigned_short();
+        self.systemStatus = inputStream.read_unsigned_byte()
+        self.dataField1 = inputStream.read_unsigned_byte()
+        self.informationLayers = inputStream.read_unsigned_byte()
+        self.dataField2 = inputStream.read_unsigned_byte()
+        self.parameter1 = inputStream.read_unsigned_short()
+        self.parameter2 = inputStream.read_unsigned_short()
+        self.parameter3 = inputStream.read_unsigned_short()
+        self.parameter4 = inputStream.read_unsigned_short()
+        self.parameter5 = inputStream.read_unsigned_short()
+        self.parameter6 = inputStream.read_unsigned_short()
 
 
 
@@ -2966,17 +2966,17 @@ class IntercomCommunicationsParameters( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.recordType);
-        outputStream.write_unsigned_short(self.recordLength);
-        outputStream.write_unsigned_int(self.recordSpecificField);
+        outputStream.write_unsigned_short(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_int(self.recordSpecificField)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_short();
-        self.recordLength = inputStream.read_unsigned_short();
-        self.recordSpecificField = inputStream.read_unsigned_int();
+        self.recordType = inputStream.read_unsigned_short()
+        self.recordLength = inputStream.read_unsigned_short()
+        self.recordSpecificField = inputStream.read_unsigned_int()
 
 
 
@@ -3008,25 +3008,25 @@ class EntityType( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.entityKind);
-        outputStream.write_unsigned_byte(self.domain);
-        outputStream.write_unsigned_short(self.country);
-        outputStream.write_unsigned_byte(self.category);
-        outputStream.write_unsigned_byte(self.subcategory);
-        outputStream.write_unsigned_byte(self.specific);
-        outputStream.write_unsigned_byte(self.extra);
+        outputStream.write_unsigned_byte(self.entityKind)
+        outputStream.write_unsigned_byte(self.domain)
+        outputStream.write_unsigned_short(self.country)
+        outputStream.write_unsigned_byte(self.category)
+        outputStream.write_unsigned_byte(self.subcategory)
+        outputStream.write_unsigned_byte(self.specific)
+        outputStream.write_unsigned_byte(self.extra)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.entityKind = inputStream.read_unsigned_byte();
-        self.domain = inputStream.read_unsigned_byte();
-        self.country = inputStream.read_unsigned_short();
-        self.category = inputStream.read_unsigned_byte();
-        self.subcategory = inputStream.read_unsigned_byte();
-        self.specific = inputStream.read_unsigned_byte();
-        self.extra = inputStream.read_unsigned_byte();
+        self.entityKind = inputStream.read_unsigned_byte()
+        self.domain = inputStream.read_unsigned_byte()
+        self.country = inputStream.read_unsigned_short()
+        self.category = inputStream.read_unsigned_byte()
+        self.subcategory = inputStream.read_unsigned_byte()
+        self.specific = inputStream.read_unsigned_byte()
+        self.extra = inputStream.read_unsigned_byte()
 
 
 
@@ -3053,20 +3053,20 @@ class Munition( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.munitionType.serialize(outputStream)
-        outputStream.write_unsigned_int(self.station);
-        outputStream.write_unsigned_short(self.quantity);
-        outputStream.write_unsigned_byte(self.munitionStatus);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_int(self.station)
+        outputStream.write_unsigned_short(self.quantity)
+        outputStream.write_unsigned_byte(self.munitionStatus)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.munitionType.parse(inputStream)
-        self.station = inputStream.read_unsigned_int();
-        self.quantity = inputStream.read_unsigned_short();
-        self.munitionStatus = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.station = inputStream.read_unsigned_int()
+        self.quantity = inputStream.read_unsigned_short()
+        self.munitionStatus = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -3084,7 +3084,7 @@ class StandardVariableSpecification( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short( len(self.standardVariables));
+        outputStream.write_unsigned_short( len(self.standardVariables))
         for anObj in self.standardVariables:
             anObj.serialize(outputStream)
 
@@ -3093,7 +3093,7 @@ class StandardVariableSpecification( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfStandardVariableRecords = inputStream.read_unsigned_short();
+        self.numberOfStandardVariableRecords = inputStream.read_unsigned_short()
         for idx in range(0, self.numberOfStandardVariableRecords):
             element = null()
             element.parse(inputStream)
@@ -3114,15 +3114,15 @@ class Vector2Float( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.x);
-        outputStream.write_float(self.y);
+        outputStream.write_float(self.x)
+        outputStream.write_float(self.y)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.x = inputStream.read_float();
-        self.y = inputStream.read_float();
+        self.x = inputStream.read_float()
+        self.y = inputStream.read_float()
 
 
 
@@ -3142,19 +3142,19 @@ class Environment( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.environmentType);
-        outputStream.write_unsigned_short(self.length);
-        outputStream.write_unsigned_byte(self.index);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_int(self.environmentType)
+        outputStream.write_unsigned_short(self.length)
+        outputStream.write_unsigned_byte(self.index)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.environmentType = inputStream.read_unsigned_int();
-        self.length = inputStream.read_unsigned_short();
-        self.index = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.environmentType = inputStream.read_unsigned_int()
+        self.length = inputStream.read_unsigned_short()
+        self.index = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -3175,17 +3175,17 @@ class AcousticEmitter( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.acousticSystemName);
-        outputStream.write_unsigned_byte(self.acousticFunction);
-        outputStream.write_unsigned_byte(self.acousticIDNumber);
+        outputStream.write_unsigned_short(self.acousticSystemName)
+        outputStream.write_unsigned_byte(self.acousticFunction)
+        outputStream.write_unsigned_byte(self.acousticIDNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.acousticSystemName = inputStream.read_unsigned_short();
-        self.acousticFunction = inputStream.read_unsigned_byte();
-        self.acousticIDNumber = inputStream.read_unsigned_byte();
+        self.acousticSystemName = inputStream.read_unsigned_short()
+        self.acousticFunction = inputStream.read_unsigned_byte()
+        self.acousticIDNumber = inputStream.read_unsigned_byte()
 
 
 
@@ -3203,17 +3203,17 @@ class AngularVelocityVector( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.x);
-        outputStream.write_float(self.y);
-        outputStream.write_float(self.z);
+        outputStream.write_float(self.x)
+        outputStream.write_float(self.y)
+        outputStream.write_float(self.z)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.x = inputStream.read_float();
-        self.y = inputStream.read_float();
-        self.z = inputStream.read_float();
+        self.x = inputStream.read_float()
+        self.y = inputStream.read_float()
+        self.z = inputStream.read_float()
 
 
 
@@ -3229,16 +3229,16 @@ class AggregateMarking( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.characterSet);
+        outputStream.write_unsigned_byte(self.characterSet)
         for idx in range(0, 31):
-            outputStream.write_unsigned_byte( self.characters[ idx ] );
+            outputStream.write_unsigned_byte( self.characters[ idx ] )
 
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.characterSet = inputStream.read_unsigned_byte();
+        self.characterSet = inputStream.read_unsigned_byte()
         self.characters = [0]*31
         for idx in range(0, 31):
             val = inputStream.read_unsigned_byte()
@@ -3258,13 +3258,13 @@ class DataFilterRecord( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.bitFlags);
+        outputStream.write_unsigned_int(self.bitFlags)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.bitFlags = inputStream.read_unsigned_int();
+        self.bitFlags = inputStream.read_unsigned_int()
 
 
 
@@ -3284,19 +3284,19 @@ class IntercomIdentifier( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.siteNumber);
-        outputStream.write_unsigned_short(self.applicationNumber);
-        outputStream.write_unsigned_short(self.referenceNumber);
-        outputStream.write_unsigned_short(self.intercomNumber);
+        outputStream.write_unsigned_short(self.siteNumber)
+        outputStream.write_unsigned_short(self.applicationNumber)
+        outputStream.write_unsigned_short(self.referenceNumber)
+        outputStream.write_unsigned_short(self.intercomNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.siteNumber = inputStream.read_unsigned_short();
-        self.applicationNumber = inputStream.read_unsigned_short();
-        self.referenceNumber = inputStream.read_unsigned_short();
-        self.intercomNumber = inputStream.read_unsigned_short();
+        self.siteNumber = inputStream.read_unsigned_short()
+        self.applicationNumber = inputStream.read_unsigned_short()
+        self.referenceNumber = inputStream.read_unsigned_short()
+        self.intercomNumber = inputStream.read_unsigned_short()
 
 
 
@@ -3322,21 +3322,21 @@ class StorageFuel( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.fuelQuantity);
-        outputStream.write_unsigned_byte(self.fuelMeasurementUnits);
-        outputStream.write_unsigned_byte(self.fuelType);
-        outputStream.write_unsigned_byte(self.fuelLocation);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_int(self.fuelQuantity)
+        outputStream.write_unsigned_byte(self.fuelMeasurementUnits)
+        outputStream.write_unsigned_byte(self.fuelType)
+        outputStream.write_unsigned_byte(self.fuelLocation)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.fuelQuantity = inputStream.read_unsigned_int();
-        self.fuelMeasurementUnits = inputStream.read_unsigned_byte();
-        self.fuelType = inputStream.read_unsigned_byte();
-        self.fuelLocation = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.fuelQuantity = inputStream.read_unsigned_int()
+        self.fuelMeasurementUnits = inputStream.read_unsigned_byte()
+        self.fuelType = inputStream.read_unsigned_byte()
+        self.fuelLocation = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -3365,23 +3365,23 @@ class Sensor( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.sensorTypeSource);
-        outputStream.write_unsigned_byte(self.sensorOnOffStatus);
-        outputStream.write_unsigned_short(self.sensorType);
-        outputStream.write_unsigned_int(self.station);
-        outputStream.write_unsigned_short(self.quantity);
-        outputStream.write_unsigned_short(self.padding);
+        outputStream.write_unsigned_byte(self.sensorTypeSource)
+        outputStream.write_unsigned_byte(self.sensorOnOffStatus)
+        outputStream.write_unsigned_short(self.sensorType)
+        outputStream.write_unsigned_int(self.station)
+        outputStream.write_unsigned_short(self.quantity)
+        outputStream.write_unsigned_short(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.sensorTypeSource = inputStream.read_unsigned_byte();
-        self.sensorOnOffStatus = inputStream.read_unsigned_byte();
-        self.sensorType = inputStream.read_unsigned_short();
-        self.station = inputStream.read_unsigned_int();
-        self.quantity = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_short();
+        self.sensorTypeSource = inputStream.read_unsigned_byte()
+        self.sensorOnOffStatus = inputStream.read_unsigned_byte()
+        self.sensorType = inputStream.read_unsigned_short()
+        self.station = inputStream.read_unsigned_int()
+        self.quantity = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_short()
 
 
 
@@ -3412,22 +3412,22 @@ class MunitionReload( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.munitionType.serialize(outputStream)
-        outputStream.write_unsigned_int(self.station);
-        outputStream.write_unsigned_short(self.standardQuantity);
-        outputStream.write_unsigned_short(self.maximumQuantity);
-        outputStream.write_unsigned_int(self.standardQuantityReloadTime);
-        outputStream.write_unsigned_int(self.maximumQuantityReloadTime);
+        outputStream.write_unsigned_int(self.station)
+        outputStream.write_unsigned_short(self.standardQuantity)
+        outputStream.write_unsigned_short(self.maximumQuantity)
+        outputStream.write_unsigned_int(self.standardQuantityReloadTime)
+        outputStream.write_unsigned_int(self.maximumQuantityReloadTime)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.munitionType.parse(inputStream)
-        self.station = inputStream.read_unsigned_int();
-        self.standardQuantity = inputStream.read_unsigned_short();
-        self.maximumQuantity = inputStream.read_unsigned_short();
-        self.standardQuantityReloadTime = inputStream.read_unsigned_int();
-        self.maximumQuantityReloadTime = inputStream.read_unsigned_int();
+        self.station = inputStream.read_unsigned_int()
+        self.standardQuantity = inputStream.read_unsigned_short()
+        self.maximumQuantity = inputStream.read_unsigned_short()
+        self.standardQuantityReloadTime = inputStream.read_unsigned_int()
+        self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
 
 
 
@@ -3462,27 +3462,27 @@ class StorageFuelReload( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.standardQuantity);
-        outputStream.write_unsigned_int(self.maximumQuantity);
-        outputStream.write_unsigned_byte(self.standardQuantityReloadTime);
-        outputStream.write_unsigned_byte(self.maximumQuantityReloadTime);
-        outputStream.write_unsigned_byte(self.fuelMeasurementUnits);
-        outputStream.write_unsigned_byte(self.fuelType);
-        outputStream.write_unsigned_byte(self.fuelLocation);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_int(self.standardQuantity)
+        outputStream.write_unsigned_int(self.maximumQuantity)
+        outputStream.write_unsigned_byte(self.standardQuantityReloadTime)
+        outputStream.write_unsigned_byte(self.maximumQuantityReloadTime)
+        outputStream.write_unsigned_byte(self.fuelMeasurementUnits)
+        outputStream.write_unsigned_byte(self.fuelType)
+        outputStream.write_unsigned_byte(self.fuelLocation)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.standardQuantity = inputStream.read_unsigned_int();
-        self.maximumQuantity = inputStream.read_unsigned_int();
-        self.standardQuantityReloadTime = inputStream.read_unsigned_byte();
-        self.maximumQuantityReloadTime = inputStream.read_unsigned_byte();
-        self.fuelMeasurementUnits = inputStream.read_unsigned_byte();
-        self.fuelType = inputStream.read_unsigned_byte();
-        self.fuelLocation = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.standardQuantity = inputStream.read_unsigned_int()
+        self.maximumQuantity = inputStream.read_unsigned_int()
+        self.standardQuantityReloadTime = inputStream.read_unsigned_byte()
+        self.maximumQuantityReloadTime = inputStream.read_unsigned_byte()
+        self.fuelMeasurementUnits = inputStream.read_unsigned_byte()
+        self.fuelType = inputStream.read_unsigned_byte()
+        self.fuelLocation = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -3508,22 +3508,22 @@ class ExpendableReload( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.expendable.serialize(outputStream)
-        outputStream.write_unsigned_int(self.station);
-        outputStream.write_unsigned_short(self.standardQuantity);
-        outputStream.write_unsigned_short(self.maximumQuantity);
-        outputStream.write_unsigned_int(self.standardQuantityReloadTime);
-        outputStream.write_unsigned_int(self.maximumQuantityReloadTime);
+        outputStream.write_unsigned_int(self.station)
+        outputStream.write_unsigned_short(self.standardQuantity)
+        outputStream.write_unsigned_short(self.maximumQuantity)
+        outputStream.write_unsigned_int(self.standardQuantityReloadTime)
+        outputStream.write_unsigned_int(self.maximumQuantityReloadTime)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.expendable.parse(inputStream)
-        self.station = inputStream.read_unsigned_int();
-        self.standardQuantity = inputStream.read_unsigned_short();
-        self.maximumQuantity = inputStream.read_unsigned_short();
-        self.standardQuantityReloadTime = inputStream.read_unsigned_int();
-        self.maximumQuantityReloadTime = inputStream.read_unsigned_int();
+        self.station = inputStream.read_unsigned_int()
+        self.standardQuantity = inputStream.read_unsigned_short()
+        self.maximumQuantity = inputStream.read_unsigned_short()
+        self.standardQuantityReloadTime = inputStream.read_unsigned_int()
+        self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
 
 
 
@@ -3542,14 +3542,14 @@ class EntityIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.entityNumber);
+        outputStream.write_unsigned_short(self.entityNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.entityNumber = inputStream.read_unsigned_short();
+        self.entityNumber = inputStream.read_unsigned_short()
 
 
 
@@ -3570,16 +3570,16 @@ class DirectedEnergyTargetEnergyDeposition( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.targetEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding);
-        outputStream.write_float(self.peakIrradiance);
+        outputStream.write_unsigned_short(self.padding)
+        outputStream.write_float(self.peakIrradiance)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.targetEntityID.parse(inputStream)
-        self.padding = inputStream.read_unsigned_short();
-        self.peakIrradiance = inputStream.read_float();
+        self.padding = inputStream.read_unsigned_short()
+        self.peakIrradiance = inputStream.read_float()
 
 
 
@@ -3600,17 +3600,17 @@ class EntityID( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.siteID);
-        outputStream.write_unsigned_short(self.applicationID);
-        outputStream.write_unsigned_short(self.entityID);
+        outputStream.write_unsigned_short(self.siteID)
+        outputStream.write_unsigned_short(self.applicationID)
+        outputStream.write_unsigned_short(self.entityID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.siteID = inputStream.read_unsigned_short();
-        self.applicationID = inputStream.read_unsigned_short();
-        self.entityID = inputStream.read_unsigned_short();
+        self.siteID = inputStream.read_unsigned_short()
+        self.applicationID = inputStream.read_unsigned_short()
+        self.entityID = inputStream.read_unsigned_short()
 
 
 
@@ -3642,25 +3642,25 @@ class EngineFuelReload( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.standardQuantity);
-        outputStream.write_unsigned_int(self.maximumQuantity);
-        outputStream.write_unsigned_int(self.standardQuantityReloadTime);
-        outputStream.write_unsigned_int(self.maximumQuantityReloadTime);
-        outputStream.write_unsigned_byte(self.fuelMeasurmentUnits);
-        outputStream.write_unsigned_byte(self.fuelLocation);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_int(self.standardQuantity)
+        outputStream.write_unsigned_int(self.maximumQuantity)
+        outputStream.write_unsigned_int(self.standardQuantityReloadTime)
+        outputStream.write_unsigned_int(self.maximumQuantityReloadTime)
+        outputStream.write_unsigned_byte(self.fuelMeasurmentUnits)
+        outputStream.write_unsigned_byte(self.fuelLocation)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.standardQuantity = inputStream.read_unsigned_int();
-        self.maximumQuantity = inputStream.read_unsigned_int();
-        self.standardQuantityReloadTime = inputStream.read_unsigned_int();
-        self.maximumQuantityReloadTime = inputStream.read_unsigned_int();
-        self.fuelMeasurmentUnits = inputStream.read_unsigned_byte();
-        self.fuelLocation = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.standardQuantity = inputStream.read_unsigned_int()
+        self.maximumQuantity = inputStream.read_unsigned_int()
+        self.standardQuantityReloadTime = inputStream.read_unsigned_int()
+        self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
+        self.fuelMeasurmentUnits = inputStream.read_unsigned_byte()
+        self.fuelLocation = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -3679,14 +3679,14 @@ class UnattachedIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.referenceNumber);
+        outputStream.write_unsigned_short(self.referenceNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.simulationAddress.parse(inputStream)
-        self.referenceNumber = inputStream.read_unsigned_short();
+        self.referenceNumber = inputStream.read_unsigned_short()
 
 
 
@@ -3711,21 +3711,21 @@ class EntityTypeVP( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.recordType);
-        outputStream.write_unsigned_byte(self.changeIndicator);
+        outputStream.write_unsigned_byte(self.recordType)
+        outputStream.write_unsigned_byte(self.changeIndicator)
         self.entityType.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding);
-        outputStream.write_unsigned_int(self.padding1);
+        outputStream.write_unsigned_short(self.padding)
+        outputStream.write_unsigned_int(self.padding1)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte();
-        self.changeIndicator = inputStream.read_unsigned_byte();
+        self.recordType = inputStream.read_unsigned_byte()
+        self.changeIndicator = inputStream.read_unsigned_byte()
         self.entityType.parse(inputStream)
-        self.padding = inputStream.read_unsigned_short();
-        self.padding1 = inputStream.read_unsigned_int();
+        self.padding = inputStream.read_unsigned_short()
+        self.padding1 = inputStream.read_unsigned_int()
 
 
 
@@ -3739,13 +3739,13 @@ class BeamStatus( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.beamState);
+        outputStream.write_unsigned_byte(self.beamState)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.beamState = inputStream.read_unsigned_byte();
+        self.beamState = inputStream.read_unsigned_byte()
 
 
 
@@ -3773,23 +3773,23 @@ class EnvironmentGeneral( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.environmentType);
-        outputStream.write_unsigned_byte(self.length);
-        outputStream.write_unsigned_byte(self.index);
-        outputStream.write_unsigned_byte(self.padding1);
-        outputStream.write_unsigned_byte(self.geometry);
-        outputStream.write_unsigned_byte(self.padding2);
+        outputStream.write_unsigned_int(self.environmentType)
+        outputStream.write_unsigned_byte(self.length)
+        outputStream.write_unsigned_byte(self.index)
+        outputStream.write_unsigned_byte(self.padding1)
+        outputStream.write_unsigned_byte(self.geometry)
+        outputStream.write_unsigned_byte(self.padding2)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.environmentType = inputStream.read_unsigned_int();
-        self.length = inputStream.read_unsigned_byte();
-        self.index = inputStream.read_unsigned_byte();
-        self.padding1 = inputStream.read_unsigned_byte();
-        self.geometry = inputStream.read_unsigned_byte();
-        self.padding2 = inputStream.read_unsigned_byte();
+        self.environmentType = inputStream.read_unsigned_int()
+        self.length = inputStream.read_unsigned_byte()
+        self.index = inputStream.read_unsigned_byte()
+        self.padding1 = inputStream.read_unsigned_byte()
+        self.geometry = inputStream.read_unsigned_byte()
+        self.padding2 = inputStream.read_unsigned_byte()
 
 
 
@@ -3807,17 +3807,17 @@ class Vector3Double( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_double(self.x);
-        outputStream.write_double(self.y);
-        outputStream.write_double(self.z);
+        outputStream.write_double(self.x)
+        outputStream.write_double(self.y)
+        outputStream.write_double(self.z)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.x = inputStream.read_double();
-        self.y = inputStream.read_double();
-        self.z = inputStream.read_double();
+        self.x = inputStream.read_double()
+        self.y = inputStream.read_double()
+        self.z = inputStream.read_double()
 
 
 
@@ -3850,25 +3850,25 @@ class GridAxis( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_double(self.domainInitialXi);
-        outputStream.write_double(self.domainFinalXi);
-        outputStream.write_unsigned_short(self.domainPointsXi);
-        outputStream.write_unsigned_byte(self.interleafFactor);
-        outputStream.write_unsigned_byte(self.axisType);
-        outputStream.write_unsigned_short(self.numberOfPointsOnXiAxis);
-        outputStream.write_unsigned_short(self.initialIndex);
+        outputStream.write_double(self.domainInitialXi)
+        outputStream.write_double(self.domainFinalXi)
+        outputStream.write_unsigned_short(self.domainPointsXi)
+        outputStream.write_unsigned_byte(self.interleafFactor)
+        outputStream.write_unsigned_byte(self.axisType)
+        outputStream.write_unsigned_short(self.numberOfPointsOnXiAxis)
+        outputStream.write_unsigned_short(self.initialIndex)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.domainInitialXi = inputStream.read_double();
-        self.domainFinalXi = inputStream.read_double();
-        self.domainPointsXi = inputStream.read_unsigned_short();
-        self.interleafFactor = inputStream.read_unsigned_byte();
-        self.axisType = inputStream.read_unsigned_byte();
-        self.numberOfPointsOnXiAxis = inputStream.read_unsigned_short();
-        self.initialIndex = inputStream.read_unsigned_short();
+        self.domainInitialXi = inputStream.read_double()
+        self.domainFinalXi = inputStream.read_double()
+        self.domainPointsXi = inputStream.read_unsigned_short()
+        self.interleafFactor = inputStream.read_unsigned_byte()
+        self.axisType = inputStream.read_unsigned_byte()
+        self.numberOfPointsOnXiAxis = inputStream.read_unsigned_short()
+        self.initialIndex = inputStream.read_unsigned_short()
 
 
 
@@ -3886,7 +3886,7 @@ class RecordSpecification( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int( len(self.recordSets));
+        outputStream.write_unsigned_int( len(self.recordSets))
         for anObj in self.recordSets:
             anObj.serialize(outputStream)
 
@@ -3895,7 +3895,7 @@ class RecordSpecification( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfRecordSets = inputStream.read_unsigned_int();
+        self.numberOfRecordSets = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfRecordSets):
             element = null()
             element.parse(inputStream)
@@ -3928,8 +3928,8 @@ class VariableDatum( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int(self.variableDatumID);
-        outputStream.write_unsigned_int(self.variableDatumLength);
+        outputStream.write_unsigned_int(self.variableDatumID)
+        outputStream.write_unsigned_int(self.variableDatumLength)
         for x in range(self.variableDatumLength // 8): # length is in bits
             outputStream.write_byte(self.variableData[x])
 
@@ -3941,10 +3941,10 @@ class VariableDatum( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.variableDatumID = inputStream.read_unsigned_int();
-        self.variableDatumLength = inputStream.read_unsigned_int();
+        self.variableDatumID = inputStream.read_unsigned_int()
+        self.variableDatumLength = inputStream.read_unsigned_int()
         for x in range(self.variableDatumLength // 8): # length is in bits
-            self.variableData.append(inputStream.read_byte());
+            self.variableData.append(inputStream.read_byte())
 
         # Skip over padding
         # "This field shall be padded at the end to make the length a multiple of 64-bits."
@@ -3967,17 +3967,17 @@ class EventIdentifierLiveEntity( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.siteNumber);
-        outputStream.write_unsigned_byte(self.applicationNumber);
-        outputStream.write_unsigned_short(self.eventNumber);
+        outputStream.write_unsigned_byte(self.siteNumber)
+        outputStream.write_unsigned_byte(self.applicationNumber)
+        outputStream.write_unsigned_short(self.eventNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.siteNumber = inputStream.read_unsigned_byte();
-        self.applicationNumber = inputStream.read_unsigned_byte();
-        self.eventNumber = inputStream.read_unsigned_short();
+        self.siteNumber = inputStream.read_unsigned_byte()
+        self.applicationNumber = inputStream.read_unsigned_byte()
+        self.eventNumber = inputStream.read_unsigned_short()
 
 
 
@@ -4012,27 +4012,27 @@ class PduHeader( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.protocolVersion);
-        outputStream.write_unsigned_byte(self.exerciseID);
-        outputStream.write_unsigned_byte(self.pduType);
-        outputStream.write_unsigned_byte(self.protocolFamily);
-        outputStream.write_unsigned_int(self.timestamp);
-        outputStream.write_unsigned_byte(self.pduLength);
-        outputStream.write_unsigned_short(self.pduStatus);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_byte(self.protocolVersion)
+        outputStream.write_unsigned_byte(self.exerciseID)
+        outputStream.write_unsigned_byte(self.pduType)
+        outputStream.write_unsigned_byte(self.protocolFamily)
+        outputStream.write_unsigned_int(self.timestamp)
+        outputStream.write_unsigned_byte(self.pduLength)
+        outputStream.write_unsigned_short(self.pduStatus)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.protocolVersion = inputStream.read_unsigned_byte();
-        self.exerciseID = inputStream.read_unsigned_byte();
-        self.pduType = inputStream.read_unsigned_byte();
-        self.protocolFamily = inputStream.read_unsigned_byte();
-        self.timestamp = inputStream.read_unsigned_int();
-        self.pduLength = inputStream.read_unsigned_byte();
-        self.pduStatus = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_byte();
+        self.protocolVersion = inputStream.read_unsigned_byte()
+        self.exerciseID = inputStream.read_unsigned_byte()
+        self.pduType = inputStream.read_unsigned_byte()
+        self.protocolFamily = inputStream.read_unsigned_byte()
+        self.timestamp = inputStream.read_unsigned_int()
+        self.pduLength = inputStream.read_unsigned_byte()
+        self.pduStatus = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -4063,23 +4063,23 @@ class PduSuperclass( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.protocolVersion);
-        outputStream.write_unsigned_byte(self.exerciseID);
-        outputStream.write_unsigned_byte(self.pduType);
-        outputStream.write_unsigned_byte(self.protocolFamily);
-        outputStream.write_unsigned_int(self.timestamp);
-        outputStream.write_unsigned_short(self.length);
+        outputStream.write_unsigned_byte(self.protocolVersion)
+        outputStream.write_unsigned_byte(self.exerciseID)
+        outputStream.write_unsigned_byte(self.pduType)
+        outputStream.write_unsigned_byte(self.protocolFamily)
+        outputStream.write_unsigned_int(self.timestamp)
+        outputStream.write_unsigned_short(self.length)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.protocolVersion = inputStream.read_unsigned_byte();
-        self.exerciseID = inputStream.read_unsigned_byte();
-        self.pduType = inputStream.read_unsigned_byte();
-        self.protocolFamily = inputStream.read_unsigned_byte();
-        self.timestamp = inputStream.read_unsigned_int();
-        self.length = inputStream.read_unsigned_short();
+        self.protocolVersion = inputStream.read_unsigned_byte()
+        self.exerciseID = inputStream.read_unsigned_byte()
+        self.pduType = inputStream.read_unsigned_byte()
+        self.protocolFamily = inputStream.read_unsigned_byte()
+        self.timestamp = inputStream.read_unsigned_int()
+        self.length = inputStream.read_unsigned_short()
 
 
 
@@ -4094,14 +4094,14 @@ class CommunicationsNodeID( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.entityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.elementID);
+        outputStream.write_unsigned_short(self.elementID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.entityID.parse(inputStream)
-        self.elementID = inputStream.read_unsigned_short();
+        self.elementID = inputStream.read_unsigned_short()
 
 
 
@@ -4118,14 +4118,14 @@ class ExpendableDescriptor( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.expendableType.serialize(outputStream)
-        outputStream.write_long(self.padding);
+        outputStream.write_long(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.expendableType.parse(inputStream)
-        self.padding = inputStream.read_long();
+        self.padding = inputStream.read_long()
 
 
 
@@ -4141,15 +4141,15 @@ class PropulsionSystemData( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_float(self.powerSetting);
-        outputStream.write_float(self.engineRpm);
+        outputStream.write_float(self.powerSetting)
+        outputStream.write_float(self.engineRpm)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.powerSetting = inputStream.read_float();
-        self.engineRpm = inputStream.read_float();
+        self.powerSetting = inputStream.read_float()
+        self.engineRpm = inputStream.read_float()
 
 
 
@@ -4166,14 +4166,14 @@ class LiveEntityIdentifier( object ):
     def serialize(self, outputStream):
         """serialize the class """
         self.liveSimulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.entityNumber);
+        outputStream.write_unsigned_short(self.entityNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         self.liveSimulationAddress.parse(inputStream)
-        self.entityNumber = inputStream.read_unsigned_short();
+        self.entityNumber = inputStream.read_unsigned_short()
 
 
 
@@ -4206,25 +4206,25 @@ class SeparationVP( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.recordType);
-        outputStream.write_unsigned_byte(self.reasonForSeparation);
-        outputStream.write_unsigned_byte(self.preEntityIndicator);
-        outputStream.write_unsigned_byte(self.padding1);
+        outputStream.write_unsigned_byte(self.recordType)
+        outputStream.write_unsigned_byte(self.reasonForSeparation)
+        outputStream.write_unsigned_byte(self.preEntityIndicator)
+        outputStream.write_unsigned_byte(self.padding1)
         self.parentEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding2);
-        outputStream.write_unsigned_int(self.stationLocation);
+        outputStream.write_unsigned_short(self.padding2)
+        outputStream.write_unsigned_int(self.stationLocation)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte();
-        self.reasonForSeparation = inputStream.read_unsigned_byte();
-        self.preEntityIndicator = inputStream.read_unsigned_byte();
-        self.padding1 = inputStream.read_unsigned_byte();
+        self.recordType = inputStream.read_unsigned_byte()
+        self.reasonForSeparation = inputStream.read_unsigned_byte()
+        self.preEntityIndicator = inputStream.read_unsigned_byte()
+        self.padding1 = inputStream.read_unsigned_byte()
         self.parentEntityID.parse(inputStream)
-        self.padding2 = inputStream.read_unsigned_short();
-        self.stationLocation = inputStream.read_unsigned_int();
+        self.padding2 = inputStream.read_unsigned_short()
+        self.stationLocation = inputStream.read_unsigned_int()
 
 
 
@@ -4242,17 +4242,17 @@ class EmitterSystem( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_short(self.emitterName);
-        outputStream.write_unsigned_byte(self.emitterFunction);
-        outputStream.write_unsigned_byte(self.emitterIDNumber);
+        outputStream.write_unsigned_short(self.emitterName)
+        outputStream.write_unsigned_byte(self.emitterFunction)
+        outputStream.write_unsigned_byte(self.emitterIDNumber)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.emitterName = inputStream.read_unsigned_short();
-        self.emitterFunction = inputStream.read_unsigned_byte();
-        self.emitterIDNumber = inputStream.read_unsigned_byte();
+        self.emitterName = inputStream.read_unsigned_short()
+        self.emitterFunction = inputStream.read_unsigned_byte()
+        self.emitterIDNumber = inputStream.read_unsigned_byte()
 
 
 
@@ -4266,13 +4266,13 @@ class PduStatus( object ):
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_byte(self.pduStatus);
+        outputStream.write_unsigned_byte(self.pduStatus)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.pduStatus = inputStream.read_unsigned_byte();
+        self.pduStatus = inputStream.read_unsigned_byte()
 
 
 
@@ -4285,22 +4285,22 @@ class LiveEntityPdu( PduSuperclass ):
         super(LiveEntityPdu, self).__init__()
         self.subprotocolNumber = subprotocolNumber
         """ Subprotocol used to decode the PDU. Section 13 of EBV."""
-        self.padding = padding
+        self.padding = 0
         """ zero-filled array of padding"""
 
     def serialize(self, outputStream):
         """serialize the class """
         super( LiveEntityPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_short(self.subprotocolNumber);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_short(self.subprotocolNumber)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( LiveEntityPdu, self).parse(inputStream)
-        self.subprotocolNumber = inputStream.read_unsigned_short();
-        self.padding = inputStream.read_unsigned_byte();
+        self.subprotocolNumber = inputStream.read_unsigned_short()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -4318,16 +4318,16 @@ class Pdu( PduSuperclass ):
     def serialize(self, outputStream):
         """serialize the class """
         super( Pdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_byte(self.pduStatus);
-        outputStream.write_unsigned_byte(self.padding);
+        outputStream.write_unsigned_byte(self.pduStatus)
+        outputStream.write_unsigned_byte(self.padding)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( Pdu, self).parse(inputStream)
-        self.pduStatus = inputStream.read_unsigned_byte();
-        self.padding = inputStream.read_unsigned_byte();
+        self.pduStatus = inputStream.read_unsigned_byte()
+        self.padding = inputStream.read_unsigned_byte()
 
 
 
@@ -4411,12 +4411,12 @@ class EntityStateUpdatePdu( EntityInformationFamilyPdu ):
         """serialize the class """
         super( EntityStateUpdatePdu, self ).serialize(outputStream)
         self.entityID.serialize(outputStream)
-        outputStream.write_byte(self.padding1);
-        outputStream.write_unsigned_byte( len(self.variableParameters));
+        outputStream.write_byte(self.padding1)
+        outputStream.write_unsigned_byte( len(self.variableParameters))
         self.entityLinearVelocity.serialize(outputStream)
         self.entityLocation.serialize(outputStream)
         self.entityOrientation.serialize(outputStream)
-        outputStream.write_unsigned_int(self.entityAppearance);
+        outputStream.write_unsigned_int(self.entityAppearance)
         for anObj in self.variableParameters:
             anObj.serialize(outputStream)
 
@@ -4427,12 +4427,12 @@ class EntityStateUpdatePdu( EntityInformationFamilyPdu ):
 
         super( EntityStateUpdatePdu, self).parse(inputStream)
         self.entityID.parse(inputStream)
-        self.padding1 = inputStream.read_byte();
-        self.numberOfVariableParameters = inputStream.read_unsigned_byte();
+        self.padding1 = inputStream.read_byte()
+        self.numberOfVariableParameters = inputStream.read_unsigned_byte()
         self.entityLinearVelocity.parse(inputStream)
         self.entityLocation.parse(inputStream)
         self.entityOrientation.parse(inputStream)
-        self.entityAppearance = inputStream.read_unsigned_int();
+        self.entityAppearance = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfVariableParameters):
             element = VariableParameter()
             element.parse(inputStream)
@@ -4471,9 +4471,9 @@ class ServiceRequestPdu( LogisticsFamilyPdu ):
         super( ServiceRequestPdu, self ).serialize(outputStream)
         self.requestingEntityID.serialize(outputStream)
         self.servicingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.serviceTypeRequested);
-        outputStream.write_unsigned_byte( len(self.supplies));
-        outputStream.write_short(self.serviceRequestPadding);
+        outputStream.write_unsigned_byte(self.serviceTypeRequested)
+        outputStream.write_unsigned_byte( len(self.supplies))
+        outputStream.write_short(self.serviceRequestPadding)
         for anObj in self.supplies:
             anObj.serialize(outputStream)
 
@@ -4485,9 +4485,9 @@ class ServiceRequestPdu( LogisticsFamilyPdu ):
         super( ServiceRequestPdu, self).parse(inputStream)
         self.requestingEntityID.parse(inputStream)
         self.servicingEntityID.parse(inputStream)
-        self.serviceTypeRequested = inputStream.read_unsigned_byte();
-        self.numberOfSupplyTypes = inputStream.read_unsigned_byte();
-        self.serviceRequestPadding = inputStream.read_short();
+        self.serviceTypeRequested = inputStream.read_unsigned_byte()
+        self.numberOfSupplyTypes = inputStream.read_unsigned_byte()
+        self.serviceRequestPadding = inputStream.read_short()
         for idx in range(0, self.numberOfSupplyTypes):
             element = null()
             element.parse(inputStream)
@@ -4521,8 +4521,8 @@ class RepairCompletePdu( LogisticsFamilyPdu ):
         super( RepairCompletePdu, self ).serialize(outputStream)
         self.receivingEntityID.serialize(outputStream)
         self.repairingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.repair);
-        outputStream.write_short(self.padding4);
+        outputStream.write_unsigned_short(self.repair)
+        outputStream.write_short(self.padding4)
 
 
     def parse(self, inputStream):
@@ -4531,8 +4531,8 @@ class RepairCompletePdu( LogisticsFamilyPdu ):
         super( RepairCompletePdu, self).parse(inputStream)
         self.receivingEntityID.parse(inputStream)
         self.repairingEntityID.parse(inputStream)
-        self.repair = inputStream.read_unsigned_short();
-        self.padding4 = inputStream.read_short();
+        self.repair = inputStream.read_unsigned_short()
+        self.padding4 = inputStream.read_short()
 
 
 
@@ -4597,10 +4597,10 @@ class CollisionPdu( EntityInformationFamilyPdu ):
         self.issuingEntityID.serialize(outputStream)
         self.collidingEntityID.serialize(outputStream)
         self.eventID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.collisionType);
-        outputStream.write_byte(self.pad);
+        outputStream.write_unsigned_byte(self.collisionType)
+        outputStream.write_byte(self.pad)
         self.velocity.serialize(outputStream)
-        outputStream.write_float(self.mass);
+        outputStream.write_float(self.mass)
         self.location.serialize(outputStream)
 
 
@@ -4611,10 +4611,10 @@ class CollisionPdu( EntityInformationFamilyPdu ):
         self.issuingEntityID.parse(inputStream)
         self.collidingEntityID.parse(inputStream)
         self.eventID.parse(inputStream)
-        self.collisionType = inputStream.read_unsigned_byte();
-        self.pad = inputStream.read_byte();
+        self.collisionType = inputStream.read_unsigned_byte()
+        self.pad = inputStream.read_byte()
         self.velocity.parse(inputStream)
-        self.mass = inputStream.read_float();
+        self.mass = inputStream.read_float()
         self.location.parse(inputStream)
 
 
@@ -4646,9 +4646,9 @@ class RepairResponsePdu( LogisticsFamilyPdu ):
         super( RepairResponsePdu, self ).serialize(outputStream)
         self.receivingEntityID.serialize(outputStream)
         self.repairingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.repairResult);
-        outputStream.write_short(self.padding1);
-        outputStream.write_byte(self.padding2);
+        outputStream.write_unsigned_byte(self.repairResult)
+        outputStream.write_short(self.padding1)
+        outputStream.write_byte(self.padding2)
 
 
     def parse(self, inputStream):
@@ -4657,9 +4657,9 @@ class RepairResponsePdu( LogisticsFamilyPdu ):
         super( RepairResponsePdu, self).parse(inputStream)
         self.receivingEntityID.parse(inputStream)
         self.repairingEntityID.parse(inputStream)
-        self.repairResult = inputStream.read_unsigned_byte();
-        self.padding1 = inputStream.read_short();
-        self.padding2 = inputStream.read_byte();
+        self.repairResult = inputStream.read_unsigned_byte()
+        self.padding1 = inputStream.read_short()
+        self.padding2 = inputStream.read_byte()
 
 
 
@@ -4722,10 +4722,10 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( DataQueryPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int(self.timeInterval);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int(self.timeInterval)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -4738,10 +4738,10 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( DataQueryPdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
-        self.timeInterval = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
+        self.timeInterval = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -4796,9 +4796,9 @@ class LinearObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
         super( LinearObjectStatePdu, self ).serialize(outputStream)
         self.objectID.serialize(outputStream)
         self.referencedObjectID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.updateNumber);
-        outputStream.write_unsigned_byte(self.forceID);
-        outputStream.write_unsigned_byte( len(self.linearSegmentParameters));
+        outputStream.write_unsigned_short(self.updateNumber)
+        outputStream.write_unsigned_byte(self.forceID)
+        outputStream.write_unsigned_byte( len(self.linearSegmentParameters))
         self.requesterID.serialize(outputStream)
         self.receivingID.serialize(outputStream)
         self.objectType.serialize(outputStream)
@@ -4813,9 +4813,9 @@ class LinearObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
         super( LinearObjectStatePdu, self).parse(inputStream)
         self.objectID.parse(inputStream)
         self.referencedObjectID.parse(inputStream)
-        self.updateNumber = inputStream.read_unsigned_short();
-        self.forceID = inputStream.read_unsigned_byte();
-        self.numberOfSegments = inputStream.read_unsigned_byte();
+        self.updateNumber = inputStream.read_unsigned_short()
+        self.forceID = inputStream.read_unsigned_byte()
+        self.numberOfSegments = inputStream.read_unsigned_byte()
         self.requesterID.parse(inputStream)
         self.receivingID.parse(inputStream)
         self.objectType.parse(inputStream)
@@ -4841,14 +4841,14 @@ class CreateEntityPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( CreateEntityPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( CreateEntityPdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -4910,12 +4910,12 @@ class IntercomSignalPdu( RadioCommunicationsFamilyPdu ):
         """serialize the class """
         super( IntercomSignalPdu, self ).serialize(outputStream)
         self.entityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.communicationsDeviceID);
-        outputStream.write_unsigned_short(self.encodingScheme);
-        outputStream.write_unsigned_short(self.tdlType);
-        outputStream.write_unsigned_int(self.sampleRate);
-        outputStream.write_unsigned_short( len(self.data));
-        outputStream.write_unsigned_short(self.samples);
+        outputStream.write_unsigned_short(self.communicationsDeviceID)
+        outputStream.write_unsigned_short(self.encodingScheme)
+        outputStream.write_unsigned_short(self.tdlType)
+        outputStream.write_unsigned_int(self.sampleRate)
+        outputStream.write_unsigned_short( len(self.data))
+        outputStream.write_unsigned_short(self.samples)
         for anObj in self.data:
             anObj.serialize(outputStream)
 
@@ -4926,12 +4926,12 @@ class IntercomSignalPdu( RadioCommunicationsFamilyPdu ):
 
         super( IntercomSignalPdu, self).parse(inputStream)
         self.entityID.parse(inputStream)
-        self.communicationsDeviceID = inputStream.read_unsigned_short();
-        self.encodingScheme = inputStream.read_unsigned_short();
-        self.tdlType = inputStream.read_unsigned_short();
-        self.sampleRate = inputStream.read_unsigned_int();
-        self.dataLength = inputStream.read_unsigned_short();
-        self.samples = inputStream.read_unsigned_short();
+        self.communicationsDeviceID = inputStream.read_unsigned_short()
+        self.encodingScheme = inputStream.read_unsigned_short()
+        self.tdlType = inputStream.read_unsigned_short()
+        self.sampleRate = inputStream.read_unsigned_int()
+        self.dataLength = inputStream.read_unsigned_short()
+        self.samples = inputStream.read_unsigned_short()
         for idx in range(0, self.dataLength):
             element = null()
             element.parse(inputStream)
@@ -4954,14 +4954,14 @@ class RemoveEntityPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( RemoveEntityPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( RemoveEntityPdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -4995,9 +4995,9 @@ class ResupplyReceivedPdu( LogisticsFamilyPdu ):
         super( ResupplyReceivedPdu, self ).serialize(outputStream)
         self.receivingEntityID.serialize(outputStream)
         self.supplyingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte( len(self.supplies));
-        outputStream.write_short(self.padding1);
-        outputStream.write_byte(self.padding2);
+        outputStream.write_unsigned_byte( len(self.supplies))
+        outputStream.write_short(self.padding1)
+        outputStream.write_byte(self.padding2)
         for anObj in self.supplies:
             anObj.serialize(outputStream)
 
@@ -5009,9 +5009,9 @@ class ResupplyReceivedPdu( LogisticsFamilyPdu ):
         super( ResupplyReceivedPdu, self).parse(inputStream)
         self.receivingEntityID.parse(inputStream)
         self.supplyingEntityID.parse(inputStream)
-        self.numberOfSupplyTypes = inputStream.read_unsigned_byte();
-        self.padding1 = inputStream.read_short();
-        self.padding2 = inputStream.read_byte();
+        self.numberOfSupplyTypes = inputStream.read_unsigned_byte()
+        self.padding1 = inputStream.read_short()
+        self.padding2 = inputStream.read_byte()
         for idx in range(0, self.numberOfSupplyTypes):
             element = null()
             element.parse(inputStream)
@@ -5085,7 +5085,7 @@ class CollisionElasticPdu( EntityInformationFamilyPdu ):
         """ This field shall contain the mass of the issuing entity and shall be represented by a 32-bit floating point number representing kilograms"""
         self.locationOfImpact = locationOfImpact or Vector3Float()
         """ This field shall specify the location of the collision with respect to the entity with which the issuing entity collided. This field shall be represented by an Entity Coordinate Vector record [see 6.2.95 item a)]."""
-        self.collisionIntermediateResultXX = colllisionIntermediateResultXX
+        self.collisionIntermediateResultXX = collisionIntermediateResultXX
         """ These six records represent the six independent components of a positive semi-definite matrix formed by pre-multiplying and post-multiplying the tensor of inertia, by the anti-symmetric matrix generated by the moment arm, and shall be represented by 32-bit floating point numbers (see 5.3.4.4)"""
         self.collisionIntermediateResultXY = collisionIntermediateResultXY
         """ tensor values"""
@@ -5112,18 +5112,18 @@ class CollisionElasticPdu( EntityInformationFamilyPdu ):
         self.issuingEntityID.serialize(outputStream)
         self.collidingEntityID.serialize(outputStream)
         self.collisionEventID.serialize(outputStream)
-        outputStream.write_short(self.pad);
+        outputStream.write_short(self.pad)
         self.contactVelocity.serialize(outputStream)
-        outputStream.write_float(self.mass);
+        outputStream.write_float(self.mass)
         self.locationOfImpact.serialize(outputStream)
-        outputStream.write_float(self.collisionIntermediateResultXX);
-        outputStream.write_float(self.collisionIntermediateResultXY);
-        outputStream.write_float(self.collisionIntermediateResultXZ);
-        outputStream.write_float(self.collisionIntermediateResultYY);
-        outputStream.write_float(self.collisionIntermediateResultYZ);
-        outputStream.write_float(self.collisionIntermediateResultZZ);
+        outputStream.write_float(self.collisionIntermediateResultXX)
+        outputStream.write_float(self.collisionIntermediateResultXY)
+        outputStream.write_float(self.collisionIntermediateResultXZ)
+        outputStream.write_float(self.collisionIntermediateResultYY)
+        outputStream.write_float(self.collisionIntermediateResultYZ)
+        outputStream.write_float(self.collisionIntermediateResultZZ)
         self.unitSurfaceNormal.serialize(outputStream)
-        outputStream.write_float(self.coefficientOfRestitution);
+        outputStream.write_float(self.coefficientOfRestitution)
 
 
     def parse(self, inputStream):
@@ -5133,18 +5133,18 @@ class CollisionElasticPdu( EntityInformationFamilyPdu ):
         self.issuingEntityID.parse(inputStream)
         self.collidingEntityID.parse(inputStream)
         self.collisionEventID.parse(inputStream)
-        self.pad = inputStream.read_short();
+        self.pad = inputStream.read_short()
         self.contactVelocity.parse(inputStream)
-        self.mass = inputStream.read_float();
+        self.mass = inputStream.read_float()
         self.locationOfImpact.parse(inputStream)
-        self.collisionIntermediateResultXX = inputStream.read_float();
-        self.collisionIntermediateResultXY = inputStream.read_float();
-        self.collisionIntermediateResultXZ = inputStream.read_float();
-        self.collisionIntermediateResultYY = inputStream.read_float();
-        self.collisionIntermediateResultYZ = inputStream.read_float();
-        self.collisionIntermediateResultZZ = inputStream.read_float();
+        self.collisionIntermediateResultXX = inputStream.read_float()
+        self.collisionIntermediateResultXY = inputStream.read_float()
+        self.collisionIntermediateResultXZ = inputStream.read_float()
+        self.collisionIntermediateResultYY = inputStream.read_float()
+        self.collisionIntermediateResultYZ = inputStream.read_float()
+        self.collisionIntermediateResultZZ = inputStream.read_float()
         self.unitSurfaceNormal.parse(inputStream)
-        self.coefficientOfRestitution = inputStream.read_float();
+        self.coefficientOfRestitution = inputStream.read_float()
 
 
 
@@ -5178,10 +5178,10 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( ActionRequestPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int(self.actionID);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int(self.actionID)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -5194,10 +5194,10 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( ActionRequestPdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
-        self.actionID = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
+        self.actionID = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -5229,18 +5229,18 @@ class AcknowledgePdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( AcknowledgePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_short(self.acknowledgeFlag);
-        outputStream.write_unsigned_short(self.responseFlag);
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_short(self.acknowledgeFlag)
+        outputStream.write_unsigned_short(self.responseFlag)
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( AcknowledgePdu, self).parse(inputStream)
-        self.acknowledgeFlag = inputStream.read_unsigned_short();
-        self.responseFlag = inputStream.read_unsigned_short();
-        self.requestID = inputStream.read_unsigned_int();
+        self.acknowledgeFlag = inputStream.read_unsigned_short()
+        self.responseFlag = inputStream.read_unsigned_short()
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -5331,13 +5331,13 @@ class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( ActionRequestReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_byte(self.requiredReliabilityService);
-        outputStream.write_unsigned_short(self.pad1);
-        outputStream.write_unsigned_byte(self.pad2);
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int(self.actionID);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_byte(self.requiredReliabilityService)
+        outputStream.write_unsigned_short(self.pad1)
+        outputStream.write_unsigned_byte(self.pad2)
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int(self.actionID)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -5350,13 +5350,13 @@ class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( ActionRequestReliablePdu, self).parse(inputStream)
-        self.requiredReliabilityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_short();
-        self.pad2 = inputStream.read_unsigned_byte();
-        self.requestID = inputStream.read_unsigned_int();
-        self.actionID = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requiredReliabilityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_short()
+        self.pad2 = inputStream.read_unsigned_byte()
+        self.requestID = inputStream.read_unsigned_int()
+        self.actionID = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -5417,16 +5417,16 @@ class DesignatorPdu( DistributedEmissionsFamilyPdu ):
         """serialize the class """
         super( DesignatorPdu, self ).serialize(outputStream)
         self.designatingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.codeName);
+        outputStream.write_unsigned_short(self.codeName)
         self.designatedEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.designatorCode);
-        outputStream.write_float(self.designatorPower);
-        outputStream.write_float(self.designatorWavelength);
+        outputStream.write_unsigned_short(self.designatorCode)
+        outputStream.write_float(self.designatorPower)
+        outputStream.write_float(self.designatorWavelength)
         self.designatorSpotWrtDesignated.serialize(outputStream)
         self.designatorSpotLocation.serialize(outputStream)
-        outputStream.write_byte(self.deadReckoningAlgorithm);
-        outputStream.write_unsigned_short(self.padding1);
-        outputStream.write_byte(self.padding2);
+        outputStream.write_byte(self.deadReckoningAlgorithm)
+        outputStream.write_unsigned_short(self.padding1)
+        outputStream.write_byte(self.padding2)
         self.entityLinearAcceleration.serialize(outputStream)
 
 
@@ -5435,16 +5435,16 @@ class DesignatorPdu( DistributedEmissionsFamilyPdu ):
 
         super( DesignatorPdu, self).parse(inputStream)
         self.designatingEntityID.parse(inputStream)
-        self.codeName = inputStream.read_unsigned_short();
+        self.codeName = inputStream.read_unsigned_short()
         self.designatedEntityID.parse(inputStream)
-        self.designatorCode = inputStream.read_unsigned_short();
-        self.designatorPower = inputStream.read_float();
-        self.designatorWavelength = inputStream.read_float();
+        self.designatorCode = inputStream.read_unsigned_short()
+        self.designatorPower = inputStream.read_float()
+        self.designatorWavelength = inputStream.read_float()
         self.designatorSpotWrtDesignated.parse(inputStream)
         self.designatorSpotLocation.parse(inputStream)
-        self.deadReckoningAlgorithm = inputStream.read_byte();
-        self.padding1 = inputStream.read_unsigned_short();
-        self.padding2 = inputStream.read_byte();
+        self.deadReckoningAlgorithm = inputStream.read_byte()
+        self.padding1 = inputStream.read_unsigned_short()
+        self.padding2 = inputStream.read_byte()
         self.entityLinearAcceleration.parse(inputStream)
 
 
@@ -5476,10 +5476,10 @@ class StopFreezePdu( SimulationManagementFamilyPdu ):
         """serialize the class """
         super( StopFreezePdu, self ).serialize(outputStream)
         self.realWorldTime.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.reason);
-        outputStream.write_unsigned_byte(self.frozenBehavior);
-        outputStream.write_short(self.padding1);
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_byte(self.reason)
+        outputStream.write_unsigned_byte(self.frozenBehavior)
+        outputStream.write_short(self.padding1)
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
@@ -5487,10 +5487,10 @@ class StopFreezePdu( SimulationManagementFamilyPdu ):
 
         super( StopFreezePdu, self).parse(inputStream)
         self.realWorldTime.parse(inputStream)
-        self.reason = inputStream.read_unsigned_byte();
-        self.frozenBehavior = inputStream.read_unsigned_byte();
-        self.padding1 = inputStream.read_short();
-        self.requestID = inputStream.read_unsigned_int();
+        self.reason = inputStream.read_unsigned_byte()
+        self.frozenBehavior = inputStream.read_unsigned_byte()
+        self.padding1 = inputStream.read_short()
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -5545,17 +5545,17 @@ class EntityStatePdu( EntityInformationFamilyPdu ):
         """serialize the class """
         super( EntityStatePdu, self ).serialize(outputStream)
         self.entityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.forceId);
-        outputStream.write_unsigned_byte( len(self.variableParameters));
+        outputStream.write_unsigned_byte(self.forceId)
+        outputStream.write_unsigned_byte( len(self.variableParameters))
         self.entityType.serialize(outputStream)
         self.alternativeEntityType.serialize(outputStream)
         self.entityLinearVelocity.serialize(outputStream)
         self.entityLocation.serialize(outputStream)
         self.entityOrientation.serialize(outputStream)
-        outputStream.write_unsigned_int(self.entityAppearance);
+        outputStream.write_unsigned_int(self.entityAppearance)
         self.deadReckoningParameters.serialize(outputStream)
         self.marking.serialize(outputStream)
-        outputStream.write_unsigned_int(self.capabilities);
+        outputStream.write_unsigned_int(self.capabilities)
         for anObj in self.variableParameters:
             anObj.serialize(outputStream)
 
@@ -5566,17 +5566,17 @@ class EntityStatePdu( EntityInformationFamilyPdu ):
 
         super( EntityStatePdu, self).parse(inputStream)
         self.entityID.parse(inputStream)
-        self.forceId = inputStream.read_unsigned_byte();
-        self.numberOfVariableParameters = inputStream.read_unsigned_byte();
+        self.forceId = inputStream.read_unsigned_byte()
+        self.numberOfVariableParameters = inputStream.read_unsigned_byte()
         self.entityType.parse(inputStream)
         self.alternativeEntityType.parse(inputStream)
         self.entityLinearVelocity.parse(inputStream)
         self.entityLocation.parse(inputStream)
         self.entityOrientation.parse(inputStream)
-        self.entityAppearance = inputStream.read_unsigned_int();
+        self.entityAppearance = inputStream.read_unsigned_int()
         self.deadReckoningParameters.parse(inputStream)
         self.marking.parse(inputStream)
-        self.capabilities = inputStream.read_unsigned_int();
+        self.capabilities = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfVariableParameters):
             element = VariableParameter()
             element.parse(inputStream)
@@ -5629,7 +5629,7 @@ class StartResumePdu( SimulationManagementFamilyPdu ):
         super( StartResumePdu, self ).serialize(outputStream)
         self.realWorldTime.serialize(outputStream)
         self.simulationTime.serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
@@ -5638,7 +5638,7 @@ class StartResumePdu( SimulationManagementFamilyPdu ):
         super( StartResumePdu, self).parse(inputStream)
         self.realWorldTime.parse(inputStream)
         self.simulationTime.parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -5716,24 +5716,24 @@ class TransmitterPdu( RadioCommunicationsFamilyPdu ):
         """serialize the class """
         super( TransmitterPdu, self ).serialize(outputStream)
         self.radioReferenceID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.radioNumber);
+        outputStream.write_unsigned_short(self.radioNumber)
         self.radioEntityType.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.transmitState);
-        outputStream.write_unsigned_byte(self.inputSource);
-        outputStream.write_unsigned_short(self.variableTransmitterParameterCount);
+        outputStream.write_unsigned_byte(self.transmitState)
+        outputStream.write_unsigned_byte(self.inputSource)
+        outputStream.write_unsigned_short(self.variableTransmitterParameterCount)
         self.antennaLocation.serialize(outputStream)
         self.relativeAntennaLocation.serialize(outputStream)
-        outputStream.write_unsigned_short(self.antennaPatternType);
-        outputStream.write_unsigned_short( len(self.antennaPatternList));
-        outputStream.write_long(self.frequency);
-        outputStream.write_float(self.transmitFrequencyBandwidth);
-        outputStream.write_float(self.power);
+        outputStream.write_unsigned_short(self.antennaPatternType)
+        outputStream.write_unsigned_short( len(self.antennaPatternList))
+        outputStream.write_long(self.frequency)
+        outputStream.write_float(self.transmitFrequencyBandwidth)
+        outputStream.write_float(self.power)
         self.modulationType.serialize(outputStream)
-        outputStream.write_unsigned_short(self.cryptoSystem);
-        outputStream.write_unsigned_short(self.cryptoKeyId);
-        outputStream.write_unsigned_byte( len(self.modulationParametersList));
-        outputStream.write_unsigned_short(self.padding2);
-        outputStream.write_unsigned_byte(self.padding3);
+        outputStream.write_unsigned_short(self.cryptoSystem)
+        outputStream.write_unsigned_short(self.cryptoKeyId)
+        outputStream.write_unsigned_byte( len(self.modulationParametersList))
+        outputStream.write_unsigned_short(self.padding2)
+        outputStream.write_unsigned_byte(self.padding3)
         for anObj in self.modulationParametersList:
             anObj.serialize(outputStream)
 
@@ -5747,24 +5747,24 @@ class TransmitterPdu( RadioCommunicationsFamilyPdu ):
 
         super( TransmitterPdu, self).parse(inputStream)
         self.radioReferenceID.parse(inputStream)
-        self.radioNumber = inputStream.read_unsigned_short();
+        self.radioNumber = inputStream.read_unsigned_short()
         self.radioEntityType.parse(inputStream)
-        self.transmitState = inputStream.read_unsigned_byte();
-        self.inputSource = inputStream.read_unsigned_byte();
-        self.variableTransmitterParameterCount = inputStream.read_unsigned_short();
+        self.transmitState = inputStream.read_unsigned_byte()
+        self.inputSource = inputStream.read_unsigned_byte()
+        self.variableTransmitterParameterCount = inputStream.read_unsigned_short()
         self.antennaLocation.parse(inputStream)
         self.relativeAntennaLocation.parse(inputStream)
-        self.antennaPatternType = inputStream.read_unsigned_short();
-        self.antennaPatternCount = inputStream.read_unsigned_short();
-        self.frequency = inputStream.read_long();
-        self.transmitFrequencyBandwidth = inputStream.read_float();
-        self.power = inputStream.read_float();
+        self.antennaPatternType = inputStream.read_unsigned_short()
+        self.antennaPatternCount = inputStream.read_unsigned_short()
+        self.frequency = inputStream.read_long()
+        self.transmitFrequencyBandwidth = inputStream.read_float()
+        self.power = inputStream.read_float()
         self.modulationType.parse(inputStream)
-        self.cryptoSystem = inputStream.read_unsigned_short();
-        self.cryptoKeyId = inputStream.read_unsigned_short();
-        self.modulationParameterCount = inputStream.read_unsigned_byte();
-        self.padding2 = inputStream.read_unsigned_short();
-        self.padding3 = inputStream.read_unsigned_byte();
+        self.cryptoSystem = inputStream.read_unsigned_short()
+        self.cryptoKeyId = inputStream.read_unsigned_short()
+        self.modulationParameterCount = inputStream.read_unsigned_byte()
+        self.padding2 = inputStream.read_unsigned_short()
+        self.padding3 = inputStream.read_unsigned_byte()
 
         """ Vendor product MACE from BattleSpace Inc, only uses 1 byte per modulation param """
         """ SISO Spec dictates it should be 2 bytes """
@@ -5784,9 +5784,9 @@ class TransmitterPdu( RadioCommunicationsFamilyPdu ):
         else:
             for idx in range(0, self.modulationParameterCount):
                 if mod_bytes == 2 :
-                   element = inputStream.read_unsigned_short();
+                   element = inputStream.read_unsigned_short()
                 else :
-                   element = inputStream.read_unsigned_byte();
+                   element = inputStream.read_unsigned_byte()
                 self.modulationParametersList.append(element)
             for idx in range(0, self.antennaPatternCount):
                 element = BeamAntennaPattern()
@@ -5826,9 +5826,9 @@ class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
         super( ElectronicEmissionsPdu, self ).serialize(outputStream)
         self.emittingEntityID.serialize(outputStream)
         self.eventID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.stateUpdateIndicator);
-        outputStream.write_unsigned_byte( len(self.systems));
-        outputStream.write_unsigned_short(self.paddingForEmissionsPdu);
+        outputStream.write_unsigned_byte(self.stateUpdateIndicator)
+        outputStream.write_unsigned_byte( len(self.systems))
+        outputStream.write_unsigned_short(self.paddingForEmissionsPdu)
 
         for anObj in self.systems:
             anObj.serialize(outputStream)
@@ -5840,9 +5840,9 @@ class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
         super( ElectronicEmissionsPdu, self).parse(inputStream)
         self.emittingEntityID.parse(inputStream)
         self.eventID.parse(inputStream)
-        self.stateUpdateIndicator = inputStream.read_unsigned_byte();
-        self.numberOfSystems = inputStream.read_unsigned_byte();
-        self.paddingForEmissionsPdu = inputStream.read_unsigned_short();
+        self.stateUpdateIndicator = inputStream.read_unsigned_byte()
+        self.numberOfSystems = inputStream.read_unsigned_byte()
+        self.paddingForEmissionsPdu = inputStream.read_unsigned_short()
 
         for idx in range(0, self.numberOfSystems):
             element = EmissionSystemRecord()
@@ -5871,29 +5871,29 @@ class EmissionSystemBeamRecord():
         self.trackJamRecords = trackJamRecords or []
 
     def serialize(self, outputStream):
-        outputStream.write_unsigned_byte(self.beamDataLength);
-        outputStream.write_unsigned_byte(self.beamIDNumber);
-        outputStream.write_unsigned_short(self.beamParameterIndex);
-        self.fundamentalParameterData.serialize(outputStream);
-        outputStream.write_unsigned_byte(self.beamFunction);
-        outputStream.write_unsigned_byte(self.numberOfTargetsInTrackJam);
-        outputStream.write_unsigned_byte(self.highDensityTrackJam);
-        outputStream.write_unsigned_byte(0); # 8 bit padding
-        outputStream.write_unsigned_int(self.jammingModeSequence);
+        outputStream.write_unsigned_byte(self.beamDataLength)
+        outputStream.write_unsigned_byte(self.beamIDNumber)
+        outputStream.write_unsigned_short(self.beamParameterIndex)
+        self.fundamentalParameterData.serialize(outputStream)
+        outputStream.write_unsigned_byte(self.beamFunction)
+        outputStream.write_unsigned_byte(self.numberOfTargetsInTrackJam)
+        outputStream.write_unsigned_byte(self.highDensityTrackJam)
+        outputStream.write_unsigned_byte(0) # 8 bit padding
+        outputStream.write_unsigned_int(self.jammingModeSequence)
 
         for anObj in self.trackJamRecords:
             anObj.serialize(outputStream)
 
     def parse(self, inputStream):
-        self.beamDataLength = inputStream.read_unsigned_byte();
-        self.beamIDNumber = inputStream.read_unsigned_byte();
-        self.beamParameterIndex = inputStream.read_unsigned_short();
-        self.fundamentalParameterData.parse(inputStream);
-        self.beamFunction = inputStream.read_unsigned_byte();
-        self.numberOfTargetsInTrackJam = inputStream.read_unsigned_byte();
-        self.highDensityTrackJam = inputStream.read_unsigned_byte();
-        inputStream.read_unsigned_byte(); # 8 bit padding
-        self.jammingModeSequence = inputStream.read_unsigned_int();
+        self.beamDataLength = inputStream.read_unsigned_byte()
+        self.beamIDNumber = inputStream.read_unsigned_byte()
+        self.beamParameterIndex = inputStream.read_unsigned_short()
+        self.fundamentalParameterData.parse(inputStream)
+        self.beamFunction = inputStream.read_unsigned_byte()
+        self.numberOfTargetsInTrackJam = inputStream.read_unsigned_byte()
+        self.highDensityTrackJam = inputStream.read_unsigned_byte()
+        inputStream.read_unsigned_byte() # 8 bit padding
+        self.jammingModeSequence = inputStream.read_unsigned_int()
 
         for idx in range(0, self.numberOfTargetsInTrackJam):
             element = TrackJamData()
@@ -5920,18 +5920,18 @@ class EmissionSystemRecord():
         self.beamRecords = beamRecords or []
 
     def serialize(self, outputStream):
-        outputStream.write_unsigned_byte(self.systemDataLength);
-        outputStream.write_unsigned_byte(self.numberOfBeams);
-        outputStream.write_unsigned_short(0); # 16 bit padding
+        outputStream.write_unsigned_byte(self.systemDataLength)
+        outputStream.write_unsigned_byte(self.numberOfBeams)
+        outputStream.write_unsigned_short(0) # 16 bit padding
         self.emitterSystem.serialize(outputStream)
         self.location.serialize(outputStream)
         for anObj in self.beamRecords:
             anObj.serialize(outputStream)
 
     def parse(self, inputStream):
-        self.systemDataLength = inputStream.read_unsigned_byte();
-        self.numberOfBeams = inputStream.read_unsigned_byte();
-        inputStream.read_unsigned_short(); # 16 bit padding
+        self.systemDataLength = inputStream.read_unsigned_byte()
+        self.numberOfBeams = inputStream.read_unsigned_byte()
+        inputStream.read_unsigned_short() # 16 bit padding
         self.emitterSystem.parse(inputStream)
         self.location.parse(inputStream)
         for idx in range(0, self.numberOfBeams):
@@ -5969,9 +5969,9 @@ class ResupplyOfferPdu( LogisticsFamilyPdu ):
         super( ResupplyOfferPdu, self ).serialize(outputStream)
         self.receivingEntityID.serialize(outputStream)
         self.supplyingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte( len(self.supplies));
-        outputStream.write_byte(self.padding1);
-        outputStream.write_short(self.padding2);
+        outputStream.write_unsigned_byte( len(self.supplies))
+        outputStream.write_byte(self.padding1)
+        outputStream.write_short(self.padding2)
         for anObj in self.supplies:
             anObj.serialize(outputStream)
 
@@ -5983,9 +5983,9 @@ class ResupplyOfferPdu( LogisticsFamilyPdu ):
         super( ResupplyOfferPdu, self).parse(inputStream)
         self.receivingEntityID.parse(inputStream)
         self.supplyingEntityID.parse(inputStream)
-        self.numberOfSupplyTypes = inputStream.read_unsigned_byte();
-        self.padding1 = inputStream.read_byte();
-        self.padding2 = inputStream.read_short();
+        self.numberOfSupplyTypes = inputStream.read_unsigned_byte()
+        self.padding1 = inputStream.read_byte()
+        self.padding2 = inputStream.read_short()
         for idx in range(0, self.numberOfSupplyTypes):
             element = null()
             element.parse(inputStream)
@@ -6029,14 +6029,14 @@ class AttributePdu( EntityInformationFamilyPdu ):
         """serialize the class """
         super( AttributePdu, self ).serialize(outputStream)
         self.originatingSimulationAddress.serialize(outputStream)
-        outputStream.write_int(self.padding1);
-        outputStream.write_short(self.padding2);
-        outputStream.write_unsigned_byte(self.attributeRecordPduType);
-        outputStream.write_unsigned_byte(self.attributeRecordProtocolVersion);
-        outputStream.write_unsigned_int(self.masterAttributeRecordType);
-        outputStream.write_unsigned_byte(self.actionCode);
-        outputStream.write_byte(self.padding3);
-        outputStream.write_unsigned_short(self.numberAttributeRecordSet);
+        outputStream.write_int(self.padding1)
+        outputStream.write_short(self.padding2)
+        outputStream.write_unsigned_byte(self.attributeRecordPduType)
+        outputStream.write_unsigned_byte(self.attributeRecordProtocolVersion)
+        outputStream.write_unsigned_int(self.masterAttributeRecordType)
+        outputStream.write_unsigned_byte(self.actionCode)
+        outputStream.write_byte(self.padding3)
+        outputStream.write_unsigned_short(self.numberAttributeRecordSet)
 
 
     def parse(self, inputStream):
@@ -6044,14 +6044,14 @@ class AttributePdu( EntityInformationFamilyPdu ):
 
         super( AttributePdu, self).parse(inputStream)
         self.originatingSimulationAddress.parse(inputStream)
-        self.padding1 = inputStream.read_int();
-        self.padding2 = inputStream.read_short();
-        self.attributeRecordPduType = inputStream.read_unsigned_byte();
-        self.attributeRecordProtocolVersion = inputStream.read_unsigned_byte();
-        self.masterAttributeRecordType = inputStream.read_unsigned_int();
-        self.actionCode = inputStream.read_unsigned_byte();
-        self.padding3 = inputStream.read_byte();
-        self.numberAttributeRecordSet = inputStream.read_unsigned_short();
+        self.padding1 = inputStream.read_int()
+        self.padding2 = inputStream.read_short()
+        self.attributeRecordPduType = inputStream.read_unsigned_byte()
+        self.attributeRecordProtocolVersion = inputStream.read_unsigned_byte()
+        self.masterAttributeRecordType = inputStream.read_unsigned_int()
+        self.actionCode = inputStream.read_unsigned_byte()
+        self.padding3 = inputStream.read_byte()
+        self.numberAttributeRecordSet = inputStream.read_unsigned_short()
 
 
 
@@ -6110,12 +6110,12 @@ class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( SetDataReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_byte(self.requiredReliabilityService);
-        outputStream.write_unsigned_short(self.pad1);
-        outputStream.write_unsigned_byte(self.pad2);
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_byte(self.requiredReliabilityService)
+        outputStream.write_unsigned_short(self.pad1)
+        outputStream.write_unsigned_byte(self.pad2)
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -6128,12 +6128,12 @@ class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( SetDataReliablePdu, self).parse(inputStream)
-        self.requiredReliabilityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_short();
-        self.pad2 = inputStream.read_unsigned_byte();
-        self.requestID = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requiredReliabilityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_short()
+        self.pad2 = inputStream.read_unsigned_byte()
+        self.requestID = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -6176,10 +6176,10 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( EventReportPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.eventType);
-        outputStream.write_unsigned_int(self.padding1);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int(self.eventType)
+        outputStream.write_unsigned_int(self.padding1)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -6192,10 +6192,10 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( EventReportPdu, self).parse(inputStream)
-        self.eventType = inputStream.read_unsigned_int();
-        self.padding1 = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.eventType = inputStream.read_unsigned_int()
+        self.padding1 = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -6228,7 +6228,7 @@ class PointObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
         super(PointObjectStatePdu, self).__init__()
         self.objectID = objectID or EntityID()
         """ Object in synthetic environment"""
-        self.referencedObjectID = referencedObjectID or EntityID();
+        self.referencedObjectID = referencedObjectID or EntityID()
         """ Object with which this point object is associated"""
         self.updateNumber = updateNumber
         """ unique update number of each state transition of an object"""
@@ -6258,16 +6258,16 @@ class PointObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
         super( PointObjectStatePdu, self ).serialize(outputStream)
         self.objectID.serialize(outputStream)
         self.referencedObjectID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.updateNumber);
-        outputStream.write_unsigned_byte(self.forceID);
-        outputStream.write_unsigned_byte(self.modifications);
+        outputStream.write_unsigned_short(self.updateNumber)
+        outputStream.write_unsigned_byte(self.forceID)
+        outputStream.write_unsigned_byte(self.modifications)
         self.objectType.serialize(outputStream)
         self.objectLocation.serialize(outputStream)
         self.objectOrientation.serialize(outputStream)
-        outputStream.write_double(self.objectAppearance);
+        outputStream.write_double(self.objectAppearance)
         self.requesterID.serialize(outputStream)
         self.receivingID.serialize(outputStream)
-        outputStream.write_unsigned_int(self.pad2);
+        outputStream.write_unsigned_int(self.pad2)
 
 
     def parse(self, inputStream):
@@ -6276,16 +6276,16 @@ class PointObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
         super( PointObjectStatePdu, self).parse(inputStream)
         self.objectID.parse(inputStream)
         self.referencedObjectID.parse(inputStream)
-        self.updateNumber = inputStream.read_unsigned_short();
-        self.forceID = inputStream.read_unsigned_byte();
-        self.modifications = inputStream.read_unsigned_byte();
+        self.updateNumber = inputStream.read_unsigned_short()
+        self.forceID = inputStream.read_unsigned_byte()
+        self.modifications = inputStream.read_unsigned_byte()
         self.objectType.parse(inputStream)
         self.objectLocation.parse(inputStream)
         self.objectOrientation.parse(inputStream)
-        self.objectAppearance = inputStream.read_double();
+        self.objectAppearance = inputStream.read_double()
         self.requesterID.parse(inputStream)
         self.receivingID.parse(inputStream)
-        self.pad2 = inputStream.read_unsigned_int();
+        self.pad2 = inputStream.read_unsigned_int()
 
 
 
@@ -6318,10 +6318,10 @@ class DataPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( DataPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int(self.padding1);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int(self.padding1)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -6334,10 +6334,10 @@ class DataPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( DataPdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
-        self.padding1 = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
+        self.padding1 = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -6478,49 +6478,49 @@ class FastEntityStatePdu( EntityInformationFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( FastEntityStatePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_short(self.site);
-        outputStream.write_unsigned_short(self.application);
-        outputStream.write_unsigned_short(self.entity);
-        outputStream.write_unsigned_byte(self.forceId);
-        outputStream.write_byte( len(self.variableParameters));
-        outputStream.write_unsigned_byte(self.entityKind);
-        outputStream.write_unsigned_byte(self.domain);
-        outputStream.write_unsigned_short(self.country);
-        outputStream.write_unsigned_byte(self.category);
-        outputStream.write_unsigned_byte(self.subcategory);
-        outputStream.write_unsigned_byte(self.specific);
-        outputStream.write_unsigned_byte(self.extra);
-        outputStream.write_unsigned_byte(self.altEntityKind);
-        outputStream.write_unsigned_byte(self.altDomain);
-        outputStream.write_unsigned_short(self.altCountry);
-        outputStream.write_unsigned_byte(self.altCategory);
-        outputStream.write_unsigned_byte(self.altSubcategory);
-        outputStream.write_unsigned_byte(self.altSpecific);
-        outputStream.write_unsigned_byte(self.altExtra);
-        outputStream.write_float(self.xVelocity);
-        outputStream.write_float(self.yVelocity);
-        outputStream.write_float(self.zVelocity);
-        outputStream.write_double(self.xLocation);
-        outputStream.write_double(self.yLocation);
-        outputStream.write_double(self.zLocation);
-        outputStream.write_float(self.psi);
-        outputStream.write_float(self.theta);
-        outputStream.write_float(self.phi);
-        outputStream.write_int(self.entityAppearance);
-        outputStream.write_unsigned_byte(self.deadReckoningAlgorithm);
+        outputStream.write_unsigned_short(self.site)
+        outputStream.write_unsigned_short(self.application)
+        outputStream.write_unsigned_short(self.entity)
+        outputStream.write_unsigned_byte(self.forceId)
+        outputStream.write_byte( len(self.variableParameters))
+        outputStream.write_unsigned_byte(self.entityKind)
+        outputStream.write_unsigned_byte(self.domain)
+        outputStream.write_unsigned_short(self.country)
+        outputStream.write_unsigned_byte(self.category)
+        outputStream.write_unsigned_byte(self.subcategory)
+        outputStream.write_unsigned_byte(self.specific)
+        outputStream.write_unsigned_byte(self.extra)
+        outputStream.write_unsigned_byte(self.altEntityKind)
+        outputStream.write_unsigned_byte(self.altDomain)
+        outputStream.write_unsigned_short(self.altCountry)
+        outputStream.write_unsigned_byte(self.altCategory)
+        outputStream.write_unsigned_byte(self.altSubcategory)
+        outputStream.write_unsigned_byte(self.altSpecific)
+        outputStream.write_unsigned_byte(self.altExtra)
+        outputStream.write_float(self.xVelocity)
+        outputStream.write_float(self.yVelocity)
+        outputStream.write_float(self.zVelocity)
+        outputStream.write_double(self.xLocation)
+        outputStream.write_double(self.yLocation)
+        outputStream.write_double(self.zLocation)
+        outputStream.write_float(self.psi)
+        outputStream.write_float(self.theta)
+        outputStream.write_float(self.phi)
+        outputStream.write_int(self.entityAppearance)
+        outputStream.write_unsigned_byte(self.deadReckoningAlgorithm)
         for idx in range(0, 15):
-            outputStream.write_byte( self.otherParameters[ idx ] );
+            outputStream.write_byte( self.otherParameters[ idx ] )
 
-        outputStream.write_float(self.xAcceleration);
-        outputStream.write_float(self.yAcceleration);
-        outputStream.write_float(self.zAcceleration);
-        outputStream.write_float(self.xAngularVelocity);
-        outputStream.write_float(self.yAngularVelocity);
-        outputStream.write_float(self.zAngularVelocity);
+        outputStream.write_float(self.xAcceleration)
+        outputStream.write_float(self.yAcceleration)
+        outputStream.write_float(self.zAcceleration)
+        outputStream.write_float(self.xAngularVelocity)
+        outputStream.write_float(self.yAngularVelocity)
+        outputStream.write_float(self.zAngularVelocity)
         for idx in range(0, 12):
-            outputStream.write_byte( self.marking[ idx ] );
+            outputStream.write_byte( self.marking[ idx ] )
 
-        outputStream.write_int(self.capabilities);
+        outputStream.write_int(self.capabilities)
         for anObj in self.variableParameters:
             anObj.serialize(outputStream)
 
@@ -6530,55 +6530,55 @@ class FastEntityStatePdu( EntityInformationFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( FastEntityStatePdu, self).parse(inputStream)
-        self.site = inputStream.read_unsigned_short();
-        self.application = inputStream.read_unsigned_short();
-        self.entity = inputStream.read_unsigned_short();
-        self.forceId = inputStream.read_unsigned_byte();
-        self.numberOfVariableParameters = inputStream.read_byte();
-        self.entityKind = inputStream.read_unsigned_byte();
-        self.domain = inputStream.read_unsigned_byte();
-        self.country = inputStream.read_unsigned_short();
-        self.category = inputStream.read_unsigned_byte();
-        self.subcategory = inputStream.read_unsigned_byte();
-        self.specific = inputStream.read_unsigned_byte();
-        self.extra = inputStream.read_unsigned_byte();
-        self.altEntityKind = inputStream.read_unsigned_byte();
-        self.altDomain = inputStream.read_unsigned_byte();
-        self.altCountry = inputStream.read_unsigned_short();
-        self.altCategory = inputStream.read_unsigned_byte();
-        self.altSubcategory = inputStream.read_unsigned_byte();
-        self.altSpecific = inputStream.read_unsigned_byte();
-        self.altExtra = inputStream.read_unsigned_byte();
-        self.xVelocity = inputStream.read_float();
-        self.yVelocity = inputStream.read_float();
-        self.zVelocity = inputStream.read_float();
-        self.xLocation = inputStream.read_double();
-        self.yLocation = inputStream.read_double();
-        self.zLocation = inputStream.read_double();
-        self.psi = inputStream.read_float();
-        self.theta = inputStream.read_float();
-        self.phi = inputStream.read_float();
-        self.entityAppearance = inputStream.read_int();
-        self.deadReckoningAlgorithm = inputStream.read_unsigned_byte();
+        self.site = inputStream.read_unsigned_short()
+        self.application = inputStream.read_unsigned_short()
+        self.entity = inputStream.read_unsigned_short()
+        self.forceId = inputStream.read_unsigned_byte()
+        self.numberOfVariableParameters = inputStream.read_byte()
+        self.entityKind = inputStream.read_unsigned_byte()
+        self.domain = inputStream.read_unsigned_byte()
+        self.country = inputStream.read_unsigned_short()
+        self.category = inputStream.read_unsigned_byte()
+        self.subcategory = inputStream.read_unsigned_byte()
+        self.specific = inputStream.read_unsigned_byte()
+        self.extra = inputStream.read_unsigned_byte()
+        self.altEntityKind = inputStream.read_unsigned_byte()
+        self.altDomain = inputStream.read_unsigned_byte()
+        self.altCountry = inputStream.read_unsigned_short()
+        self.altCategory = inputStream.read_unsigned_byte()
+        self.altSubcategory = inputStream.read_unsigned_byte()
+        self.altSpecific = inputStream.read_unsigned_byte()
+        self.altExtra = inputStream.read_unsigned_byte()
+        self.xVelocity = inputStream.read_float()
+        self.yVelocity = inputStream.read_float()
+        self.zVelocity = inputStream.read_float()
+        self.xLocation = inputStream.read_double()
+        self.yLocation = inputStream.read_double()
+        self.zLocation = inputStream.read_double()
+        self.psi = inputStream.read_float()
+        self.theta = inputStream.read_float()
+        self.phi = inputStream.read_float()
+        self.entityAppearance = inputStream.read_int()
+        self.deadReckoningAlgorithm = inputStream.read_unsigned_byte()
         self.otherParameters = [0]*15
         for idx in range(0, 15):
             val = inputStream.read_byte()
 
             self.otherParameters[  idx  ] = val
 
-        self.xAcceleration = inputStream.read_float();
-        self.yAcceleration = inputStream.read_float();
-        self.zAcceleration = inputStream.read_float();
-        self.xAngularVelocity = inputStream.read_float();
-        self.yAngularVelocity = inputStream.read_float();
-        self.zAngularVelocity = inputStream.read_float();
+        self.xAcceleration = inputStream.read_float()
+        self.yAcceleration = inputStream.read_float()
+        self.zAcceleration = inputStream.read_float()
+        self.xAngularVelocity = inputStream.read_float()
+        self.yAngularVelocity = inputStream.read_float()
+        self.zAngularVelocity = inputStream.read_float()
         self.marking = [0]*12
         for idx in range(0, 12):
             val = inputStream.read_byte()
 
             self.marking[  idx  ] = val
 
-        self.capabilities = inputStream.read_int();
+        self.capabilities = inputStream.read_int()
         for idx in range(0, self.numberOfVariableParameters):
             element = VariableParameter()
             element.parse(inputStream)
@@ -6608,18 +6608,18 @@ class AcknowledgeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( AcknowledgeReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_short(self.acknowledgeFlag);
-        outputStream.write_unsigned_short(self.responseFlag);
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_short(self.acknowledgeFlag)
+        outputStream.write_unsigned_short(self.responseFlag)
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( AcknowledgeReliablePdu, self).parse(inputStream)
-        self.acknowledgeFlag = inputStream.read_unsigned_short();
-        self.responseFlag = inputStream.read_unsigned_short();
-        self.requestID = inputStream.read_unsigned_int();
+        self.acknowledgeFlag = inputStream.read_unsigned_short()
+        self.responseFlag = inputStream.read_unsigned_short()
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -6653,10 +6653,10 @@ class StartResumeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         super( StartResumeReliablePdu, self ).serialize(outputStream)
         self.realWorldTime.serialize(outputStream)
         self.simulationTime.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.requiredReliabilityService);
-        outputStream.write_unsigned_short(self.pad1);
-        outputStream.write_unsigned_byte(self.pad2);
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_byte(self.requiredReliabilityService)
+        outputStream.write_unsigned_short(self.pad1)
+        outputStream.write_unsigned_byte(self.pad2)
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
@@ -6665,10 +6665,10 @@ class StartResumeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         super( StartResumeReliablePdu, self).parse(inputStream)
         self.realWorldTime.parse(inputStream)
         self.simulationTime.parse(inputStream)
-        self.requiredReliabilityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_short();
-        self.pad2 = inputStream.read_unsigned_byte();
-        self.requestID = inputStream.read_unsigned_int();
+        self.requiredReliabilityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_short()
+        self.pad2 = inputStream.read_unsigned_byte()
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -6722,13 +6722,13 @@ class ArealObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
         super( ArealObjectStatePdu, self ).serialize(outputStream)
         self.objectID.serialize(outputStream)
         self.referencedObjectID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.updateNumber);
-        outputStream.write_unsigned_byte(self.forceID);
-        outputStream.write_unsigned_byte(self.modifications);
+        outputStream.write_unsigned_short(self.updateNumber)
+        outputStream.write_unsigned_byte(self.forceID)
+        outputStream.write_unsigned_byte(self.modifications)
         self.objectType.serialize(outputStream)
-        outputStream.write_unsigned_int(self.specificObjectAppearance);
-        outputStream.write_unsigned_short(self.generalObjectAppearance);
-        outputStream.write_unsigned_short( len(self.objectLocation));
+        outputStream.write_unsigned_int(self.specificObjectAppearance)
+        outputStream.write_unsigned_short(self.generalObjectAppearance)
+        outputStream.write_unsigned_short( len(self.objectLocation))
         self.requesterID.serialize(outputStream)
         self.receivingID.serialize(outputStream)
         for anObj in self.objectLocation:
@@ -6742,13 +6742,13 @@ class ArealObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
         super( ArealObjectStatePdu, self).parse(inputStream)
         self.objectID.parse(inputStream)
         self.referencedObjectID.parse(inputStream)
-        self.updateNumber = inputStream.read_unsigned_short();
-        self.forceID = inputStream.read_unsigned_byte();
-        self.modifications = inputStream.read_unsigned_byte();
+        self.updateNumber = inputStream.read_unsigned_short()
+        self.forceID = inputStream.read_unsigned_byte()
+        self.modifications = inputStream.read_unsigned_byte()
         self.objectType.parse(inputStream)
-        self.specificObjectAppearance = inputStream.read_unsigned_int();
-        self.generalObjectAppearance = inputStream.read_unsigned_short();
-        self.numberOfPoints = inputStream.read_unsigned_short();
+        self.specificObjectAppearance = inputStream.read_unsigned_int()
+        self.generalObjectAppearance = inputStream.read_unsigned_short()
+        self.numberOfPoints = inputStream.read_unsigned_short()
         self.requesterID.parse(inputStream)
         self.receivingID.parse(inputStream)
         for idx in range(0, self.numberOfPoints):
@@ -6796,13 +6796,13 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( DataQueryReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_byte(self.requiredReliabilityService);
-        outputStream.write_unsigned_short(self.pad1);
-        outputStream.write_unsigned_byte(self.pad2);
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int(self.timeInterval);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_byte(self.requiredReliabilityService)
+        outputStream.write_unsigned_short(self.pad1)
+        outputStream.write_unsigned_byte(self.pad2)
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int(self.timeInterval)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -6815,13 +6815,13 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( DataQueryReliablePdu, self).parse(inputStream)
-        self.requiredReliabilityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_short();
-        self.pad2 = inputStream.read_unsigned_byte();
-        self.requestID = inputStream.read_unsigned_int();
-        self.timeInterval = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requiredReliabilityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_short()
+        self.pad2 = inputStream.read_unsigned_byte()
+        self.requestID = inputStream.read_unsigned_int()
+        self.timeInterval = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -6853,7 +6853,7 @@ class MinefieldStatePdu( MinefieldFamilyPdu ):
                  mineTypes=None):
         """ Initializer for MinefieldStatePdu"""
         super(MinefieldStatePdu, self).__init__()
-        self.minefieldID = minefield or MinefieldIdentifier()
+        self.minefieldID = minefieldID or MinefieldIdentifier()
         """ Minefield ID"""
         self.minefieldSequence = minefieldSequence
         """ Minefield sequence"""
@@ -6884,15 +6884,15 @@ class MinefieldStatePdu( MinefieldFamilyPdu ):
         """serialize the class """
         super( MinefieldStatePdu, self ).serialize(outputStream)
         self.minefieldID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.minefieldSequence);
-        outputStream.write_unsigned_byte(self.forceID);
-        outputStream.write_unsigned_byte( len(self.perimeterPoints));
+        outputStream.write_unsigned_short(self.minefieldSequence)
+        outputStream.write_unsigned_byte(self.forceID)
+        outputStream.write_unsigned_byte( len(self.perimeterPoints))
         self.minefieldType.serialize(outputStream)
-        outputStream.write_unsigned_short( len(self.mineType));
+        outputStream.write_unsigned_short( len(self.mineType))
         self.minefieldLocation.serialize(outputStream)
         self.minefieldOrientation.serialize(outputStream)
-        outputStream.write_unsigned_short(self.appearance);
-        outputStream.write_unsigned_short(self.protocolMode);
+        outputStream.write_unsigned_short(self.appearance)
+        outputStream.write_unsigned_short(self.protocolMode)
         for anObj in self.perimeterPoints:
             anObj.serialize(outputStream)
 
@@ -6906,15 +6906,15 @@ class MinefieldStatePdu( MinefieldFamilyPdu ):
 
         super( MinefieldStatePdu, self).parse(inputStream)
         self.minefieldID.parse(inputStream)
-        self.minefieldSequence = inputStream.read_unsigned_short();
-        self.forceID = inputStream.read_unsigned_byte();
-        self.numberOfPerimeterPoints = inputStream.read_unsigned_byte();
+        self.minefieldSequence = inputStream.read_unsigned_short()
+        self.forceID = inputStream.read_unsigned_byte()
+        self.numberOfPerimeterPoints = inputStream.read_unsigned_byte()
         self.minefieldType.parse(inputStream)
-        self.numberOfMineTypes = inputStream.read_unsigned_short();
+        self.numberOfMineTypes = inputStream.read_unsigned_short()
         self.minefieldLocation.parse(inputStream)
         self.minefieldOrientation.parse(inputStream)
-        self.appearance = inputStream.read_unsigned_short();
-        self.protocolMode = inputStream.read_unsigned_short();
+        self.appearance = inputStream.read_unsigned_short()
+        self.protocolMode = inputStream.read_unsigned_short()
         for idx in range(0, self.numberOfPerimeterPoints):
             element = null()
             element.parse(inputStream)
@@ -6962,12 +6962,12 @@ class DataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( DataReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_byte(self.requiredReliabilityService);
-        outputStream.write_unsigned_short(self.pad1);
-        outputStream.write_unsigned_byte(self.pad2);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_byte(self.requiredReliabilityService)
+        outputStream.write_unsigned_short(self.pad1)
+        outputStream.write_unsigned_byte(self.pad2)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -6980,12 +6980,12 @@ class DataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( DataReliablePdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
-        self.requiredReliabilityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_short();
-        self.pad2 = inputStream.read_unsigned_byte();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
+        self.requiredReliabilityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_short()
+        self.pad2 = inputStream.read_unsigned_byte()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -7023,8 +7023,8 @@ class CommentPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( CommentPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -7037,8 +7037,8 @@ class CommentPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( CommentPdu, self).parse(inputStream)
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -7076,8 +7076,8 @@ class CommentReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( CommentReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -7090,8 +7090,8 @@ class CommentReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( CommentReliablePdu, self).parse(inputStream)
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -7164,19 +7164,19 @@ class DirectedEnergyFirePdu( WarfareFamilyPdu ):
         super( DirectedEnergyFirePdu, self ).serialize(outputStream)
         self.munitionType.serialize(outputStream)
         self.shotStartTime.serialize(outputStream)
-        outputStream.write_float(self.commulativeShotTime);
+        outputStream.write_float(self.commulativeShotTime)
         self.ApertureEmitterLocation.serialize(outputStream)
-        outputStream.write_float(self.apertureDiameter);
-        outputStream.write_float(self.wavelength);
-        outputStream.write_float(self.peakIrradiance);
-        outputStream.write_float(self.pulseRepetitionFrequency);
-        outputStream.write_int(self.pulseWidth);
-        outputStream.write_int(self.flags);
-        outputStream.write_byte(self.pulseShape);
-        outputStream.write_unsigned_byte(self.padding1);
-        outputStream.write_unsigned_int(self.padding2);
-        outputStream.write_unsigned_short(self.padding3);
-        outputStream.write_unsigned_short( len(self.dERecords));
+        outputStream.write_float(self.apertureDiameter)
+        outputStream.write_float(self.wavelength)
+        outputStream.write_float(self.peakIrradiance)
+        outputStream.write_float(self.pulseRepetitionFrequency)
+        outputStream.write_int(self.pulseWidth)
+        outputStream.write_int(self.flags)
+        outputStream.write_byte(self.pulseShape)
+        outputStream.write_unsigned_byte(self.padding1)
+        outputStream.write_unsigned_int(self.padding2)
+        outputStream.write_unsigned_short(self.padding3)
+        outputStream.write_unsigned_short( len(self.dERecords))
         for anObj in self.dERecords:
             anObj.serialize(outputStream)
 
@@ -7188,19 +7188,19 @@ class DirectedEnergyFirePdu( WarfareFamilyPdu ):
         super( DirectedEnergyFirePdu, self).parse(inputStream)
         self.munitionType.parse(inputStream)
         self.shotStartTime.parse(inputStream)
-        self.commulativeShotTime = inputStream.read_float();
+        self.commulativeShotTime = inputStream.read_float()
         self.ApertureEmitterLocation.parse(inputStream)
-        self.apertureDiameter = inputStream.read_float();
-        self.wavelength = inputStream.read_float();
-        self.peakIrradiance = inputStream.read_float();
-        self.pulseRepetitionFrequency = inputStream.read_float();
-        self.pulseWidth = inputStream.read_int();
-        self.flags = inputStream.read_int();
-        self.pulseShape = inputStream.read_byte();
-        self.padding1 = inputStream.read_unsigned_byte();
-        self.padding2 = inputStream.read_unsigned_int();
-        self.padding3 = inputStream.read_unsigned_short();
-        self.numberOfDERecords = inputStream.read_unsigned_short();
+        self.apertureDiameter = inputStream.read_float()
+        self.wavelength = inputStream.read_float()
+        self.peakIrradiance = inputStream.read_float()
+        self.pulseRepetitionFrequency = inputStream.read_float()
+        self.pulseWidth = inputStream.read_int()
+        self.flags = inputStream.read_int()
+        self.pulseShape = inputStream.read_byte()
+        self.padding1 = inputStream.read_unsigned_byte()
+        self.padding2 = inputStream.read_unsigned_int()
+        self.padding3 = inputStream.read_unsigned_short()
+        self.numberOfDERecords = inputStream.read_unsigned_short()
         for idx in range(0, self.numberOfDERecords):
             element = null()
             element.parse(inputStream)
@@ -7256,9 +7256,9 @@ class DetonationPdu( WarfareFamilyPdu ):
         self.locationInWorldCoordinates.serialize(outputStream)
         self.descriptor.serialize(outputStream)
         self.locationOfEntityCoordinates.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.detonationResult);
-        outputStream.write_unsigned_byte( len(self.variableParameters));
-        outputStream.write_unsigned_short(self.pad);
+        outputStream.write_unsigned_byte(self.detonationResult)
+        outputStream.write_unsigned_byte( len(self.variableParameters))
+        outputStream.write_unsigned_short(self.pad)
         for anObj in self.variableParameters:
             anObj.serialize(outputStream)
 
@@ -7274,9 +7274,9 @@ class DetonationPdu( WarfareFamilyPdu ):
         self.locationInWorldCoordinates.parse(inputStream)
         self.descriptor.parse(inputStream)
         self.locationOfEntityCoordinates.parse(inputStream)
-        self.detonationResult = inputStream.read_unsigned_byte();
-        self.numberOfVariableParameters = inputStream.read_unsigned_byte();
-        self.pad = inputStream.read_unsigned_short();
+        self.detonationResult = inputStream.read_unsigned_byte()
+        self.numberOfVariableParameters = inputStream.read_unsigned_byte()
+        self.pad = inputStream.read_unsigned_short()
         for idx in range(0, self.numberOfVariableParameters):
             element = VariableParameter()
             element.parse(inputStream)
@@ -7314,10 +7314,10 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( SetDataPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int(self.padding1);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int(self.padding1)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -7330,10 +7330,10 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( SetDataPdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
-        self.padding1 = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
+        self.padding1 = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -7381,13 +7381,13 @@ class RecordQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( RecordQueryReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_byte(self.requiredReliabilityService);
-        outputStream.write_unsigned_short(self.pad1);
-        outputStream.write_unsigned_byte(self.pad2);
-        outputStream.write_unsigned_short(self.eventType);
-        outputStream.write_unsigned_int(self.time);
-        outputStream.write_unsigned_int( len(self.recordIDs));
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_byte(self.requiredReliabilityService)
+        outputStream.write_unsigned_short(self.pad1)
+        outputStream.write_unsigned_byte(self.pad2)
+        outputStream.write_unsigned_short(self.eventType)
+        outputStream.write_unsigned_int(self.time)
+        outputStream.write_unsigned_int( len(self.recordIDs))
         for anObj in self.recordIDs:
             anObj.serialize(outputStream)
 
@@ -7397,13 +7397,13 @@ class RecordQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( RecordQueryReliablePdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
-        self.requiredReliabilityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_short();
-        self.pad2 = inputStream.read_unsigned_byte();
-        self.eventType = inputStream.read_unsigned_short();
-        self.time = inputStream.read_unsigned_int();
-        self.numberOfRecords = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
+        self.requiredReliabilityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_short()
+        self.pad2 = inputStream.read_unsigned_byte()
+        self.eventType = inputStream.read_unsigned_short()
+        self.time = inputStream.read_unsigned_int()
+        self.numberOfRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfRecords):
             element = null()
             element.parse(inputStream)
@@ -7442,10 +7442,10 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( ActionResponsePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int(self.requestStatus);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int(self.requestStatus)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -7458,10 +7458,10 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( ActionResponsePdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
-        self.requestStatus = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
+        self.requestStatus = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -7501,9 +7501,9 @@ class EntityDamageStatusPdu( WarfareFamilyPdu ):
         """serialize the class """
         super( EntityDamageStatusPdu, self ).serialize(outputStream)
         self.damagedEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding1);
-        outputStream.write_unsigned_short(self.padding2);
-        outputStream.write_unsigned_short( len(self.damageDescriptionRecords));
+        outputStream.write_unsigned_short(self.padding1)
+        outputStream.write_unsigned_short(self.padding2)
+        outputStream.write_unsigned_short( len(self.damageDescriptionRecords))
         for anObj in self.damageDescriptionRecords:
             anObj.serialize(outputStream)
 
@@ -7514,9 +7514,9 @@ class EntityDamageStatusPdu( WarfareFamilyPdu ):
 
         super( EntityDamageStatusPdu, self).parse(inputStream)
         self.damagedEntityID.parse(inputStream)
-        self.padding1 = inputStream.read_unsigned_short();
-        self.padding2 = inputStream.read_unsigned_short();
-        self.numberOfDamageDescription = inputStream.read_unsigned_short();
+        self.padding1 = inputStream.read_unsigned_short()
+        self.padding2 = inputStream.read_unsigned_short()
+        self.numberOfDamageDescription = inputStream.read_unsigned_short()
         for idx in range(0, self.numberOfDamageDescription):
             element = null()
             element.parse(inputStream)
@@ -7560,11 +7560,11 @@ class FirePdu( WarfareFamilyPdu ):
         super( FirePdu, self ).serialize(outputStream)
         self.munitionExpendibleID.serialize(outputStream)
         self.eventID.serialize(outputStream)
-        outputStream.write_unsigned_int(self.fireMissionIndex);
+        outputStream.write_unsigned_int(self.fireMissionIndex)
         self.locationInWorldCoordinates.serialize(outputStream)
         self.descriptor.serialize(outputStream)
         self.velocity.serialize(outputStream)
-        outputStream.write_float(self.range);
+        outputStream.write_float(self.range)
 
 
     def parse(self, inputStream):
@@ -7573,11 +7573,11 @@ class FirePdu( WarfareFamilyPdu ):
         super( FirePdu, self).parse(inputStream)
         self.munitionExpendibleID.parse(inputStream)
         self.eventID.parse(inputStream)
-        self.fireMissionIndex = inputStream.read_unsigned_int();
+        self.fireMissionIndex = inputStream.read_unsigned_int()
         self.locationInWorldCoordinates.parse(inputStream)
         self.descriptor.parse(inputStream)
         self.velocity.parse(inputStream)
-        self.range = inputStream.read_float();
+        self.range = inputStream.read_float()
 
 
 
@@ -7607,22 +7607,22 @@ class ReceiverPdu( RadioCommunicationsFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( ReceiverPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_short(self.receiverState);
-        outputStream.write_unsigned_short(self.padding1);
-        outputStream.write_float(self.receivedPower);
+        outputStream.write_unsigned_short(self.receiverState)
+        outputStream.write_unsigned_short(self.padding1)
+        outputStream.write_float(self.receivedPower)
         self.transmitterEntityId.serialize(outputStream)
-        outputStream.write_unsigned_short(self.transmitterRadioId);
+        outputStream.write_unsigned_short(self.transmitterRadioId)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( ReceiverPdu, self).parse(inputStream)
-        self.receiverState = inputStream.read_unsigned_short();
-        self.padding1 = inputStream.read_unsigned_short();
-        self.receivedPower = inputStream.read_float();
+        self.receiverState = inputStream.read_unsigned_short()
+        self.padding1 = inputStream.read_unsigned_short()
+        self.receivedPower = inputStream.read_float()
         self.transmitterEntityId.parse(inputStream)
-        self.transmitterRadioId = inputStream.read_unsigned_short();
+        self.transmitterRadioId = inputStream.read_unsigned_short()
 
 
 
@@ -7675,13 +7675,13 @@ class UaPdu( DistributedEmissionsFamilyPdu ):
         super( UaPdu, self ).serialize(outputStream)
         self.emittingEntityID.serialize(outputStream)
         self.eventID.serialize(outputStream)
-        outputStream.write_byte(self.stateChangeIndicator);
-        outputStream.write_byte(self.pad);
-        outputStream.write_unsigned_short(self.passiveParameterIndex);
-        outputStream.write_unsigned_byte(self.propulsionPlantConfiguration);
-        outputStream.write_unsigned_byte( len(self.shaftRPMs));
-        outputStream.write_unsigned_byte( len(self.apaData));
-        outputStream.write_unsigned_byte( len(self.emitterSystems));
+        outputStream.write_byte(self.stateChangeIndicator)
+        outputStream.write_byte(self.pad)
+        outputStream.write_unsigned_short(self.passiveParameterIndex)
+        outputStream.write_unsigned_byte(self.propulsionPlantConfiguration)
+        outputStream.write_unsigned_byte( len(self.shaftRPMs))
+        outputStream.write_unsigned_byte( len(self.apaData))
+        outputStream.write_unsigned_byte( len(self.emitterSystems))
         for anObj in self.shaftRPMs:
             anObj.serialize(outputStream)
 
@@ -7699,13 +7699,13 @@ class UaPdu( DistributedEmissionsFamilyPdu ):
         super( UaPdu, self).parse(inputStream)
         self.emittingEntityID.parse(inputStream)
         self.eventID.parse(inputStream)
-        self.stateChangeIndicator = inputStream.read_byte();
-        self.pad = inputStream.read_byte();
-        self.passiveParameterIndex = inputStream.read_unsigned_short();
-        self.propulsionPlantConfiguration = inputStream.read_unsigned_byte();
-        self.numberOfShafts = inputStream.read_unsigned_byte();
-        self.numberOfAPAs = inputStream.read_unsigned_byte();
-        self.numberOfUAEmitterSystems = inputStream.read_unsigned_byte();
+        self.stateChangeIndicator = inputStream.read_byte()
+        self.pad = inputStream.read_byte()
+        self.passiveParameterIndex = inputStream.read_unsigned_short()
+        self.propulsionPlantConfiguration = inputStream.read_unsigned_byte()
+        self.numberOfShafts = inputStream.read_unsigned_byte()
+        self.numberOfAPAs = inputStream.read_unsigned_byte()
+        self.numberOfUAEmitterSystems = inputStream.read_unsigned_byte()
         for idx in range(0, self.numberOfShafts):
             element = null()
             element.parse(inputStream)
@@ -7772,17 +7772,17 @@ class IntercomControlPdu( RadioCommunicationsFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( IntercomControlPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_byte(self.controlType);
-        outputStream.write_unsigned_byte(self.communicationsChannelType);
+        outputStream.write_unsigned_byte(self.controlType)
+        outputStream.write_unsigned_byte(self.communicationsChannelType)
         self.sourceEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.sourceCommunicationsDeviceID);
-        outputStream.write_unsigned_byte(self.sourceLineID);
-        outputStream.write_unsigned_byte(self.transmitPriority);
-        outputStream.write_unsigned_byte(self.transmitLineState);
-        outputStream.write_unsigned_byte(self.command);
+        outputStream.write_unsigned_byte(self.sourceCommunicationsDeviceID)
+        outputStream.write_unsigned_byte(self.sourceLineID)
+        outputStream.write_unsigned_byte(self.transmitPriority)
+        outputStream.write_unsigned_byte(self.transmitLineState)
+        outputStream.write_unsigned_byte(self.command)
         self.masterEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.masterCommunicationsDeviceID);
-        outputStream.write_unsigned_int( len(self.intercomParameters));
+        outputStream.write_unsigned_short(self.masterCommunicationsDeviceID)
+        outputStream.write_unsigned_int( len(self.intercomParameters))
         for anObj in self.intercomParameters:
             anObj.serialize(outputStream)
 
@@ -7792,17 +7792,17 @@ class IntercomControlPdu( RadioCommunicationsFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( IntercomControlPdu, self).parse(inputStream)
-        self.controlType = inputStream.read_unsigned_byte();
-        self.communicationsChannelType = inputStream.read_unsigned_byte();
+        self.controlType = inputStream.read_unsigned_byte()
+        self.communicationsChannelType = inputStream.read_unsigned_byte()
         self.sourceEntityID.parse(inputStream)
-        self.sourceCommunicationsDeviceID = inputStream.read_unsigned_byte();
-        self.sourceLineID = inputStream.read_unsigned_byte();
-        self.transmitPriority = inputStream.read_unsigned_byte();
-        self.transmitLineState = inputStream.read_unsigned_byte();
-        self.command = inputStream.read_unsigned_byte();
+        self.sourceCommunicationsDeviceID = inputStream.read_unsigned_byte()
+        self.sourceLineID = inputStream.read_unsigned_byte()
+        self.transmitPriority = inputStream.read_unsigned_byte()
+        self.transmitLineState = inputStream.read_unsigned_byte()
+        self.command = inputStream.read_unsigned_byte()
         self.masterEntityID.parse(inputStream)
-        self.masterCommunicationsDeviceID = inputStream.read_unsigned_short();
-        self.intercomParametersLength = inputStream.read_unsigned_int();
+        self.masterCommunicationsDeviceID = inputStream.read_unsigned_short()
+        self.intercomParametersLength = inputStream.read_unsigned_int()
         for idx in range(0, self.intercomParametersLength):
             element = null()
             element.parse(inputStream)
@@ -7849,12 +7849,12 @@ class SignalPdu( RadioCommunicationsFamilyPdu ):
         """serialize the class """
         super( SignalPdu, self ).serialize(outputStream)
         self.entityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.radioID);
-        outputStream.write_unsigned_short(self.encodingScheme);
-        outputStream.write_unsigned_short(self.tdlType);
-        outputStream.write_unsigned_int(self.sampleRate);
-        outputStream.write_short( len(self.data) * 8);
-        outputStream.write_short(self.samples);
+        outputStream.write_unsigned_short(self.radioID)
+        outputStream.write_unsigned_short(self.encodingScheme)
+        outputStream.write_unsigned_short(self.tdlType)
+        outputStream.write_unsigned_int(self.sampleRate)
+        outputStream.write_short( len(self.data) * 8)
+        outputStream.write_short(self.samples)
         for b in self.data:
             outputStream.write_byte(b)
 
@@ -7865,12 +7865,12 @@ class SignalPdu( RadioCommunicationsFamilyPdu ):
 
         super( SignalPdu, self).parse(inputStream)
         self.entityID.parse(inputStream)
-        self.radioID = inputStream.read_unsigned_short();
-        self.encodingScheme = inputStream.read_unsigned_short();
-        self.tdlType = inputStream.read_unsigned_short();
-        self.sampleRate = inputStream.read_unsigned_int();
-        self.dataLength = inputStream.read_short();
-        self.samples = inputStream.read_short();
+        self.radioID = inputStream.read_unsigned_short()
+        self.encodingScheme = inputStream.read_unsigned_short()
+        self.tdlType = inputStream.read_unsigned_short()
+        self.sampleRate = inputStream.read_unsigned_int()
+        self.dataLength = inputStream.read_short()
+        self.samples = inputStream.read_short()
         for idx in range(0, self.dataLength // 8):
             element = inputStream.read_byte()
             self.data.append(element)
@@ -7898,20 +7898,20 @@ class RemoveEntityReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( RemoveEntityReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_byte(self.requiredReliabilityService);
-        outputStream.write_unsigned_short(self.pad1);
-        outputStream.write_unsigned_byte(self.pad2);
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_byte(self.requiredReliabilityService)
+        outputStream.write_unsigned_short(self.pad1)
+        outputStream.write_unsigned_byte(self.pad2)
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( RemoveEntityReliablePdu, self).parse(inputStream)
-        self.requiredReliabilityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_short();
-        self.pad2 = inputStream.read_unsigned_byte();
-        self.requestID = inputStream.read_unsigned_int();
+        self.requiredReliabilityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_short()
+        self.pad2 = inputStream.read_unsigned_byte()
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -7952,11 +7952,11 @@ class SeesPdu( DistributedEmissionsFamilyPdu ):
         """serialize the class """
         super( SeesPdu, self ).serialize(outputStream)
         self.orginatingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.infraredSignatureRepresentationIndex);
-        outputStream.write_unsigned_short(self.acousticSignatureRepresentationIndex);
-        outputStream.write_unsigned_short(self.radarCrossSectionSignatureRepresentationIndex);
-        outputStream.write_unsigned_short( len(self.propulsionSystemData));
-        outputStream.write_unsigned_short( len(self.vectoringSystemData));
+        outputStream.write_unsigned_short(self.infraredSignatureRepresentationIndex)
+        outputStream.write_unsigned_short(self.acousticSignatureRepresentationIndex)
+        outputStream.write_unsigned_short(self.radarCrossSectionSignatureRepresentationIndex)
+        outputStream.write_unsigned_short( len(self.propulsionSystemData))
+        outputStream.write_unsigned_short( len(self.vectoringSystemData))
         for anObj in self.propulsionSystemData:
             anObj.serialize(outputStream)
 
@@ -7970,11 +7970,11 @@ class SeesPdu( DistributedEmissionsFamilyPdu ):
 
         super( SeesPdu, self).parse(inputStream)
         self.orginatingEntityID.parse(inputStream)
-        self.infraredSignatureRepresentationIndex = inputStream.read_unsigned_short();
-        self.acousticSignatureRepresentationIndex = inputStream.read_unsigned_short();
-        self.radarCrossSectionSignatureRepresentationIndex = inputStream.read_unsigned_short();
-        self.numberOfPropulsionSystems = inputStream.read_unsigned_short();
-        self.numberOfVectoringNozzleSystems = inputStream.read_unsigned_short();
+        self.infraredSignatureRepresentationIndex = inputStream.read_unsigned_short()
+        self.acousticSignatureRepresentationIndex = inputStream.read_unsigned_short()
+        self.radarCrossSectionSignatureRepresentationIndex = inputStream.read_unsigned_short()
+        self.numberOfPropulsionSystems = inputStream.read_unsigned_short()
+        self.numberOfVectoringNozzleSystems = inputStream.read_unsigned_short()
         for idx in range(0, self.numberOfPropulsionSystems):
             element = null()
             element.parse(inputStream)
@@ -8008,20 +8008,20 @@ class CreateEntityReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( CreateEntityReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_byte(self.requiredReliabilityService);
-        outputStream.write_unsigned_short(self.pad1);
-        outputStream.write_unsigned_byte(self.pad2);
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_byte(self.requiredReliabilityService)
+        outputStream.write_unsigned_short(self.pad1)
+        outputStream.write_unsigned_byte(self.pad2)
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( CreateEntityReliablePdu, self).parse(inputStream)
-        self.requiredReliabilityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_short();
-        self.pad2 = inputStream.read_unsigned_byte();
-        self.requestID = inputStream.read_unsigned_int();
+        self.requiredReliabilityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_short()
+        self.pad2 = inputStream.read_unsigned_byte()
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -8055,11 +8055,11 @@ class StopFreezeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """serialize the class """
         super( StopFreezeReliablePdu, self ).serialize(outputStream)
         self.realWorldTime.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.reason);
-        outputStream.write_unsigned_byte(self.frozenBehavior);
-        outputStream.write_unsigned_byte(self.requiredReliablityService);
-        outputStream.write_unsigned_byte(self.pad1);
-        outputStream.write_unsigned_int(self.requestID);
+        outputStream.write_unsigned_byte(self.reason)
+        outputStream.write_unsigned_byte(self.frozenBehavior)
+        outputStream.write_unsigned_byte(self.requiredReliablityService)
+        outputStream.write_unsigned_byte(self.pad1)
+        outputStream.write_unsigned_int(self.requestID)
 
 
     def parse(self, inputStream):
@@ -8067,11 +8067,11 @@ class StopFreezeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 
         super( StopFreezeReliablePdu, self).parse(inputStream)
         self.realWorldTime.parse(inputStream)
-        self.reason = inputStream.read_unsigned_byte();
-        self.frozenBehavior = inputStream.read_unsigned_byte();
-        self.requiredReliablityService = inputStream.read_unsigned_byte();
-        self.pad1 = inputStream.read_unsigned_byte();
-        self.requestID = inputStream.read_unsigned_int();
+        self.reason = inputStream.read_unsigned_byte()
+        self.frozenBehavior = inputStream.read_unsigned_byte()
+        self.requiredReliablityService = inputStream.read_unsigned_byte()
+        self.pad1 = inputStream.read_unsigned_byte()
+        self.requestID = inputStream.read_unsigned_int()
 
 
 
@@ -8104,10 +8104,10 @@ class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( EventReportReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_short(self.eventType);
-        outputStream.write_unsigned_int(self.pad1);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_short(self.eventType)
+        outputStream.write_unsigned_int(self.pad1)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -8120,10 +8120,10 @@ class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( EventReportReliablePdu, self).parse(inputStream)
-        self.eventType = inputStream.read_unsigned_short();
-        self.pad1 = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.eventType = inputStream.read_unsigned_short()
+        self.pad1 = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
@@ -8166,8 +8166,8 @@ class MinefieldResponseNackPdu( MinefieldFamilyPdu ):
         super( MinefieldResponseNackPdu, self ).serialize(outputStream)
         self.minefieldID.serialize(outputStream)
         self.requestingEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.requestID);
-        outputStream.write_unsigned_byte( len(self.missingPduSequenceNumbers));
+        outputStream.write_unsigned_byte(self.requestID)
+        outputStream.write_unsigned_byte( len(self.missingPduSequenceNumbers))
         for anObj in self.missingPduSequenceNumbers:
             anObj.serialize(outputStream)
 
@@ -8179,8 +8179,8 @@ class MinefieldResponseNackPdu( MinefieldFamilyPdu ):
         super( MinefieldResponseNackPdu, self).parse(inputStream)
         self.minefieldID.parse(inputStream)
         self.requestingEntityID.parse(inputStream)
-        self.requestID = inputStream.read_unsigned_byte();
-        self.numberOfMissingPdus = inputStream.read_unsigned_byte();
+        self.requestID = inputStream.read_unsigned_byte()
+        self.numberOfMissingPdus = inputStream.read_unsigned_byte()
         for idx in range(0, self.numberOfMissingPdus):
             element = null()
             element.parse(inputStream)
@@ -8219,10 +8219,10 @@ class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( ActionResponseReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int(self.requestID);
-        outputStream.write_unsigned_int(self.responseStatus);
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
-        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        outputStream.write_unsigned_int(self.requestID)
+        outputStream.write_unsigned_int(self.responseStatus)
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -8235,10 +8235,10 @@ class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( ActionResponseReliablePdu, self).parse(inputStream)
-        self.requestID = inputStream.read_unsigned_int();
-        self.responseStatus = inputStream.read_unsigned_int();
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        self.requestID = inputStream.read_unsigned_int()
+        self.responseStatus = inputStream.read_unsigned_int()
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
