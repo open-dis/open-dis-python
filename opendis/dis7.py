@@ -7,14 +7,14 @@ class DataQueryDatumSpecification( object ):
     """List of fixed and variable datum records. Section 6.2.17 """
 
     def __init__(self,
-                numberOfFixedDatums=0,
-                numberOfVariableDatums=0,
+                numberOfFixedDatumRecords=0,
+                numberOfVariableDatumRecords=0,
                 fixedDatumIDList=None,
                 variableDatumIDList=None):
         """ Initializer for DataQueryDatumSpecification"""
-        self.numberOfFixedDatums = numberOfFixedDatums
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datums"""
-        self.numberOfVariableDatums = numberOfVariableDatums
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datums"""
         self.fixedDatumIDList = fixedDatumIDList or []
         """ variable length list fixed datum IDs"""
@@ -36,14 +36,14 @@ class DataQueryDatumSpecification( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfFixedDatums = inputStream.read_unsigned_int();
-        self.numberOfVariableDatums = inputStream.read_unsigned_int();
-        for idx in range(0, self.numberOfFixedDatums):
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatumIDList.append(element)
 
-        for idx in range(0, self.numberOfVariableDatums):
+        for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumIDList.append(element)
@@ -54,15 +54,19 @@ class DataQueryDatumSpecification( object ):
 class RadioIdentifier( object ):
     """The unique designation of an attached or unattached radio in an event or exercise Section 6.2.70"""
 
-    def __init__(self):
+    def __init__(self,
+                 siteNumber=0,
+                 applicationNumber=0,
+                 referenceNumber=0,
+                 radioNumber=0):
         """ Initializer for RadioIdentifier"""
-        self.siteNumber = 0
+        self.siteNumber = siteNumber
         """  site"""
-        self.applicationNumber = 0
+        self.applicationNumber = applicationNumber
         """ application number"""
-        self.referenceNumber = 0
+        self.referenceNumber = referenceNumber
         """  reference number"""
-        self.radioNumber = 0
+        self.radioNumber = radioNumber
         """  Radio number"""
 
     def serialize(self, outputStream):
@@ -86,9 +90,9 @@ class RadioIdentifier( object ):
 class RequestID( object ):
     """A monotonically increasing number inserted into all simulation managment PDUs. This should be a hand-coded thingie, maybe a singleton. Section 6.2.75"""
 
-    def __init__(self):
+    def __init__(self, requestID=0):
         """ Initializer for RequestID"""
-        self.requestID = 0
+        self.requestID = requestID
         """ monotonically increasing number"""
 
     def serialize(self, outputStream):
@@ -106,13 +110,16 @@ class RequestID( object ):
 class IFFData( object ):
     """repeating element if IFF Data specification record"""
 
-    def __init__(self):
+    def __init__(self,
+                 recordType=0,
+                 recordLength=0,
+                 iffData=None):
         """ Initializer for IFFData"""
-        self.recordType = 0
+        self.recordType = recordType
         """ enumeration for type of record"""
-        self.recordLength = 0
+        self.recordLength = recordLength
         """ length of record. Should be padded to 32 bit boundary."""
-        self.iffData = []
+        self.iffData = iffData or []
         """ IFF data."""
 
     def serialize(self, outputStream):
@@ -140,17 +147,22 @@ class IFFData( object ):
 class MunitionDescriptor( object ):
     """Represents the firing or detonation of a munition. Section 6.2.19.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 munitionType=None,
+                 warhead=0,
+                 fuse=0,
+                 quantity=0,
+                 rate=0):
         """ Initializer for MunitionDescriptor"""
-        self.munitionType = EntityType();
+        self.munitionType = munitionType or EntityType()
         """ What munition was used in the burst"""
-        self.warhead = 0
+        self.warhead = warhead
         """ type of warhead enumeration"""
-        self.fuse = 0
+        self.fuse = fuse
         """ type of fuse used enumeration"""
-        self.quantity = 0
+        self.quantity = quantity
         """ how many of the munition were fired"""
-        self.rate = 0
+        self.rate = rate
         """ rate at which the munition was fired"""
 
     def serialize(self, outputStream):
@@ -176,9 +188,9 @@ class MunitionDescriptor( object ):
 class MinefieldSensorType( object ):
     """Information about a minefield sensor. Section 6.2.57"""
 
-    def __init__(self):
+    def __init__(self, sensorType=0):
         """ Initializer for MinefieldSensorType"""
-        self.sensorType = 0
+        self.sensorType = sensorType
         """ sensor type. bit fields 0-3 are the type category, 4-15 are teh subcategory"""
 
     def serialize(self, outputStream):
@@ -196,11 +208,11 @@ class MinefieldSensorType( object ):
 class GroupID( object ):
     """Unique designation of a group of entities contained in the isGroupOfPdu. Represents a group of entities rather than a single entity. Section 6.2.43"""
 
-    def __init__(self):
+    def __init__(self, SimulationAddress=None, groupNumber=0):
         """ Initializer for GroupID"""
-        self.simulationAddress = EntityType();
+        self.simulationAddress = simulationAddress or EntityType()
         """ Simulation address (site and application number)"""
-        self.groupNumber = 0
+        self.groupNumber = groupNumber
         """ group number"""
 
     def serialize(self, outputStream):
@@ -220,12 +232,12 @@ class GroupID( object ):
 class LayerHeader( object ):
     """The identification of the additional information layer number, layer-specific information, and the length of the layer. Section 6.2.51"""
 
-    def __init__(self):
+    def __init__(self, layerNumber=0, layerSpecificInformation=0, length=0):
         """ Initializer for LayerHeader"""
-        self.layerNumber = 0
-        self.layerSpecificInformation = 0
+        self.layerNumber = layerNumber
+        self.layerSpecificInformation = layerSpecificInformation
         """ field shall specify layer-specific information that varies by System Type (see 6.2.86) and Layer Number."""
-        self.length = 0
+        self.length = length
         """ This field shall specify the length in octets of the layer, including the Layer Header record"""
 
     def serialize(self, outputStream):
@@ -247,9 +259,9 @@ class LayerHeader( object ):
 class UnsignedDISInteger( object ):
     """container class not in specification"""
 
-    def __init__(self):
+    def __init__(self, val=0):
         """ Initializer for UnsignedDISInteger"""
-        self.val = 0
+        self.val = val
         """ unsigned integer"""
 
     def serialize(self, outputStream):
@@ -267,15 +279,19 @@ class UnsignedDISInteger( object ):
 class DeadReckoningParameters( object ):
     """Not specified in the standard. This is used by the ESPDU"""
 
-    def __init__(self):
+    def __init__(self,
+                 deadReckoningAlgorithm=0,
+                 parameters=None,
+                 entityLinearAcceleration=None,
+                 entityAngularVelocity=None):
         """ Initializer for DeadReckoningParameters"""
-        self.deadReckoningAlgorithm = 0
+        self.deadReckoningAlgorithm = deadReckoningAlgorithm
         """ Algorithm to use in computing dead reckoning. See EBV doc."""
-        self.parameters =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.parameters =  parameters or [0] * 15
         """ Dead reckoning parameters. Contents depends on algorithm."""
-        self.entityLinearAcceleration = Vector3Float();
+        self.entityLinearAcceleration = entityLinearAcceleration or Vector3Float()
         """ Linear acceleration of the entity"""
-        self.entityAngularVelocity = Vector3Float();
+        self.entityAngularVelocity = entityAngularVelocity or Vector3Float()
         """ Angular velocity of the entity"""
 
     def serialize(self, outputStream):
@@ -306,9 +322,9 @@ class DeadReckoningParameters( object ):
 class ProtocolMode( object ):
     """Bit field used to identify minefield data. bits 14-15 are a 2-bit enum, other bits unused. Section 6.2.69"""
 
-    def __init__(self):
+    def __init__(self, protocolMode=0):
         """ Initializer for ProtocolMode"""
-        self.protocolMode = 0
+        self.protocolMode = protocolMode
         """ Bitfields, 14-15 contain an enum"""
 
     def serialize(self, outputStream):
@@ -326,23 +342,36 @@ class ProtocolMode( object ):
 class AngleDeception( object ):
     """The Angle Deception attribute record may be used to communicate discrete values that are associated with angle deception jamming that cannot be referenced to an emitter mode. The values provided in the record records (provided in the associated Electromagnetic Emission PDU). (The victim radar beams are those that are targeted by the jammer.) Section 6.2.21.2.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 recordType=3501,
+                 recordLength=48,
+                 emitterNumber=0,
+                 beamNumber=0,
+                 stateIndicator=0,
+                 azimuthOffset=0.0,
+                 azimuthWidth=0.0,
+                 azimuthPullRate=0.0,
+                 azimuthPullAcceleration=0.0,
+                 elevationOffset=0.0,
+                 elevationWidth=0.0,
+                 elevationPullRate=0.0,
+                 elevationPullAcceleration=0.0):
         """ Initializer for AngleDeception"""
-        self.recordType = 3501
-        self.recordLength = 48
+        self.recordType = recordType
+        self.recordLength = recordLength
         self.padding = 0
-        self.emitterNumber = 0
-        self.beamNumber = 0
-        self.stateIndicator = 0
+        self.emitterNumber = emitterNumber
+        self.beamNumber = beamNumber
+        self.stateIndicator = stateIndicator
         self.padding2 = 0
-        self.azimuthOffset = 0
-        self.azimuthWidth = 0
-        self.azimuthPullRate = 0
-        self.azimuthPullAcceleration = 0
-        self.elevationOffset = 0
-        self.elevationWidth = 0
-        self.elevationPullRate = 0
-        self.elevationPullAcceleration = 0
+        self.azimuthOffset = azimuthOffset
+        self.azimuthWidth = azimuthWidth
+        self.azimuthPullRate = azimuthPullRate
+        self.azimuthPullAcceleration = azimuthPullAcceleration
+        self.elevationOffset = elevationOffset
+        self.elevationWidth = elevationWidth
+        self.elevationPullRate = elevationPullRate
+        self.elevationPullAcceleration = elevationPullAcceleration
         self.padding3 = 0
 
     def serialize(self, outputStream):
@@ -390,25 +419,33 @@ class AngleDeception( object ):
 class EntityAssociation( object ):
     """Association or disassociation of two entities.  Section 6.2.94.4.3"""
 
-    def __init__(self):
+    def __init__(self,
+                 changeIndicator=0,
+                 associationStatus=0,
+                 associationType=0,
+                 entityID=None,
+                 ownStationLocation=0,
+                 physicalConnectionType=0,
+                 groupMemberType=0,
+                 groupNumber=0):
         """ Initializer for EntityAssociation"""
         self.recordType = 4
         """ the identification of the Variable Parameter record. Enumeration from EBV"""
-        self.changeIndicator = 0
+        self.changeIndicator = changeIndicator
         """ Indicates if this VP has changed since last issuance"""
-        self.associationStatus = 0
+        self.associationStatus = associationStatus
         """ Indicates association status between two entities; 8 bit enum"""
-        self.associationType = 0
+        self.associationType = associationType
         """ Type of association; 8 bit enum"""
-        self.entityID = EntityID();
+        self.entityID = entityID or EntityID()
         """ Object ID of entity associated with this entity"""
-        self.ownStationLocation = 0
+        self.ownStationLocation = ownStationLocation
         """ Station location on one's own entity. EBV doc."""
-        self.physicalConnectionType = 0
+        self.physicalConnectionType = physicalConnectionType
         """ Type of physical connection. EBV doc"""
-        self.groupMemberType = 0
+        self.groupMemberType = groupMemberType
         """ Type of member the entity is within th egroup"""
-        self.groupNumber = 0
+        self.groupNumber = groupNumber
         """ Group if any to which the entity belongs"""
 
     def serialize(self, outputStream):
@@ -442,11 +479,13 @@ class EntityAssociation( object ):
 class VectoringNozzleSystem( object ):
     """Operational data for describing the vectoring nozzle systems Section 6.2.96"""
 
-    def __init__(self):
+    def __init__(self,
+                 horizontalDeflectionAngle=0.0,
+                 verticalDeflectionAngle=0.0):
         """ Initializer for VectoringNozzleSystem"""
-        self.horizontalDeflectionAngle = 0
+        self.horizontalDeflectionAngle = horizontalDeflectionAngle
         """ In degrees"""
-        self.verticalDeflectionAngle = 0
+        self.verticalDeflectionAngle = verticalDeflectionAngle
         """ In degrees"""
 
     def serialize(self, outputStream):
@@ -464,23 +503,32 @@ class VectoringNozzleSystem( object ):
 
 
 class FalseTargetsAttribute( object ):
-    """The False Targets attribute record shall be used to communicate discrete values that are associated with false targets jamming that cannot be referenced to an emitter mode. The values provided in the False Targets attri- bute record shall be considered valid only for the victim radar beams listed in the jamming beam's Track/Jam Data records (provided in the associated Electromagnetic Emission PDU). Section 6.2.21.3"""
+    """The False Targets attribute record shall be used to communicate discrete values that are associated with false targets jamming that cannot be referenced to an emitter mode. The values provided in the False Targets attribute record shall be considered valid only for the victim radar beams listed in the jamming beam's Track/Jam Data records (provided in the associated Electromagnetic Emission PDU). Section 6.2.21.3"""
 
-    def __init__(self):
+    def __init__(self,
+                 emitterNumber=0,
+                 beamNumber=0,
+                 stateIndicator=0,
+                 falseTargetCount=0,
+                 walkSpeed=0.0,
+                 walkAcceleration=0.0,
+                 maximumWalkDistance=0.0,
+                 keepTime=0.0,
+                 echoSpacing=0.0):
         """ Initializer for FalseTargetsAttribute"""
         self.recordType = 3502
-        self.recordLength = 40
+        self.recordLength = 48
         self.padding = 0
-        self.emitterNumber = 0
-        self.beamNumber = 0
-        self.stateIndicator = 0
+        self.emitterNumber = emitterNumber
+        self.beamNumber = beamNumber
+        self.stateIndicator = stateIndicator
         self.padding2 = 0
-        self.falseTargetCount = 0
-        self.walkSpeed = 0
-        self.walkAcceleration = 0
-        self.maximumWalkDistance = 0
-        self.keepTime = 0
-        self.echoSpacing = 0
+        self.falseTargetCount = falseTargetCount
+        self.walkSpeed = walkSpeed
+        self.walkAcceleration = walkAcceleration
+        self.maximumWalkDistance = maximumWalkDistance
+        self.keepTime = keepTime
+        self.echoSpacing = echoSpacing
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -521,11 +569,11 @@ class FalseTargetsAttribute( object ):
 class MinefieldIdentifier( object ):
     """The unique designation of a minefield Section 6.2.56 """
 
-    def __init__(self):
+    def __init__(self, simulationAddress=None, minefieldNumber=0):
         """ Initializer for MinefieldIdentifier"""
-        self.simulationAddress = SimulationAddress();
+        self.simulationAddress = simulationAddress or SimulationAddress()
         """ """
-        self.minefieldNumber = 0
+        self.minefieldNumber = minefieldNumber
         """ """
 
     def serialize(self, outputStream):
@@ -545,20 +593,27 @@ class MinefieldIdentifier( object ):
 class RadioType( object ):
     """Identifies the type of radio. Section 6.2.71"""
 
-    def __init__(self):
+    def __init__(self,
+                 entityKind=0,
+                 domain=0,
+                 country=0,
+                 category=0,
+                 subcategory=0,
+                 specific=0,
+                 extra=0):
         """ Initializer for RadioType"""
-        self.entityKind = 0
+        self.entityKind = entityKind
         """ Kind of entity"""
-        self.domain = 0
+        self.domain = domain
         """ Domain of entity (air, surface, subsurface, space, etc)"""
-        self.country = 0
+        self.country = country
         """ country to which the design of the entity is attributed"""
-        self.category = 0
+        self.category = category
         """ category of entity"""
-        self.subcategory = 0
+        self.subcategory = subcategory
         """ specific info based on subcategory field"""
-        self.specific = 0
-        self.extra = 0
+        self.specific = specific
+        self.extra = extra
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -587,11 +642,11 @@ class RadioType( object ):
 class NamedLocationIdentification( object ):
     """Information about the discrete positional relationship of the part entity with respect to the its host entity Section 6.2.62 """
 
-    def __init__(self):
+    def __init__(self, stationName=0, stationNumber=0):
         """ Initializer for NamedLocationIdentification"""
-        self.stationName = 0
+        self.stationName = stationName
         """ the station name within the host at which the part entity is located. If the part entity is On Station, this field shall specify the representation of the parts location data fields. This field shall be specified by a 16-bit enumeration """
-        self.stationNumber = 0
+        self.stationNumber = stationNumber
         """ the number of the particular wing station, cargo hold etc., at which the part is attached. """
 
     def serialize(self, outputStream):
@@ -681,11 +736,11 @@ class OneByteChunk( object ):
 class EulerAngles( object ):
     """Three floating point values representing an orientation, psi, theta, and phi, aka the euler angles, in radians. Section 6.2.33"""
 
-    def __init__(self):
+    def __init__(self, psi=0.0, theta=0.0, phi=0.0):
         """ Initializer for EulerAngles"""
-        self.psi = 0
-        self.theta = 0
-        self.phi = 0
+        self.psi = psi
+        self.theta = theta
+        self.phi = phi
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -706,7 +761,18 @@ class EulerAngles( object ):
 class DirectedEnergyPrecisionAimpoint( object ):
     """DE Precision Aimpoint Record. Section 6.2.20.3"""
 
-    def __init__(self):
+    def __init__(self,
+                 targetSpotLocation=None,
+                 targetSpotEntityLocation=None,
+                 targetSpotVelocity=None,
+                 targetSpotAcceleration=None,
+                 targetEntityID=None,
+                 targetComponentID=0,
+                 beamSpotType=0,
+                 beamSpotCrossSectionSemiMajorAxis=0.0,
+                 beamSpotCrossSectionSemiMinorAxis=0.0,
+                 beamSpotCrossSectionOrientationAngle=0.0,
+                 peakIrradiance=0.0):
         """ Initializer for DirectedEnergyPrecisionAimpoint"""
         self.recordType = 4000
         """ Type of Record"""
@@ -714,27 +780,27 @@ class DirectedEnergyPrecisionAimpoint( object ):
         """ Length of Record"""
         self.padding = 0
         """ Padding"""
-        self.targetSpotLocation = Vector3Double();
+        self.targetSpotLocation = targetSpotLocation or Vector3Double()
         """ Position of Target Spot in World Coordinates."""
-        self.targetSpotEntityLocation = Vector3Float();
+        self.targetSpotEntityLocation = targetSpotEntityLocation or Vector3Float()
         """ Position (meters) of Target Spot relative to Entity Position."""
-        self.targetSpotVelocity = Vector3Float();
+        self.targetSpotVelocity = targetSpotVelocity or Vector3Float()
         """ Velocity (meters/sec) of Target Spot."""
-        self.targetSpotAcceleration = Vector3Float();
+        self.targetSpotAcceleration = targetSpotAcceleration or Vector3Float()
         """ Acceleration (meters/sec/sec) of Target Spot."""
-        self.targetEntityID = EntityID();
+        self.targetEntityID = targetEntityID or EntityID()
         """ Unique ID of the target entity."""
-        self.targetComponentID = 0
+        self.targetComponentID = targetComponentID
         """ Target Component ID ENUM, same as in DamageDescriptionRecord."""
-        self.beamSpotType = 0
+        self.beamSpotType = beamSpotType
         """ Spot Shape ENUM."""
-        self.beamSpotCrossSectionSemiMajorAxis = 0
+        self.beamSpotCrossSectionSemiMajorAxis = beamSpotCrossSectionSemiMajorAxis
         """ Beam Spot Cross Section Semi-Major Axis."""
-        self.beamSpotCrossSectionSemiMinorAxis = 0
+        self.beamSpotCrossSectionSemiMinorAxis = beamSpotCrossSectionSemiMinorAxis
         """ Beam Spot Cross Section Semi-Major Axis."""
-        self.beamSpotCrossSectionOrientationAngle = 0
+        self.beamSpotCrossSectionOrientationAngle = beamSpotCrossSectionOrientationAngle
         """ Beam Spot Cross Section Orientation Angle."""
-        self.peakIrradiance = 0
+        self.peakIrradiance = peakIrradiance
         """ Peak irradiance"""
         self.padding2 = 0
         """ padding"""
@@ -782,11 +848,11 @@ class DirectedEnergyPrecisionAimpoint( object ):
 class IffDataSpecification( object ):
     """Requires hand coding to be useful. Section 6.2.43"""
 
-    def __init__(self):
+    def __init__(self, numberOfIffDataRecords=0, iffDataRecords=None):
         """ Initializer for IffDataSpecification"""
-        self.numberOfIffDataRecords = 0
+        self.numberOfIffDataRecords = numberOfIffDataRecords
         """ Number of iff records"""
-        self.iffDataRecords = []
+        self.iffDataRecords = iffDataRecords or []
         """ IFF data records"""
 
     def serialize(self, outputStream):
@@ -810,11 +876,11 @@ class IffDataSpecification( object ):
 class OwnershipStatus( object ):
     """used to convey entity and conflict status information associated with transferring ownership of an entity. Section 6.2.65"""
 
-    def __init__(self):
+    def __init__(self, entityId=None, ownershipStatus=0):
         """ Initializer for OwnershipStatus"""
-        self.entityId = EntityID();
+        self.entityId = enntityId or EntityID()
         """ EntityID"""
-        self.ownershipStatus = 0
+        self.ownershipStatus = ownershipStatus
         """ The ownership and/or ownership conflict status of the entity represented by the Entity ID field."""
         self.padding = 0
         """ padding"""
@@ -838,21 +904,28 @@ class OwnershipStatus( object ):
 class BeamAntennaPattern( object ):
     """Used when the antenna pattern type field has a value of 1. Specifies the direction, pattern, and polarization of radiation from an antenna. Section 6.2.9.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 beamDirection=None,
+                 azimuthBeamwidth=0.0,
+                 elevationBeamwidth=0.0,
+                 referenceSystem=0,
+                 ez=0.0,
+                 ex=0.0,
+                 phase=0.0):
         """ Initializer for BeamAntennaPattern"""
         self.beamDirection = EulerAngles();
         """ The rotation that transforms the reference coordinate sytem into the beam coordinate system. Either world coordinates or entity coordinates may be used as the reference coordinate system, as specified by the reference system field of the antenna pattern record."""
-        self.azimuthBeamwidth = 0
-        self.elevationBeamwidth = 0
-        self.referenceSystem = 0
+        self.azimuthBeamwidth = azimuthBeamwidth
+        self.elevationBeamwidth = elevationBeamwidth
+        self.referenceSystem = referenceSystem
         self.padding1 = 0
         self.padding2 = 0
-        self.ez = 0.0
+        self.ez = ez
         """ This field shall specify the magnitude of the Z-component (in beam coordinates) of the Electrical field at some arbitrary single point in the main beam and in the far field of the antenna. """
-        self.ex = 0.0
-        """ This field shall specify the magnitude of the X-component (in beam coordinates) of the Electri- cal field at some arbitrary single point in the main beam and in the far field of the antenna."""
-        self.phase = 0.0
-        """ This field shall specify the phase angle between EZ and EX in radians. If fully omni-direc- tional antenna is modeled using beam pattern type one, the omni-directional antenna shall be repre- sented by beam direction Euler angles psi, theta, and phi of zero, an azimuth beamwidth of 2PI, and an elevation beamwidth of PI"""
+        self.ex = ex
+        """ This field shall specify the magnitude of the X-component (in beam coordinates) of the Electrical field at some arbitrary single point in the main beam and in the far field of the antenna."""
+        self.phase = phase
+        """ This field shall specify the phase angle between EZ and EX in radians. If fully omni-directional antenna is modeled using beam pattern type one, the omni-directional antenna shall be represented by beam direction Euler angles psi, theta, and phi of zero, an azimuth beamwidth of 2PI, and an elevation beamwidth of PI"""
         self.padding3 = 0
         """ padding"""
 
@@ -889,17 +962,21 @@ class BeamAntennaPattern( object ):
 class AttachedParts( object ):
     """Removable parts that may be attached to an entity.  Section 6.2.93.3"""
 
-    def __init__(self):
+    def __init__(self,
+                 detachedIndicator=0,
+                 partAttachedTo=0,
+                 parameterType=0,
+                 parameterValue=0):
         """ Initializer for AttachedParts"""
         self.recordType = 1
         """ the identification of the Variable Parameter record. Enumeration from EBV"""
-        self.detachedIndicator = 0
+        self.detachedIndicator = detachedIndicator
         """ 0 = attached, 1 = detached. See I.2.3.1 for state transition diagram"""
-        self.partAttachedTo = 0
+        self.partAttachedTo = partAttachedTo
         """ the identification of the articulated part to which this articulation parameter is attached. This field shall be specified by a 16-bit unsigned integer. This field shall contain the value zero if the articulated part is attached directly to the entity."""
-        self.parameterType = 0
+        self.parameterType = parameterType
         """ The location or station to which the part is attached"""
-        self.parameterValue = 0
+        self.parameterValue = parameterValue
         """ The definition of the 64 bits shall be determined based on the type of parameter specified in the Parameter Type field """
 
     def serialize(self, outputStream):
@@ -925,11 +1002,11 @@ class AttachedParts( object ):
 class VariableTransmitterParameters( object ):
     """Relates to radios. NOT COMPLETE. Section 6.2.94"""
 
-    def __init__(self):
+    def __init__(self, recordType=0, recordLength=4):
         """ Initializer for VariableTransmitterParameters"""
-        self.recordType = 0
+        self.recordType = recordType
         """ Type of VTP. Enumeration from EBV"""
-        self.recordLength = 4
+        self.recordLength = recordLength
         """ Length, in bytes"""
 
     def serialize(self, outputStream):
@@ -949,11 +1026,11 @@ class VariableTransmitterParameters( object ):
 class Attribute( object ):
     """Used to convey information for one or more attributes. Attributes conform to the standard variable record format of 6.2.82. Section 6.2.10. NOT COMPLETE"""
 
-    def __init__(self):
+    def __init__(self, recordType=0, recordLength=0, recordSpecificFields=0):
         """ Initializer for Attribute"""
-        self.recordType = 0
-        self.recordLength = 0
-        self.recordSpecificFields = 0
+        self.recordType = recordType
+        self.recordLength = recordLength
+        self.recordSpecificFields = recordSpecificFields
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -974,10 +1051,10 @@ class Attribute( object ):
 class RecordQuerySpecification( object ):
     """The identification of the records being queried 6.2.72"""
 
-    def __init__(self):
+    def __init__(self, numberOfRecords=0, records=None):
         """ Initializer for RecordQuerySpecification"""
-        self.numberOfRecords = 0
-        self.records = []
+        self.numberOfRecords = numberOfRecords
+        self.records = records or []
         """ variable length list of 32 bit records"""
 
     def serialize(self, outputStream):
@@ -999,17 +1076,22 @@ class RecordQuerySpecification( object ):
 class ArticulatedParts( object ):
     """ articulated parts for movable parts and a combination of moveable/attached parts of an entity. Section 6.2.94.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 recordType=0,
+                 changeIndicator=0,
+                 partAttachedTo=0,
+                 parameterType=0,
+                 parameterValue=0):
         """ Initializer for ArticulatedParts"""
-        self.recordType = 0
+        self.recordType = recordType
         """ the identification of the Variable Parameter record. Enumeration from EBV"""
-        self.changeIndicator = 0
+        self.changeIndicator = changeIndicator
         """ indicate the change of any parameter for any articulated part. Starts at zero, incremented for each change """
-        self.partAttachedTo = 0
+        self.partAttachedTo = partAttachedTo
         """ the identification of the articulated part to which this articulation parameter is attached. This field shall be specified by a 16-bit unsigned integer. This field shall contain the value zero if the articulated part is attached directly to the entity."""
-        self.parameterType = 0
+        self.parameterType = parameterType
         """ the type of parameter represented, 32 bit enumeration"""
-        self.parameterValue = 0
+        self.parameterValue = parameterValue
         """ The definition of the 64 bits shall be determined based on the type of parameter specified in the Parameter Type field """
 
     def serialize(self, outputStream):
@@ -1035,15 +1117,19 @@ class ArticulatedParts( object ):
 class ObjectType( object ):
     """The unique designation of an environmental object. Section 6.2.64"""
 
-    def __init__(self):
+    def __init__(self,
+                 domain=0,
+                 objectKind=0,
+                 category=0,
+                 subcategory=0):
         """ Initializer for ObjectType"""
-        self.domain = 0
+        self.domain = domain
         """ Domain of entity (air, surface, subsurface, space, etc)"""
-        self.objectKind = 0
+        self.objectKind = objectKind
         """ country to which the design of the entity is attributed"""
-        self.category = 0
+        self.category = category
         """ category of entity"""
-        self.subcategory = 0
+        self.subcategory = subcategory
         """ subcategory of entity"""
 
     def serialize(self, outputStream):
@@ -1067,13 +1153,16 @@ class ObjectType( object ):
 class Association( object ):
     """An entity's associations with other entities and/or locations. For each association, this record shall specify the type of the association, the associated entity's EntityID and/or the associated location's world coordinates. This record may be used (optionally) in a transfer transaction to send internal state data from the divesting simulation to the acquiring simulation (see 5.9.4). This record may also be used for other purposes. Section 6.2.9"""
 
-    def __init__(self):
+    def __init__(self,
+                 associationType=0,
+                 associatedEntityID=None,
+                 associatedLocation=None):
         """ Initializer for Association"""
-        self.associationType = 0
+        self.associationType = associationType
         self.padding4 = 0
-        self.associatedEntityID = EntityID();
+        self.associatedEntityID = associatedEntityID or EntityID()
         """ identity of associated entity. If none, NO_SPECIFIC_ENTITY"""
-        self.associatedLocation = Vector3Double();
+        self.associatedLocation = associatedLocation or Vector3Double()
         """ location, in world coordinates"""
 
     def serialize(self, outputStream):
@@ -1097,17 +1186,22 @@ class Association( object ):
 class RecordSpecificationElement( object ):
     """Synthetic record, made up from section 6.2.72. This is used to acheive a repeating variable list element."""
 
-    def __init__(self):
+    def __init__(self,
+                 recordID=0,
+                 recordSetSerialNumber=0,
+                 recordLength=0,
+                 recordCount=0,
+                 recordValues=0):
         """ Initializer for RecordSpecificationElement"""
-        self.recordID = 0
+        self.recordID = recordID
         """ the data structure used to convey the parameter values of the record for each record. 32 bit enumeration."""
-        self.recordSetSerialNumber = 0
+        self.recordSetSerialNumber = recordSetSerialNumber
         """ the serial number of the first record in the block of records"""
-        self.recordLength = 0
+        self.recordLength = recordLength
         """  the length, in bits, of the record. Note, bits, not bytes."""
-        self.recordCount = 0
+        self.recordCount = recordCount
         """  the number of records included in the record set """
-        self.recordValues = 0
+        self.recordValues = recordValues
         """ the concatenated records of the format specified by the Record ID field. The length of this field is the Record Length multiplied by the Record Count, in units of bits. ^^^This is wrong--variable sized data records, bit values. THis MUST be patched after generation."""
         self.pad4 = 0
         """ Padding of 0 to 31 unused bits as required for 32-bit alignment of the Record Set field. ^^^This is wrong--variable sized padding. MUST be patched post-code generation"""
@@ -1152,7 +1246,7 @@ class EightByteChunk( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.otherParameters = [0]*8
+        self.otherParameters = [0] * 8
         for idx in range(0, 8):
             val = inputStream.read_byte()
 
@@ -1164,12 +1258,14 @@ class EightByteChunk( object ):
 class AntennaLocation( object ):
     """Location of the radiating portion of the antenna, specified in world coordinates and entity coordinates. Section 6.2.8"""
 
-    def __init__(self):
+    def __init__(self,
+                 antennaLocation=None,
+                 relativeAntennaLocation=None):
         """ Initializer for AntennaLocation"""
-        self.antennaLocation = Vector3Double();
-        """ Location of the radiating portion of the antenna in world    coordinates"""
-        self.relativeAntennaLocation = Vector3Float();
-        """ Location of the radiating portion of the antenna     in entity coordinates"""
+        self.antennaLocation = antennaLocation or Vector3Double()
+        """ Location of the radiating portion of the antenna in world coordinates"""
+        self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float()
+        """ Location of the radiating portion of the antenna in entity coordinates"""
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -1188,11 +1284,11 @@ class AntennaLocation( object ):
 class ObjectIdentifier( object ):
     """The unique designation of an environmental object. Section 6.2.63"""
 
-    def __init__(self):
+    def __init__(self, simulationAddress=None, objectNumber=0):
         """ Initializer for ObjectIdentifier"""
-        self.simulationAddress = SimulationAddress();
+        self.simulationAddress = simulationAddress or SimulationAddress()
         """  Simulation Address"""
-        self.objectNumber = 0
+        self.objectNumber = objectNumber
         """ object number"""
 
     def serialize(self, outputStream):
@@ -1212,11 +1308,11 @@ class ObjectIdentifier( object ):
 class AggregateIdentifier( object ):
     """The unique designation of each aggrgate in an exercise is specified by an aggregate identifier record. The aggregate ID is not an entity and shall not be treated as such. Section 6.2.3."""
 
-    def __init__(self):
+    def __init__(self, simulationAddress=None, aggregateID=0):
         """ Initializer for AggregateIdentifier"""
-        self.simulationAddress = SimulationAddress();
+        self.simulationAddress = simulationAddress or SimulationAddress()
         """ Simulation address, ie site and application, the first two fields of the entity ID"""
-        self.aggregateID = 0
+        self.aggregateID = aggregateID
         """ the aggregate ID"""
 
     def serialize(self, outputStream):
@@ -1262,17 +1358,22 @@ class FixedDatum( object ):
 class VariableParameter( object ):
     """specification of additional information associated with an entity or detonation, not otherwise accounted for in a PDU 6.2.94.1"""
 
-    def __init__(self):
+    def __init__(self,
+                 recordType=0,
+                 variableParameterFields1=0,
+                 variableParameterFields2=0,
+                 variableParameterFields3=0,
+                 variableParameterFields4=0):
         """ Initializer for VariableParameter"""
-        self.recordType = 0
+        self.recordType = recordType
         """ the identification of the Variable Parameter record. Enumeration from EBV"""
-        self.variableParameterFields1 = 0
+        self.variableParameterFields1 = variableParameterFields1
         """ Variable parameter data fields. Two doubles minus one byte"""
-        self.variableParameterFields2 = 0
+        self.variableParameterFields2 = variableParameterFields2
         """ Variable parameter data fields. """
-        self.variableParameterFields3 = 0
+        self.variableParameterFields3 = variableParameterFields3
         """ Variable parameter data fields. """
-        self.variableParameterFields4 = 0
+        self.variableParameterFields4 = variableParameterFields4
         """ Variable parameter data fields. """
 
     def serialize(self, outputStream):
@@ -1314,11 +1415,11 @@ class ChangeOptions( object ):
 class LiveSimulationAddress( object ):
     """A simulation's designation associated with all Live Entity IDs contained in Live Entity PDUs. Section 6.2.55 """
 
-    def __init__(self):
+    def __init__(self, liveSiteNumber=0, liveApplicationNumber=0):
         """ Initializer for LiveSimulationAddress"""
-        self.liveSiteNumber = 0
+        self.liveSiteNumber = liveSiteNumber
         """ facility, installation, organizational unit or geographic location may have multiple sites associated with it. The Site Number is the first component of the Live Simulation Address, which defines a live simulation."""
-        self.liveApplicationNumber = 0
+        self.liveApplicationNumber = liveApplicationNumber
         """ An application associated with a live site is termed a live application. Each live application participating in an event """
 
     def serialize(self, outputStream):
@@ -1338,11 +1439,11 @@ class LiveSimulationAddress( object ):
 class EntityMarking( object ):
     """Specifies the character set used inthe first byte, followed by 11 characters of text data. Section 6.29"""
 
-    def __init__(self):
+    def __init__(self, characterSet=0, characters=None):
         """ Initializer for EntityMarking"""
-        self.characterSet = 0
+        self.characterSet = characterSet
         """ The character set"""
-        self.characters =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.characters =  characters or [0] * 11
         """ The characters"""
 
     def setString(self, new_str):
@@ -1380,20 +1481,26 @@ class EntityMarking( object ):
 class UAFundamentalParameter( object ):
     """Regeneration parameters for active emission systems that are variable throughout a scenario. Section 6.2.91"""
 
-    def __init__(self):
+    def __init__(self,
+                 activeEmissionParameterIndex=0,
+                 scanPattern=0,
+                 beamCenterAzimuthHorizontal=0.0,
+                 azimuthBeamwidthHorizontal=0.0,
+                 beamCenterDepressionElevation=0.0,
+                 beamwidthDownElevation=0.0):
         """ Initializer for UAFundamentalParameter"""
-        self.activeEmissionParameterIndex = 0
+        self.activeEmissionParameterIndex = activeEmissionParameterIndex
         """ Which database record shall be used. An enumeration from EBV document"""
-        self.scanPattern = 0
+        self.scanPattern = scanPattern
         """ The type of scan pattern, If not used, zero. An enumeration from EBV document"""
-        self.beamCenterAzimuthHorizontal = 0
+        self.beamCenterAzimuthHorizontal = beamCenterAzimuthHorizontal
         """ center azimuth bearing of th emain beam. In radians."""
-        self.azimuthalBeamwidthHorizontal = 0
-        """ Horizontal beamwidth of th emain beam Meastued at the 3dB down point of peak radiated power. In radians."""
-        self.beamCenterDepressionElevation = 0
+        self.azimuthalBeamwidthHorizontal = azimuthBeamwidthHorizontal
+        """ Horizontal beamwidth of the main beam measured at the 3dB down point of peak radiated power. In radians."""
+        self.beamCenterDepressionElevation = beamCenterDepressionElevation
         """ center of the d/e angle of th emain beam relative to the stablised de angle of the target. In radians."""
-        self.beamwidthDownElevation = 0
-        """ vertical beamwidth of the main beam. Meastured at the 3dB down point of peak radiated power. In radians."""
+        self.beamwidthDownElevation = beamwidthDownElevation
+        """ vertical beamwidth of the main beam. Measured at the 3dB down point of peak radiated power. In radians."""
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -1447,7 +1554,15 @@ class TwoByteChunk( object ):
 class DirectedEnergyDamage( object ):
     """Damage sustained by an entity due to directed energy. Location of the damage based on a relative x,y,z location from the center of the entity. Section 6.2.15.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 damageLocation=None,
+                 damageDiameter=0,
+                 temperature=-273.15,
+                 componentIdentification=0,
+                 componentDamageStatus=0,
+                 componentVisualDamageStatus=0,
+                 componentVisualSmokeColor=0,
+                 fireEventID=None):
         """ Initializer for DirectedEnergyDamage"""
         self.recordType = 4500
         """ DE Record Type."""
@@ -1455,21 +1570,21 @@ class DirectedEnergyDamage( object ):
         """ DE Record Length (bytes)."""
         self.padding = 0
         """ padding."""
-        self.damageLocation = Vector3Float();
+        self.damageLocation = damageLocation or Vector3Float()
         """ location of damage, relative to center of entity"""
-        self.damageDiameter = 0
+        self.damageDiameter = damageDiameter
         """ Size of damaged area, in meters."""
-        self.temperature = -273.15
+        self.temperature = temperature
         """ average temp of the damaged area, in degrees celsius. If firing entitty does not model this, use a value of -273.15"""
-        self.componentIdentification = 0
+        self.componentIdentification = componentIdentification
         """ enumeration"""
-        self.componentDamageStatus = 0
+        self.componentDamageStatus = componentDamageStatus
         """ enumeration"""
-        self.componentVisualDamageStatus = 0
+        self.componentVisualDamageStatus = componentVisualDamageStatus
         """ enumeration"""
-        self.componentVisualSmokeColor = 0
+        self.componentVisualSmokeColor = componentVisualSmokeColor
         """ enumeration"""
-        self.fireEventID = EventIdentifier();
+        self.fireEventID = fireEventID or EventIdentifier()
         """ For any component damage resulting this field shall be set to the fire event ID from that PDU."""
         self.padding2 = 0
         """ padding"""
@@ -1511,15 +1626,18 @@ class DirectedEnergyDamage( object ):
 class ExplosionDescriptor( object ):
     """Explosion of a non-munition. Section 6.2.19.3"""
 
-    def __init__(self):
+    def __init__(self,
+                 explodingObject=None,
+                 explosiveMaterial=0,
+                 explosiveForce=0.0):
         """ Initializer for ExplosionDescriptor"""
-        self.explodingObject = EntityType();
+        self.explodingObject = explodingObject or EntityType()
         """ Type of the object that exploded. See 6.2.30"""
-        self.explosiveMaterial = 0
+        self.explosiveMaterial = explosiveMaterial
         """ Material that exploded. Can be grain dust, tnt, gasoline, etc. Enumeration"""
         self.padding = 0
         """ padding"""
-        self.explosiveForce = 0
+        self.explosiveForce = explosiveForce
         """ Force of explosion, in equivalent KG of TNT"""
 
     def serialize(self, outputStream):
@@ -1543,11 +1661,11 @@ class ExplosionDescriptor( object ):
 class ClockTime( object ):
     """Time measurements that exceed one hour are represented by this record. The first field is the hours since the unix epoch (Jan 1 1970, used by most Unix systems and java) and the second field the timestamp units since the top of the hour. Section 6.2.14"""
 
-    def __init__(self):
+    def __init__(self, hour=0, timePastHour=0):
         """ Initializer for ClockTime"""
-        self.hour = 0
+        self.hour = hour
         """ Hours in UTC"""
-        self.timePastHour = 0
+        self.timePastHour = timePastHour
         """ Time past the hour"""
 
     def serialize(self, outputStream):
@@ -1567,13 +1685,16 @@ class ClockTime( object ):
 class SecondaryOperationalData( object ):
     """Additional operational data for an IFF emitting system and the number of IFF Fundamental Parameter Data records Section 6.2.76."""
 
-    def __init__(self):
+    def __init__(self,
+                 operationalData1=0,
+                 operationalData2=0,
+                 numberOfIFFFundamentalParameterRecords=0):
         """ Initializer for SecondaryOperationalData"""
-        self.operationalData1 = 0
+        self.operationalData1 = operationalData1
         """ additional operational characteristics of the IFF emitting system. Each 8-bit field will vary depending on the system type."""
-        self.operationalData2 = 0
+        self.operationalData2 = operationalData2
         """ additional operational characteristics of the IFF emitting system. Each 8-bit field will vary depending on the system type."""
-        self.numberOfIFFFundamentalParameterRecords = 0
+        self.numberOfIFFFundamentalParameterRecords = numberOfIFFFundamentalParameterRecords
         """ the number of IFF Fundamental Parameter Data records that follow"""
 
     def serialize(self, outputStream):
@@ -1595,21 +1716,28 @@ class SecondaryOperationalData( object ):
 class EnvironmentType( object ):
     """Description of environmental data in environmental process and gridded data PDUs. Section 6.2.32"""
 
-    def __init__(self):
+    def __init__(self,
+                 entityKind=0,
+                 domain=0,
+                 entityClass=0,
+                 category=0,
+                 subcategory=0,
+                 specific=0,
+                 extra=0):
         """ Initializer for EnvironmentType"""
-        self.entityKind = 0
+        self.entityKind = entityKind
         """ Kind of entity"""
-        self.domain = 0
+        self.domain = domain
         """ Domain of entity (air, surface, subsurface, space, etc)"""
-        self.entityClass = 0
+        self.entityClass = entityClass
         """ class of environmental entity"""
-        self.category = 0
+        self.category = category
         """ category of entity"""
-        self.subcategory = 0
+        self.subcategory = subcategory
         """ subcategory of entity"""
-        self.specific = 0
+        self.specific = specific
         """ specific info based on subcategory field"""
-        self.extra = 0
+        self.extra = extra
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -1638,9 +1766,9 @@ class EnvironmentType( object ):
 class TotalRecordSets( object ):
     """Total number of record sets contained in a logical set of one or more PDUs. Used to transfer ownership, etc Section 6.2.88"""
 
-    def __init__(self):
+    def __init__(self, totalRecordSets=0):
         """ Initializer for TotalRecordSets"""
-        self.totalRecordSets = 0
+        self.totalRecordSets = totalRecordSets
         """ Total number of record sets"""
         self.padding = 0
         """ padding"""
@@ -1662,11 +1790,11 @@ class TotalRecordSets( object ):
 class MineEntityIdentifier( object ):
     """The unique designation of a mine contained in the Minefield Data PDU. No espdus are issued for mine entities.  Section 6.2.55 """
 
-    def __init__(self):
+    def __init__(self, simulationAddress=None, mineEntityNumber=0):
         """ Initializer for MineEntityIdentifier"""
-        self.simulationAddress = SimulationAddress();
+        self.simulationAddress = simulationAddress or SimulationAddress()
         """ """
-        self.mineEntityNumber = 0
+        self.mineEntityNumber = mineEntityNumber
         """ """
 
     def serialize(self, outputStream):
@@ -1686,11 +1814,11 @@ class MineEntityIdentifier( object ):
 class Relationship( object ):
     """The relationship of the part entity to its host entity. Section 6.2.74."""
 
-    def __init__(self):
+    def __init__(self, nature=0, position=0):
         """ Initializer for Relationship"""
-        self.nature = 0
+        self.nature = nature
         """ the nature or purpose for joining of the part entity to the host entity and shall be represented by a 16-bit enumeration"""
-        self.position = 0
+        self.position = position
         """ the position of the part entity with respect to the host entity and shall be represented by a 16-bit enumeration"""
 
     def serialize(self, outputStream):
@@ -1710,23 +1838,33 @@ class Relationship( object ):
 class EEFundamentalParameterData( object ):
     """Contains electromagnetic emmission regeneration parameters that are variable throught a scenario. Section 6.2.22."""
 
-    def __init__(self):
+    def __init__(self,
+                 frequency=0.0,
+                 frequencyRange=0,
+                 effectiveRadiatedPower=0,
+                 pulseRepetitionFrequency=0.0,
+                 pulseWidth=0.0,
+                 beamAzimuthCenter=0.0,
+                 beamAzimuthSweep=0.0,
+                 beamElevationCenter=0.0,
+                 beamElevationSweep=0.0,
+                 beamSweepSync=0.0):
         """ Initializer for EEFundamentalParameterData"""
-        self.frequency = 0
+        self.frequency = frequency
         """ center frequency of the emission in hertz."""
-        self.frequencyRange = 0
+        self.frequencyRange = frequencyRange
         """ Bandwidth of the frequencies corresponding to the fequency field."""
-        self.effectiveRadiatedPower = 0
+        self.effectiveRadiatedPower = effectiveRadiatedPower
         """ Effective radiated power for the emission in DdBm. For a radar noise jammer, indicates the peak of the transmitted power."""
-        self.pulseRepetitionFrequency = 0
+        self.pulseRepetitionFrequency = pulseRepetitionFrequency
         """ Average repetition frequency of the emission in hertz."""
-        self.pulseWidth = 0
+        self.pulseWidth = pulseWidth
         """ Average pulse width  of the emission in microseconds."""
-        self.beamAzimuthCenter = 0
-        self.beamAzimuthSweep = 0
-        self.beamElevationCenter = 0
-        self.beamElevationSweep = 0
-        self.beamSweepSync = 0
+        self.beamAzimuthCenter = beamAzimuthCenter
+        self.beamAzimuthSweep = beamAzimuthSweep
+        self.beamElevationCenter = beamElevationCenter
+        self.beamElevationSweep = beamElevationSweep
+        self.beamSweepSync = beamSweepSync
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -1760,12 +1898,12 @@ class EEFundamentalParameterData( object ):
 class JammingTechnique( object ):
     """Jamming technique. Section 6.2.49"""
 
-    def __init__(self):
+    def __init__(self, kind=0, category=0, subcategory=0, specific=0):
         """ Initializer for JammingTechnique"""
-        self.kind = 0
-        self.category = 0
-        self.subcategory = 0
-        self.specific = 0
+        self.kind = kind
+        self.category = category
+        self.subcategory = subcategory
+        self.specific = specific
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -1788,15 +1926,19 @@ class JammingTechnique( object ):
 class DatumSpecification( object ):
     """List of fixed and variable datum records. Section 6.2.18 """
 
-    def __init__(self):
+    def __init__(self,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumIDList=None,
+                 variableDatumIDList=None):
         """ Initializer for DatumSpecification"""
-        self.numberOfFixedDatums = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datums"""
-        self.numberOfVariableDatums = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datums"""
-        self.fixedDatumIDList = []
+        self.fixedDatumIDList = fixedDatumIDList or []
         """ variable length list fixed datums"""
-        self.variableDatumIDList = []
+        self.variableDatumIDList = variableDatumIDList or []
         """ variable length list variable datums"""
 
     def serialize(self, outputStream):
@@ -1814,14 +1956,14 @@ class DatumSpecification( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfFixedDatums = inputStream.read_unsigned_int();
-        self.numberOfVariableDatums = inputStream.read_unsigned_int();
-        for idx in range(0, self.numberOfFixedDatums):
+        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int();
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int();
+        for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatumIDList.append(element)
 
-        for idx in range(0, self.numberOfVariableDatums):
+        for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumIDList.append(element)
@@ -1832,21 +1974,26 @@ class DatumSpecification( object ):
 class DirectedEnergyAreaAimpoint( object ):
     """DE Precision Aimpoint Record. NOT COMPLETE. Section 6.2.20.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 recordLength=0,
+                 beamAntennaPatternRecordCount=0,
+                 directedEnergyTargetEnergyDepositionRecordCount=0,
+                 beamAntennaParameterList=None,
+                 directedEnergyTargetEnergyDepositionList=None):
         """ Initializer for DirectedEnergyAreaAimpoint"""
         self.recordType = 4001
         """ Type of Record enumeration"""
-        self.recordLength = 0
+        self.recordLength = recordLength
         """ Length of Record"""
         self.padding = 0
         """ Padding"""
-        self.beamAntennaPatternRecordCount = 0
+        self.beamAntennaPatternRecordCount = beamAntennaPatternRecordCount
         """ Number of beam antenna pattern records"""
-        self.directedEnergyTargetEnergyDepositionRecordCount = 0
+        self.directedEnergyTargetEnergyDepositionRecordCount = directedEnergyTargetEnergyDepositionRecordCount
         """ Number of DE target energy depositon records"""
-        self.beamAntennaParameterList = []
+        self.beamAntennaParameterList = beamAntennaParameterList or []
         """ list of beam antenna records. See 6.2.9.2"""
-        self.directedEnergyTargetEnergyDepositionRecordList = []
+        self.directedEnergyTargetEnergyDepositionRecordList = directedEnergyTargetEnergyDepositionList or []
         """ list of DE target deposition records. See 6.2.21.4"""
 
     def serialize(self, outputStream):
@@ -1888,13 +2035,13 @@ class DirectedEnergyAreaAimpoint( object ):
 class Vector3Float( object ):
     """Three floating point values, x, y, and z. Section 6.2.95"""
 
-    def __init__(self):
+    def __init__(self, x=0.0, y=0.0, z=0.0):
         """ Initializer for Vector3Float"""
-        self.x = 0
+        self.x = x
         """ X value"""
-        self.y = 0
+        self.y = y
         """ y Value"""
-        self.z = 0
+        self.z = z
         """ Z value"""
 
     def serialize(self, outputStream):
@@ -1916,13 +2063,17 @@ class Vector3Float( object ):
 class Expendable( object ):
     """An entity's expendable (chaff, flares, etc) information. Section 6.2.36"""
 
-    def __init__(self):
+    def __init__(self,
+                 expendable=None,
+                 station=0,
+                 quantity=0,
+                 expendableStatus=0):
         """ Initializer for Expendable"""
-        self.expendable = EntityType();
+        self.expendable = expendable or EntityType()
         """ Type of expendable"""
-        self.station = 0
-        self.quantity = 0
-        self.expendableStatus = 0
+        self.station = station
+        self.quantity = quantity
+        self.expendableStatus = expendableStatus
         self.padding = 0
 
     def serialize(self, outputStream):
@@ -1948,13 +2099,15 @@ class Expendable( object ):
 class IOCommunicationsNode( object ):
     """A communications node that is part of a simulted communcations network. Section 6.2.49.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 communicationsNodeType=0,
+                 communicationsNodeID=None):
         """ Initializer for IOCommunicationsNode"""
         self.recordType = 5501
         self.recordLength = 16
-        self.communcationsNodeType = 0
+        self.communcationsNodeType = communicationsNodeType
         self.padding = 0
-        self.communicationsNodeID = CommunicationsNodeID();
+        self.communicationsNodeID = communicationsNodeID or CommunicationsNodeID()
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -1979,15 +2132,19 @@ class IOCommunicationsNode( object ):
 class ModulationType( object ):
     """Information about the type of modulation used for radio transmission. 6.2.59 """
 
-    def __init__(self):
+    def __init__(self,
+                 spreadSpectrum=0,
+                 majorModulation=0,
+                 detail=0,
+                 radioSystem=0):
         """ Initializer for ModulationType"""
-        self.spreadSpectrum = 0
+        self.spreadSpectrum = spreadSpectrum
         """ This field shall indicate the spread spectrum technique or combination of spread spectrum techniques in use. Bit field. 0=freq hopping, 1=psuedo noise, time hopping=2, reamining bits unused"""
-        self.majorModulation = 0
+        self.majorModulation = majorModulation
         """ the major classification of the modulation type. """
-        self.detail = 0
+        self.detail = detail
         """ provide certain detailed information depending upon the major modulation type"""
-        self.radioSystem = 0
+        self.radioSystem = radioSystem
         """ the radio system associated with this Transmitter PDU and shall be used as the basis to interpret other fields whose values depend on a specific radio system."""
 
     def serialize(self, outputStream):
@@ -2011,27 +2168,37 @@ class ModulationType( object ):
 class LinearSegmentParameter( object ):
     """The specification of an individual segment of a linear segment synthetic environment object in a Linear Object State PDU Section 6.2.52"""
 
-    def __init__(self):
+    def __init__(self,
+                 segmentNumber=0,
+                 segmentModification=0,
+                 generalSegmentAppearance=0,
+                 specificSegmentAppearance=0,
+                 segmentLocation=None,
+                 segmentOrientation=None,
+                 segmentLength=0.0,
+                 segmentWidth=0.0,
+                 segmentHeight=0.0,
+                 segmentDepth=0.0):
         """ Initializer for LinearSegmentParameter"""
-        self.segmentNumber = 0
+        self.segmentNumber = segmentNumber
         """ the individual segment of the linear segment """
-        self.segmentModification = 0
+        self.segmentModification = segmentModification
         """  whether a modification has been made to the point objects location or orientation"""
-        self.generalSegmentAppearance = 0
+        self.generalSegmentAppearance = generalSegmentAppearance
         """ general dynamic appearance attributes of the segment. This record shall be defined as a 16-bit record of enumerations. The values defined for this record are included in Section 12 of SISO-REF-010."""
-        self.specificSegmentAppearance = 0
+        self.specificSegmentAppearance = specificSegmentAppearance
         """ This field shall specify specific dynamic appearance attributes of the segment. This record shall be defined as a 32-bit record of enumerations."""
-        self.segmentLocation = Vector3Double();
+        self.segmentLocation = segmentLocation or Vector3Double()
         """ This field shall specify the location of the linear segment in the simulated world and shall be represented by a World Coordinates record """
-        self.segmentOrientation = EulerAngles();
+        self.segmentOrientation = segmentOrientation or EulerAngles()
         """ orientation of the linear segment about the segment location and shall be represented by a Euler Angles record """
-        self.segmentLength = 0
+        self.segmentLength = segmentLength
         """ length of the linear segment, in meters, extending in the positive X direction"""
-        self.segmentWidth = 0
+        self.segmentWidth = segmentWidth
         """ The total width of the linear segment, in meters, shall be specified by a 16-bit unsigned integer. One-half of the width shall extend in the positive Y direction, and one-half of the width shall extend in the negative Y direction."""
-        self.segmentHeight = 0
+        self.segmentHeight = segmentHeight
         """ The height of the linear segment, in meters, above ground shall be specified by a 16-bit unsigned integer."""
-        self.segmentDepth = 0
+        self.segmentDepth = segmentDepth
         """ The depth of the linear segment, in meters, below ground level """
         self.padding = 0
         """ padding"""
@@ -2071,11 +2238,11 @@ class LinearSegmentParameter( object ):
 class SimulationAddress( object ):
     """A Simulation Address record shall consist of the Site Identification number and the Application Identification number. Section 6.2.79 """
 
-    def __init__(self):
+    def __init__(self, site=0, application=0):
         """ Initializer for SimulationAddress"""
-        self.site = 0
+        self.site = site
         """ A site is defined as a facility, installation, organizational unit or a geographic location that has one or more simulation applications capable of participating in a distributed event. """
-        self.application = 0
+        self.application = application
         """ An application is defined as a software program that is used to generate and process distributed simulation data including live, virtual and constructive data."""
 
     def serialize(self, outputStream):
@@ -2095,15 +2262,19 @@ class SimulationAddress( object ):
 class SystemIdentifier( object ):
     """The ID of the IFF emitting system. NOT COMPLETE. Section 6.2.87"""
 
-    def __init__(self):
+    def __init__(self,
+                 systemType=0,
+                 systemName=0,
+                 systemMode=0,
+                 changeOptions=None):
         """ Initializer for SystemIdentifier"""
-        self.systemType = 0
+        self.systemType = systemType
         """ general type of emitting system, an enumeration"""
-        self.systemName = 0
+        self.systemName = systemName
         """ named type of system, an enumeration"""
-        self.systemMode = 0
+        self.systemMode = systemMode
         """ mode of operation for the system, an enumeration"""
-        self.changeOptions = ChangeOptions();
+        self.changeOptions = changeOptions or ChangeOptions()
         """ status of this PDU, see section 6.2.15"""
 
     def serialize(self, outputStream):
@@ -2127,13 +2298,13 @@ class SystemIdentifier( object ):
 class TrackJamData( object ):
     """ Track-Jam data Section 6.2.89"""
 
-    def __init__(self):
+    def __init__(self, entityID=None, emitterNumber=0, beamNumber=0):
         """ Initializer for TrackJamData"""
-        self.entityID = EntityID();
+        self.entityID = entityID or EntityID()
         """ the entity tracked or illumated, or an emitter beam targeted with jamming"""
-        self.emitterNumber = 0
+        self.emitterNumber = emitterNumber
         """ Emitter system associated with the entity"""
-        self.beamNumber = 0
+        self.beamNumber = beamNumber
         """ Beam associated with the entity"""
 
     def serialize(self, outputStream):
@@ -2155,21 +2326,28 @@ class TrackJamData( object ):
 class AggregateType( object ):
     """Identifies the type and organization of an aggregate. Section 6.2.5"""
 
-    def __init__(self):
+    def __init__(self,
+                 aggregateKind=0,
+                 domain=0,
+                 country=0,
+                 category=0,
+                 subcategory=0,
+                 specificInfo=0,
+                 extra=0):
         """ Initializer for AggregateType"""
-        self.aggregateKind = 0
+        self.aggregateKind = aggregateKind
         """ Grouping criterion used to group the aggregate. Enumeration from EBV document"""
-        self.domain = 0
+        self.domain = domain
         """ Domain of entity (air, surface, subsurface, space, etc) Zero means domain does not apply."""
-        self.country = 0
+        self.country = country
         """ country to which the design of the entity is attributed"""
-        self.category = 0
+        self.category = category
         """ category of entity"""
-        self.subcategory = 0
+        self.subcategory = subcategory
         """ subcategory of entity"""
-        self.specificInfo = 0
+        self.specificInfo = specificInfo
         """ specific info based on subcategory field. specific is a reserved word in sql."""
-        self.extra = 0
+        self.extra = extra
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -2196,15 +2374,18 @@ class AggregateType( object ):
 
 
 class SimulationManagementPduHeader( object ):
-    """First part of a simulation management (SIMAN) PDU and SIMAN-Reliability (SIMAN-R) PDU. Sectionn 6.2.81"""
+    """First part of a simulation management (SIMAN) PDU and SIMAN-Reliability (SIMAN-R) PDU. Section 6.2.81"""
 
-    def __init__(self):
+    def __init__(self,
+                 pduHeader=None,
+                 originatingID=None,
+                 receivingID=None):
         """ Initializer for SimulationManagementPduHeader"""
-        self.pduHeader = PduHeader();
+        self.pduHeader = pduHeader or PduHeader()
         """ Conventional PDU header"""
-        self.originatingID = SimulationIdentifier();
+        self.originatingID = originatingID or SimulationIdentifier()
         """ IDs the simulation or entity, etiehr a simulation or an entity. Either 6.2.80 or 6.2.28"""
-        self.receivingID = SimulationIdentifier();
+        self.receivingID = receivingID or SimulationIdentifier()
         """ simulation, all simulations, a special ID, or an entity. See 5.6.5 and 5.12.4"""
 
     def serialize(self, outputStream):
@@ -2226,17 +2407,22 @@ class SimulationManagementPduHeader( object ):
 class BeamData( object ):
     """Describes the scan volue of an emitter beam. Section 6.2.11."""
 
-    def __init__(self):
+    def __init__(self,
+                 beamAzimuthCenter=0.0,
+                 beamAzimuthSweep=0.0,
+                 beamElevationCenter=0.0,
+                 beamElevationSweep=0.0,
+                 beamSweepSync=0.0):
         """ Initializer for BeamData"""
-        self.beamAzimuthCenter = 0
+        self.beamAzimuthCenter = beamAzimuthCenter
         """ Specifies the beam azimuth an elevation centers and corresponding half-angles to describe the scan volume"""
-        self.beamAzimuthSweep = 0
+        self.beamAzimuthSweep = beamAzimuthSweep
         """ Specifies the beam azimuth sweep to determine scan volume"""
-        self.beamElevationCenter = 0
+        self.beamElevationCenter = beamElevationCenter
         """ Specifies the beam elevation center to determine scan volume"""
-        self.beamElevationSweep = 0
+        self.beamElevationSweep = beamElevationSweep
         """ Specifies the beam elevation sweep to determine scan volume"""
-        self.beamSweepSync = 0
+        self.beamSweepSync = beamSweepSync
         """ allows receiver to synchronize its regenerated scan pattern to that of the emmitter. Specifies the percentage of time a scan is through its pattern from its origion."""
 
     def serialize(self, outputStream):
@@ -2262,7 +2448,11 @@ class BeamData( object ):
 class EngineFuel( object ):
     """Information about an entity's engine fuel. Section 6.2.24."""
 
-    def __init__(self):
+    def __init__(self,
+                 fuelQuantity=0,
+                 fuelMeasurementUnits=0,
+                 fuelType=0,
+                 fuelLocation=0):
         """ Initializer for EngineFuel"""
         self.fuelQuantity = 0
         """ Fuel quantity, units specified by next field"""
@@ -2298,16 +2488,22 @@ class EngineFuel( object ):
 class IOEffect( object ):
     """Effect of IO on an entity. Section 6.2.49.3"""
 
-    def __init__(self):
+    def __init__(self,
+                 ioStatus=0,
+                 ioLinkType=0,
+                 ioEffect=None,
+                 ioEffectDutyCycle=0,
+                 ioEffectDuration=0,
+                 ioProcess=0):
         """ Initializer for IOEffect"""
         self.recordType = 5500
         self.recordLength = 16
-        self.ioStatus = 0
-        self.ioLinkType = 0
-        self.ioEffect = EntityID();
-        self.ioEffectDutyCycle = 0
-        self.ioEffectDuration = 0
-        self.ioProcess = 0
+        self.ioStatus = ioStatus
+        self.ioLinkType = ioLinkType
+        self.ioEffect = ioEffect or EntityID()
+        self.ioEffectDutyCycle = ioEffectDutyCycle
+        self.ioEffectDuration = ioEffectDuration
+        self.ioProcess = ioProcess
         self.padding = 0
 
     def serialize(self, outputStream):
@@ -2339,13 +2535,13 @@ class IOEffect( object ):
 
 
 class SimulationIdentifier( object ):
-    """The unique designation of a simulation when using the 48-bit identifier format shall be specified by the Sim- ulation Identifier record. The reason that the 48-bit format is required in addition to the 32-bit simulation address format that actually identifies a specific simulation is because some 48-bit identifier fields in PDUs may contain either an Object Identifier, such as an Entity ID, or a Simulation Identifier. Section 6.2.80"""
+    """The unique designation of a simulation when using the 48-bit identifier format shall be specified by the Simulation Identifier record. The reason that the 48-bit format is required in addition to the 32-bit simulation address format that actually identifies a specific simulation is because some 48-bit identifier fields in PDUs may contain either an Object Identifier, such as an Entity ID, or a Simulation Identifier. Section 6.2.80"""
 
-    def __init__(self):
+    def __init__(self, simulationAddress=None, referenceNumber=0):
         """ Initializer for SimulationIdentifier"""
-        self.simulationAddress = SimulationAddress();
+        self.simulationAddress = simulationAddress or SimulationAddress()
         """ Simulation address """
-        self.referenceNumber = 0
+        self.referenceNumber = referenceNumber
         """ This field shall be set to zero as there is no reference number associated with a Simulation Identifier."""
 
     def serialize(self, outputStream):
@@ -2365,27 +2561,37 @@ class SimulationIdentifier( object ):
 class GridAxisDescriptorVariable( object ):
     """Grid axis descriptor fo variable spacing axis data. NOT COMPLETE. Need padding to 64 bit boundary."""
 
-    def __init__(self):
+    def __init__(self,
+                 domainInitialXi=0.0,
+                 domainFinalXi=0.0,
+                 domainPointsXi=0,
+                 interleafFactor=0,
+                 axisType=0,
+                 numberOfPointsOnXiAxis=0,
+                 initialIndex=0,
+                 coordinateScaleXi=0.0,
+                 coordinateOffsetXi=0.0,
+                 xiValues=None):
         """ Initializer for GridAxisDescriptorVariable"""
-        self.domainInitialXi = 0
+        self.domainInitialXi = domainInitialXi
         """ coordinate of the grid origin or initial value"""
-        self.domainFinalXi = 0
+        self.domainFinalXi = domainFinalXi
         """ coordinate of the endpoint or final value"""
-        self.domainPointsXi = 0
+        self.domainPointsXi = domainPointsXi
         """ The number of grid points along the Xi domain axis for the enviornmental state data"""
-        self.interleafFactor = 0
+        self.interleafFactor = interleafFactor
         """ interleaf factor along the domain axis."""
-        self.axisType = 0
+        self.axisType = axisType
         """ type of grid axis"""
-        self.numberOfPointsOnXiAxis = 0
+        self.numberOfPointsOnXiAxis = numberOfPointsOnXiAxis
         """ Number of grid locations along Xi axis"""
-        self.initialIndex = 0
+        self.initialIndex = initialIndex
         """ initial grid point for the current pdu"""
-        self.coordinateScaleXi = 0
+        self.coordinateScaleXi = coordinateScaleXi
         """ value that linearly scales the coordinates of the grid locations for the xi axis"""
-        self.coordinateOffsetXi = 0.0
+        self.coordinateOffsetXi = coordinateOffsetXi
         """ The constant offset value that shall be applied to the grid locations for the xi axis"""
-        self.xiValues = []
+        self.xiValues = xiValues or []
         """ list of coordinates"""
 
     def serialize(self, outputStream):
@@ -2427,11 +2633,11 @@ class GridAxisDescriptorVariable( object ):
 class SupplyQuantity( object ):
     """ A supply, and the amount of that supply. Section 6.2.86"""
 
-    def __init__(self):
+    def __init__(self, supplyType=None, quantity=0.0):
         """ Initializer for SupplyQuantity"""
-        self.supplyType = EntityType();
+        self.supplyType = supplyType or EntityType()
         """ Type of supply"""
-        self.quantity = 0
+        self.quantity = quantity
         """ the number of units of a supply type. """
 
     def serialize(self, outputStream):
@@ -2451,15 +2657,19 @@ class SupplyQuantity( object ):
 class SilentEntitySystem( object ):
     """information abou an enitity not producing espdus. Section 6.2.79"""
 
-    def __init__(self):
+    def __init__(self,
+                 numberOfEntities=0,
+                 numberOfAppearanceRecords=0,
+                 entityType=None,
+                 appearanceRecordList=None):
         """ Initializer for SilentEntitySystem"""
-        self.numberOfEntities = 0
+        self.numberOfEntities = numberOfEntities
         """ number of the type specified by the entity type field"""
-        self.numberOfAppearanceRecords = 0
+        self.numberOfAppearanceRecords = numberOfAppearanceRecords
         """ number of entity appearance records that follow"""
-        self.entityType = EntityType();
+        self.entityType = entityType or EntityType()
         """ Entity type"""
-        self.appearanceRecordList = []
+        self.appearanceRecordList = appearanceRecordList or []
         """ Variable length list of appearance records"""
 
     def serialize(self, outputStream):
@@ -2489,11 +2699,11 @@ class SilentEntitySystem( object ):
 class EventIdentifier( object ):
     """Identifies an event in the world. Use this format for every PDU EXCEPT the LiveEntityPdu. Section 6.2.34."""
 
-    def __init__(self):
+    def __init__(self, simulationAddress=None, eventNumber=0):
         """ Initializer for EventIdentifier"""
-        self.simulationAddress = SimulationAddress();
+        self.simulationAddress = simulationAddress or SimulationAddress()
         """ Site and application IDs"""
-        self.eventNumber = 0
+        self.eventNumber = eventNumber
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -2512,20 +2722,30 @@ class EventIdentifier( object ):
 class BlankingSector( object ):
     """The Blanking Sector attribute record may be used to convey persistent areas within a scan volume where emitter power for a specific active emitter beam is reduced to an insignificant value. Section 6.2.21.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 recordType=3500,
+                 recordLength=40,
+                 emitterNumber=0,
+                 beamNumber=0,
+                 stateIndicator=0,
+                 leftAzimuth=0.0,
+                 rightAzimuth=0.0,
+                 lowerElevation=0.0,
+                 upperElevation=0.0,
+                 residualPower=0.0):
         """ Initializer for BlankingSector"""
         self.recordType = 3500
         self.recordLength = 40
         self.padding = 0
-        self.emitterNumber = 0
-        self.beamNumber = 0
-        self.stateIndicator = 0
+        self.emitterNumber = emitterNumber
+        self.beamNumber = beamNumber
+        self.stateIndicator = stateIndicator
         self.padding2 = 0
-        self.leftAzimuth = 0
-        self.rightAzimuth = 0
-        self.lowerElevation = 0
-        self.upperElevation = 0
-        self.residualPower = 0
+        self.leftAzimuth = leftAzimuth
+        self.rightAzimuth = rightAzimuth
+        self.lowerElevation = lowerElevation
+        self.upperElevation = upperElevation
+        self.residualPower = residualPower
         self.padding3 = 0
         self.padding4 = 0
 
@@ -2570,15 +2790,19 @@ class BlankingSector( object ):
 class LaunchedMunitionRecord( object ):
     """Identity of a communications node. Section 6.2.50"""
 
-    def __init__(self):
+    def __init__(self,
+                 fireEventID=None,
+                 firingEntityID=None,
+                 targetEntityID=None,
+                 targetLocation=None):
         """ Initializer for LaunchedMunitionRecord"""
-        self.fireEventID = EventIdentifier();
+        self.fireEventID = fireEventID or EventIdentifier()
         self.padding = 0
-        self.firingEntityID = EventIdentifier();
+        self.firingEntityID = firingEntityID or EventIdentifier()
         self.padding2 = 0
-        self.targetEntityID = EventIdentifier();
+        self.targetEntityID = targetEntityID or EventIdentifier()
         self.padding3 = 0
-        self.targetLocation = Vector3Double();
+        self.targetLocation = targetLocation or Vector3Double()
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -2607,7 +2831,14 @@ class LaunchedMunitionRecord( object ):
 class IFFFundamentalParameterData( object ):
     """Fundamental IFF atc data. Section 6.2.45"""
 
-    def __init__(self):
+    def __init__(self,
+                 erp=0.0,
+                 frequency=0.0,
+                 pgrf=0.0,
+                 pulseWidth=0.0,
+                 burstLength=0,
+                 applicableModes=0,
+                 systemSpecificData=None):
         """ Initializer for IFFFundamentalParameterData"""
         self.erp = 0
         """ ERP"""
@@ -2621,7 +2852,7 @@ class IFFFundamentalParameterData( object ):
         """ Burst length"""
         self.applicableModes = 0
         """ Applicable modes enumeration"""
-        self.systemSpecificData =  [ 0, 0, 0]
+        self.systemSpecificData = systemSpecificData or [0] * 3
         """ System-specific data"""
 
     def serialize(self, outputStream):
@@ -2658,27 +2889,37 @@ class IFFFundamentalParameterData( object ):
 class FundamentalOperationalData( object ):
     """Basic operational data for IFF. Section 6.2.40."""
 
-    def __init__(self):
+    def __init__(self,
+                 systemStatus=0,
+                 dataField1=0,
+                 informationLayers=0,
+                 dataField2=0,
+                 parameter1=0,
+                 parameter2=0,
+                 parameter3=0,
+                 parameter4=0,
+                 parameter5=0,
+                 parameter6=0):
         """ Initializer for FundamentalOperationalData"""
-        self.systemStatus = 0
+        self.systemStatus = systemStatus
         """ system status"""
-        self.dataField1 = 0
+        self.dataField1 = dataField1
         """ data field 1"""
-        self.informationLayers = 0
+        self.informationLayers = informationLayers
         """ eight boolean fields"""
-        self.dataField2 = 0
+        self.dataField2 = dataField2
         """ enumeration"""
-        self.parameter1 = 0
+        self.parameter1 = parameter1
         """ parameter, enumeration"""
-        self.parameter2 = 0
+        self.parameter2 = parameter2
         """ parameter, enumeration"""
-        self.parameter3 = 0
+        self.parameter3 = parameter3
         """ parameter, enumeration"""
-        self.parameter4 = 0
+        self.parameter4 = parameter4
         """ parameter, enumeration"""
-        self.parameter5 = 0
+        self.parameter5 = parameter5
         """ parameter, enumeration"""
-        self.parameter6 = 0
+        self.parameter6 = parameter6
         """ parameter, enumeration"""
 
     def serialize(self, outputStream):
@@ -2714,13 +2955,13 @@ class FundamentalOperationalData( object ):
 class IntercomCommunicationsParameters( object ):
     """Intercom communcations parameters. Section 6.2.47.  This requires hand coding"""
 
-    def __init__(self):
+    def __init__(self, recordType=0, recordLength=0, recordSpecificField=0):
         """ Initializer for IntercomCommunicationsParameters"""
-        self.recordType = 0
+        self.recordType = recordType
         """ Type of intercom parameters record"""
-        self.recordLength = 0
+        self.recordLength = recordLength
         """ length of record"""
-        self.recordSpecificField = 0
+        self.recordSpecificField = recordSpecificField
         """ This is a placeholder."""
 
     def serialize(self, outputStream):
@@ -2742,21 +2983,28 @@ class IntercomCommunicationsParameters( object ):
 class EntityType( object ):
     """Identifies the type of Entity"""
 
-    def __init__(self):
+    def __init__(self,
+                 entityKind=0,
+                 domain=0,
+                 country=0,
+                 category=0,
+                 subcategory=0,
+                 specific=0,
+                 extra=0):
         """ Initializer for EntityType"""
-        self.entityKind = 0
+        self.entityKind = entityKind
         """ Kind of entity"""
-        self.domain = 0
+        self.domain = domain
         """ Domain of entity (air, surface, subsurface, space, etc)"""
-        self.country = 0
+        self.country = country
         """ country to which the design of the entity is attributed"""
-        self.category = 0
+        self.category = category
         """ category of entity"""
-        self.subcategory = 0
+        self.subcategory = subcategory
         """ subcategory of entity"""
-        self.specific = 0
+        self.specific = specific
         """ specific info based on subcategory field. Renamed from specific because that is a reserved word in SQL."""
-        self.extra = 0
+        self.extra = extra
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -2785,15 +3033,19 @@ class EntityType( object ):
 class Munition( object ):
     """An entity's munition (e.g., bomb, missile) information shall be represented by one or more Munition records. For each type or location of munition, this record shall specify the type, location, quantity and status of munitions that an entity contains. Section 6.2.60 """
 
-    def __init__(self):
+    def __init__(self,
+                 munitionType=None,
+                 station=0,
+                 quantity=0,
+                 munitionStatus=0):
         """ Initializer for Munition"""
-        self.munitionType = EntityType();
+        self.munitionType = munitionType or EntityType()
         """  This field shall identify the entity type of the munition. See section 6.2.30."""
-        self.station = 0
+        self.station = station
         """ the station or launcher to which the munition is assigned. See Annex I"""
-        self.quantity = 0
+        self.quantity = quantity
         """ the quantity remaining of this munition."""
-        self.munitionStatus = 0
+        self.munitionStatus = munitionStatus
         """  the status of the munition. It shall be represented by an 8-bit enumeration. """
         self.padding = 0
         """ padding """
@@ -2821,11 +3073,13 @@ class Munition( object ):
 class StandardVariableSpecification( object ):
     """Does not work, and causes failure in anything it is embedded in. Section 6.2.83"""
 
-    def __init__(self):
+    def __init__(self,
+                 numberOfStandardVariableRecords=0,
+                 standardVariables=None):
         """ Initializer for StandardVariableSpecification"""
-        self.numberOfStandardVariableRecords = 0
+        self.numberOfStandardVariableRecords = numberOfStandardVariableRecords
         """ Number of static variable records"""
-        self.standardVariables = []
+        self.standardVariables = standardVariables or []
         """ variable length list of standard variables, The class type and length here are WRONG and will cause the incorrect serialization of any class in whihc it is embedded."""
 
     def serialize(self, outputStream):
@@ -2851,11 +3105,11 @@ class StandardVariableSpecification( object ):
 class Vector2Float( object ):
     """Two floating point values, x, y"""
 
-    def __init__(self):
+    def __init__(self, x=0.0, y=0.0):
         """ Initializer for Vector2Float"""
-        self.x = 0
+        self.x = x
         """ X value"""
-        self.y = 0
+        self.y = y
         """ y Value"""
 
     def serialize(self, outputStream):
@@ -2875,14 +3129,14 @@ class Vector2Float( object ):
 class Environment( object ):
     """Incomplete environment record; requires hand coding to fix. Section 6.2.31.1"""
 
-    def __init__(self):
+    def __init__(self, environmentType=0, length=0, index=0):
         """ Initializer for Environment"""
-        self.environmentType = 0
+        self.environmentType = environmentType
         """ type"""
-        self.length = 0
+        self.length = length
         """ length, in bits, of the record"""
-        self.index = 0
-        """ identifies the sequntially numbered record index"""
+        self.index = index
+        """ identifies the sequentially numbered record index"""
         self.padding = 0
         """ padding"""
 
@@ -2905,15 +3159,18 @@ class Environment( object ):
 
 
 class AcousticEmitter( object ):
-    """ information about a specific UA emmtter. Section 6.2.2."""
+    """ information about a specific UA emitter. Section 6.2.2."""
 
-    def __init__(self):
+    def __init__(self,
+                 acousticSystemName=0,
+                 acousticFunction=0,
+                 acousticIDNumber=0):
         """ Initializer for AcousticEmitter"""
-        self.acousticSystemName = 0
+        self.acousticSystemName = acousticSystemName
         """ the system for a particular UA emitter, and an enumeration"""
-        self.acousticFunction = 0
+        self.acousticFunction = acousticFunction
         """ The function of the acoustic system"""
-        self.acousticIDNumber = 0
+        self.acousticIDNumber = acousticIDNumber
         """ The UA emitter identification number relative to a specific system"""
 
     def serialize(self, outputStream):
@@ -2935,7 +3192,7 @@ class AcousticEmitter( object ):
 class AngularVelocityVector( object ):
     """Angular velocity measured in radians per second out each of the entity's own coordinate axes. Order of measurement is angular velocity around the x, y, and z axis of the entity. The positive direction is determined by the right hand rule. Section 6.2.7"""
 
-    def __init__(self):
+    def __init__(self, x=0.0, y=0.0, z=0.0):
         """ Initializer for AngularVelocityVector"""
         self.x = 0
         """ velocity about the x axis"""
@@ -2963,11 +3220,11 @@ class AngularVelocityVector( object ):
 class AggregateMarking( object ):
     """Specifies the character set used in the first byte, followed by up to 31 characters of text data. Section 6.2.4. """
 
-    def __init__(self):
+    def __init__(self, characterSet=0, characters=None):
         """ Initializer for AggregateMarking"""
-        self.characterSet = 0
+        self.characterSet = characterSet
         """ The character set"""
-        self.characters =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.characters =  [0] * 31
         """ The characters"""
 
     def serialize(self, outputStream):
@@ -2994,9 +3251,9 @@ class AggregateMarking( object ):
 class DataFilterRecord( object ):
     """identify which of the optional data fields are contained in the Minefield Data PDU or requested in the Minefield Query PDU. This is a 32-bit record. For each field, true denotes that the data is requested or present and false denotes that the data is neither requested nor present. Section 6.2.16"""
 
-    def __init__(self):
+    def __init__(self, bitFlags=0):
         """ Initializer for DataFilterRecord"""
-        self.bitFlags = 0
+        self.bitFlags = bitFlags
         """ Bitflags field"""
 
     def serialize(self, outputStream):
@@ -3012,14 +3269,18 @@ class DataFilterRecord( object ):
 
 
 class IntercomIdentifier( object ):
-    """Unique designation of an attached or unattached intercom in an event or exercirse. Section 6.2.48"""
+    """Unique designation of an attached or unattached intercom in an event or exercise. Section 6.2.48"""
 
-    def __init__(self):
+    def __init__(self,
+                 siteNumber=0,
+                 applicationNumber=0,
+                 referenceNumber=0,
+                 intercomNumber=0):
         """ Initializer for IntercomIdentifier"""
-        self.siteNumber = 0
-        self.applicationNumber = 0
-        self.referenceNumber = 0
-        self.intercomNumber = 0
+        self.siteNumber = siteNumber
+        self.applicationNumber = applicationNumber
+        self.referenceNumber = referenceNumber
+        self.intercomNumber = intercomNumber
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -3042,15 +3303,19 @@ class IntercomIdentifier( object ):
 class StorageFuel( object ):
     """Information about an entity's engine fuel. Section 6.2.84."""
 
-    def __init__(self):
+    def __init__(self,
+                 fuelQuantity=0,
+                 fuelMeasurementUnits=0,
+                 fuelType=0,
+                 fuelLocation=0):
         """ Initializer for StorageFuel"""
-        self.fuelQuantity = 0
+        self.fuelQuantity = fuelQuantity
         """ Fuel quantity, units specified by next field"""
-        self.fuelMeasurementUnits = 0
+        self.fuelMeasurementUnits = fuelMeasurementUnits
         """ Units in which the fuel is measured"""
-        self.fuelType = 0
+        self.fuelType = fuelType
         """ Type of fuel"""
-        self.fuelLocation = 0
+        self.fuelLocation = fuelLocation
         """ Location of fuel as related to entity. See section 14 of EBV document"""
         self.padding = 0
         """ padding"""
@@ -3078,16 +3343,21 @@ class StorageFuel( object ):
 class Sensor( object ):
     """An entity's sensor information.  Section 6.2.77."""
 
-    def __init__(self):
+    def __init__(self,
+                 sensorTypeSource=0,
+                 sensorOnOffStatus=0,
+                 sensorType=0,
+                 station=0,
+                 quantity=0):
         """ Initializer for Sensor"""
-        self.sensorTypeSource = 0
+        self.sensorTypeSource = sensorTypeSource
         """  the source of the Sensor Type field """
-        self.sensorOnOffStatus = 0
+        self.sensorOnOffStatus = sensorOnOffStatus
         """ the on/off status of the sensor"""
-        self.sensorType = 0
+        self.sensorType = sensorType
         """ the sensor type and shall be represented by a 16-bit enumeration. """
-        self.station = 0
-        """  the station to which the sensor is assigned. A zero value shall indi- cate that this Sensor record is not associated with any particular station and represents the total quan- tity of this sensor for this entity. If this field is non-zero, it shall either reference an attached part or an articulated part"""
+        self.station = station
+        """  the station to which the sensor is assigned. A zero value shall indicate that this Sensor record is not associated with any particular station and represents the total quantity of this sensor for this entity. If this field is non-zero, it shall either reference an attached part or an articulated part"""
         self.quantity = 0
         """ quantity of the sensor """
         self.padding = 0
@@ -3118,19 +3388,25 @@ class Sensor( object ):
 class MunitionReload( object ):
     """indicate weapons (munitions) previously communicated via the Munition record. Section 6.2.61 """
 
-    def __init__(self):
+    def __init__(self,
+                 munitionType=None,
+                 station=0,
+                 standardQuantity=0,
+                 maximumQuantity=0,
+                 standardQuantityReloadTime=0,
+                 maximumQuantityReloadTime=0):
         """ Initializer for MunitionReload"""
-        self.munitionType = EntityType();
+        self.munitionType = munitionType or EntityType()
         """  This field shall identify the entity type of the munition. See section 6.2.30."""
-        self.station = 0
+        self.station = station
         """ the station or launcher to which the munition is assigned. See Annex I"""
-        self.standardQuantity = 0
+        self.standardQuantity = standardQuantity
         """ the standard quantity of this munition type normally loaded at this station/launcher if a station/launcher is specified."""
-        self.maximumQuantity = 0
+        self.maximumQuantity = maximumQuantity
         """ the maximum quantity of this munition type that this station/launcher is capable of holding when a station/launcher is specified """
-        self.standardQuantityReloadTime = 0
+        self.standardQuantityReloadTime = standardQuantityReloadTime
         """ numer of seconds of sim time required to reload the std qty"""
-        self.maximumQuantityReloadTime = 0
+        self.maximumQuantityReloadTime = maximumQuantityReloadTime
         """ the number of seconds of sim time required to reload the max possible quantity"""
 
     def serialize(self, outputStream):
@@ -3156,23 +3432,30 @@ class MunitionReload( object ):
 
 
 class StorageFuelReload( object ):
-    """For each type or location of Storage Fuel, this record shall specify the type, location, fuel measure- ment units, reload quantity and maximum quantity for storage fuel either for the whole entity or a specific storage fuel location (tank). Section 6.2.85."""
+    """For each type or location of Storage Fuel, this record shall specify the type, location, fuel measurement units, reload quantity and maximum quantity for storage fuel either for the whole entity or a specific storage fuel location (tank). Section 6.2.85."""
 
-    def __init__(self):
+    def __init__(self,
+                 standardQuantity=0,
+                 maximumQuantity=0,
+                 standardQuantityReloadTime=0,
+                 maximumQuantityReloadTime=0,
+                 fuelMeasurementUnits=0,
+                 fuelType=0,
+                 fuelLocation=0):
         """ Initializer for StorageFuelReload"""
-        self.standardQuantity = 0
-        """  the standard quantity of this fuel type normally loaded at this station/launcher if a station/launcher is specified. If the Station/Launcher field is set to zero, then this is the total quantity of this fuel type that would be present in a standard reload of all appli- cable stations/launchers associated with this entity."""
-        self.maximumQuantity = 0
-        """ the maximum quantity of this fuel type that this sta- tion/launcher is capable of holding when a station/launcher is specified. This would be the value used when a maximum reload was desired to be set for this station/launcher. If the Station/launcher field is set to zero, then this is the maximum quantity of this fuel type that would be present on this entity at all stations/launchers that can accept this fuel type."""
-        self.standardQuantityReloadTime = 0
+        self.standardQuantity = standardQuantity
+        """  the standard quantity of this fuel type normally loaded at this station/launcher if a station/launcher is specified. If the Station/Launcher field is set to zero, then this is the total quantity of this fuel type that would be present in a standard reload of all applicable stations/launchers associated with this entity."""
+        self.maximumQuantity = maximumQuantity
+        """ the maximum quantity of this fuel type that this station/launcher is capable of holding when a station/launcher is specified. This would be the value used when a maximum reload was desired to be set for this station/launcher. If the Station/launcher field is set to zero, then this is the maximum quantity of this fuel type that would be present on this entity at all stations/launchers that can accept this fuel type."""
+        self.standardQuantityReloadTime = standardQuantityReloadTime
         """ the seconds normally required to reload the standard quantity of this fuel type at this specific station/launcher. When the Station/Launcher field is set to zero, this shall be the time it takes to perform a standard quantity reload of this fuel type at all applicable stations/launchers for this entity."""
-        self.maximumQuantityReloadTime = 0
+        self.maximumQuantityReloadTime = maximumQuantityReloadTime
         """ the seconds normally required to reload the maximum possible quantity of this fuel type at this station/launcher. When the Station/Launcher field is set to zero, this shall be the time it takes to perform a maximum quantity load/reload of this fuel type at all applicable stations/launchers for this entity."""
-        self.fuelMeasurementUnits = 0
+        self.fuelMeasurementUnits = fuelMeasurementUnits
         """ the fuel measurement units. Enumeration"""
-        self.fuelType = 0
+        self.fuelType = fuelType
         """ Fuel type. Enumeration"""
-        self.fuelLocation = 0
+        self.fuelLocation = fuelLocation
         """ Location of fuel as related to entity. See section 14 of EBV document"""
         self.padding = 0
         """ padding"""
@@ -3206,15 +3489,21 @@ class StorageFuelReload( object ):
 class ExpendableReload( object ):
     """An entity's expendable (chaff, flares, etc) information. Section 6.2.37"""
 
-    def __init__(self):
+    def __init__(self,
+                 expendable=None,
+                 station=0,
+                 standardQuantity=0,
+                 maximumQuantity=0,
+                 standardQuantityReloadTime=0,
+                 maximumQuantityReloadTime=0):
         """ Initializer for ExpendableReload"""
-        self.expendable = EntityType();
+        self.expendable = expendable or EntityType()
         """ Type of expendable"""
-        self.station = 0
-        self.standardQuantity = 0
-        self.maximumQuantity = 0
-        self.standardQuantityReloadTime = 0
-        self.maximumQuantityReloadTime = 0
+        self.station = station
+        self.standardQuantity = standardQuantity
+        self.maximumQuantity = maximumQuantity
+        self.standardQuantityReloadTime = standardQuantityReloadTime
+        self.maximumQuantityReloadTime = maximumQuantityReloadTime
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -3241,11 +3530,13 @@ class ExpendableReload( object ):
 class EntityIdentifier( object ):
     """Entity Identifier. Unique ID for entities in the world. Consists of an simulation address and a entity number. Section 6.2.28."""
 
-    def __init__(self):
+    def __init__(self,
+                 simulationAddress=None,
+                 entityNumber=0):
         """ Initializer for EntityIdentifier"""
-        self.simulationAddress = SimulationAddress();
+        self.simulationAddress = simulationAddress or SimulationAddress()
         """ Site and application IDs"""
-        self.entityNumber = 0
+        self.entityNumber = entityNumber
         """ Entity number"""
 
     def serialize(self, outputStream):
@@ -3265,13 +3556,15 @@ class EntityIdentifier( object ):
 class DirectedEnergyTargetEnergyDeposition( object ):
     """DE energy depostion properties for a target entity. Section 6.2.20.4"""
 
-    def __init__(self):
+    def __init__(self,
+                 targetEntityID=None,
+                 peakIrradiance=0.0):
         """ Initializer for DirectedEnergyTargetEnergyDeposition"""
-        self.targetEntityID = EntityID();
+        self.targetEntityID = targetEntityID or EntityID()
         """ Unique ID of the target entity."""
         self.padding = 0
         """ padding"""
-        self.peakIrradiance = 0
+        self.peakIrradiance = peakIrradiance
         """ Peak irrandiance"""
 
     def serialize(self, outputStream):
@@ -3293,13 +3586,16 @@ class DirectedEnergyTargetEnergyDeposition( object ):
 class EntityID( object ):
     """more laconically named EntityIdentifier"""
 
-    def __init__(self):
+    def __init__(self,
+                 siteID=0,
+                 applicationID=0,
+                 entityID=0):
         """ Initializer for EntityID"""
-        self.siteID = 0
+        self.siteID = siteID
         """ Site ID"""
-        self.applicationID = 0
+        self.applicationID = applicationID
         """ application number ID"""
-        self.entityID = 0
+        self.entityID = entityID
         """ Entity number ID"""
 
     def serialize(self, outputStream):
@@ -3319,21 +3615,27 @@ class EntityID( object ):
 
 
 class EngineFuelReload( object ):
-    """For each type or location of engine fuell, this record specifies the type, location, fuel measurement units, and reload quantity and maximum quantity. Section 6.2.25."""
+    """For each type or location of engine fuel, this record specifies the type, location, fuel measurement units, and reload quantity and maximum quantity. Section 6.2.25."""
 
-    def __init__(self):
+    def __init__(self,
+                 standardQuantity=0,
+                 maximumQuantity=0,
+                 standardQuantityReloadTime=0,
+                 maximumQuantityReloadTime=0,
+                 fuelMeasurementUnits=0,
+                 fuelLocation=0):
         """ Initializer for EngineFuelReload"""
-        self.standardQuantity = 0
+        self.standardQuantity = standardQuantity
         """ standard quantity of fuel loaded"""
-        self.maximumQuantity = 0
+        self.maximumQuantity = maximumQuantity
         """ maximum quantity of fuel loaded"""
-        self.standardQuantityReloadTime = 0
+        self.standardQuantityReloadTime = standardQuantityReloadTime
         """ seconds normally required to to reload standard qty"""
-        self.maximumQuantityReloadTime = 0
+        self.maximumQuantityReloadTime = maximumQuantityReloadTime
         """ seconds normally required to to reload maximum qty"""
-        self.fuelMeasurmentUnits = 0
+        self.fuelMeasurmentUnits = fuelMeasurementUnits
         """ Units of measure"""
-        self.fuelLocation = 0
+        self.fuelLocation = fuelLocation
         """ fuel  location as related to the entity"""
         self.padding = 0
         """ padding"""
@@ -3365,11 +3667,13 @@ class EngineFuelReload( object ):
 class UnattachedIdentifier( object ):
     """The unique designation of one or more unattached radios in an event or exercise Section 6.2.91"""
 
-    def __init__(self):
+    def __init__(self,
+                 simulationAddress=None,
+                 referenceNumber=0):
         """ Initializer for UnattachedIdentifier"""
-        self.simulationAddress = SimulationAddress();
+        self.simulationAddress = simulationAddress or SimulationAddress()
         """ See 6.2.79"""
-        self.referenceNumber = 0
+        self.referenceNumber = referenceNumber
         """ Reference number"""
 
     def serialize(self, outputStream):
@@ -3389,13 +3693,16 @@ class UnattachedIdentifier( object ):
 class EntityTypeVP( object ):
     """Association or disassociation of two entities.  Section 6.2.94.5"""
 
-    def __init__(self):
+    def __init__(self,
+                 recordType=3,
+                 changeIndicator=0,
+                 entityType=None):
         """ Initializer for EntityTypeVP"""
-        self.recordType = 3
+        self.recordType = recordType
         """ the identification of the Variable Parameter record. Enumeration from EBV"""
-        self.changeIndicator = 0
+        self.changeIndicator = changeIndicator
         """ Indicates if this VP has changed since last issuance"""
-        self.entityType = EntityType();
+        self.entityType = entityType or EntityType()
         """ """
         self.padding = 0
         """ padding"""
@@ -3423,11 +3730,11 @@ class EntityTypeVP( object ):
 
 
 class BeamStatus( object ):
-    """Information related to the status of a beam. This is contained in the beam status field of the electromagnitec emission PDU. The first bit determines whether the beam is active (0) or deactivated (1). Section 6.2.12."""
+    """Information related to the status of a beam. This is contained in the beam status field of the electromagnetic emission PDU. The first bit determines whether the beam is active (0) or deactivated (1). Section 6.2.12."""
 
-    def __init__(self):
+    def __init__(self, beamState=0):
         """ Initializer for BeamStatus"""
-        self.beamState = 0
+        self.beamState = beamState
         """ First bit zero means beam is active, first bit = 1 means deactivated. The rest is padding."""
 
     def serialize(self, outputStream):
@@ -3445,17 +3752,21 @@ class BeamStatus( object ):
 class EnvironmentGeneral( object ):
     """ Information about a geometry, a state associated with a geometry, a bounding volume, or an associated entity ID. NOTE: this class requires hand coding. 6.2.31"""
 
-    def __init__(self):
+    def __init__(self,
+                 environmentType=0,
+                 length=0,
+                 index=0,
+                 geometry=0):
         """ Initializer for EnvironmentGeneral"""
-        self.environmentType = 0
+        self.environmentType = environmentType
         """ Record type"""
-        self.length = 0
+        self.length = length
         """ length, in bits"""
-        self.index = 0
+        self.index = index
         """ Identify the sequentially numbered record index"""
-        self.padding1 = 0
+        self.padding = 0
         """ padding"""
-        self.geometry = 0
+        self.geometry = geometry
         """ Geometry or state record"""
         self.padding2 = 0
         """ padding to bring the total size up to a 64 bit boundry"""
@@ -3485,13 +3796,13 @@ class EnvironmentGeneral( object ):
 class Vector3Double( object ):
     """Three double precision floating point values, x, y, and z. Used for world coordinates Section 6.2.97."""
 
-    def __init__(self):
+    def __init__(self, x=0.0, y=0.0, z=0.0):
         """ Initializer for Vector3Double"""
-        self.x = 0
+        self.x = x
         """ X value"""
-        self.y = 0
+        self.y = y
         """ y Value"""
-        self.z = 0
+        self.z = z
         """ Z value"""
 
     def serialize(self, outputStream):
@@ -3513,21 +3824,28 @@ class Vector3Double( object ):
 class GridAxis( object ):
     """Grid axis record for fixed data. Section 6.2.41"""
 
-    def __init__(self):
+    def __init__(self,
+                 domainInitialXi=0.0,
+                 domainFinalXi=0.0,
+                 domainPointsXi=0,
+                 interleafFactor=0,
+                 axisType=0,
+                 numberOfPointsOnXiAxis=0,
+                 initialIndex=0):
         """ Initializer for GridAxis"""
-        self.domainInitialXi = 0
+        self.domainInitialXi = domainInitialXi
         """ coordinate of the grid origin or initial value"""
-        self.domainFinalXi = 0
+        self.domainFinalXi = domainFinalXi
         """ coordinate of the endpoint or final value"""
-        self.domainPointsXi = 0
+        self.domainPointsXi = domainPointsXi
         """ The number of grid points along the Xi domain axis for the enviornmental state data"""
-        self.interleafFactor = 0
+        self.interleafFactor = interleafFactor
         """ interleaf factor along the domain axis."""
-        self.axisType = 0
+        self.axisType = axisType
         """ type of grid axis"""
-        self.numberOfPointsOnXiAxis = 0
+        self.numberOfPointsOnXiAxis = numberOfPointsOnXiAxis
         """ Number of grid locations along Xi axis"""
-        self.initialIndex = 0
+        self.initialIndex = initialIndex
         """ initial grid point for the current pdu"""
 
     def serialize(self, outputStream):
@@ -3557,11 +3875,13 @@ class GridAxis( object ):
 class RecordSpecification( object ):
     """This record shall specify the number of record sets contained in the Record Specification record and the record details. Section 6.2.73."""
 
-    def __init__(self):
+    def __init__(self,
+                 numberOfRecordSets=0,
+                 recordSets=None):
         """ Initializer for RecordSpecification"""
-        self.numberOfRecordSets = 0
+        self.numberOfRecordSets = numberOfRecordSets
         """ The number of record sets"""
-        self.recordSets = []
+        self.recordSets = recordSets or []
         """ variable length list record specifications."""
 
     def serialize(self, outputStream):
@@ -3636,11 +3956,14 @@ class VariableDatum( object ):
 class EventIdentifierLiveEntity( object ):
     """Identifies an event in the world. Use this format for ONLY the LiveEntityPdu. Section 6.2.34."""
 
-    def __init__(self):
+    def __init__(self,
+                 siteNumber=0,
+                 applicationNumber=0,
+                 eventNumber=0):
         """ Initializer for EventIdentifierLiveEntity"""
-        self.siteNumber = 0
-        self.applicationNumber = 0
-        self.eventNumber = 0
+        self.siteNumber = siteNumber
+        self.applicationNumber = applicationNumber
+        self.eventNumber = eventNumber
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -3659,23 +3982,30 @@ class EventIdentifierLiveEntity( object ):
 
 
 class PduHeader( object ):
-    """Not used. The PDU Header Record is directly incoroporated into the PDU class. Here for completness only. Section 6.2.66"""
+    """Not used. The PDU Header Record is directly incorporated into the PDU class. Here for completeness only. Section 6.2.66"""
 
-    def __init__(self):
+    def __init__(self,
+                 protocolVersion=7,
+                 exerciseID=0,
+                 pduType=0,
+                 protocolFamily=0,
+                 timestamp=0,
+                 pduLength=0,
+                 pduStatus=0):
         """ Initializer for PduHeader"""
-        self.protocolVersion = 7
+        self.protocolVersion = protocolVersion
         """ The version of the protocol. 5=DIS-1995, 6=DIS-1998, 7=DIS-2009."""
-        self.exerciseID = 0
+        self.exerciseID = exerciseID
         """ Exercise ID"""
-        self.pduType = 0
+        self.pduType = pduType
         """ Type of pdu, unique for each PDU class"""
-        self.protocolFamily = 0
+        self.protocolFamily = protocolFamily
         """ value that refers to the protocol family, eg SimulationManagement, etc"""
-        self.timestamp = 0
+        self.timestamp = timestamp
         """ Timestamp value"""
-        self.pduLength = 0
+        self.pduLength = pduLength
         """ Length, in bytes, of the PDU. Changed name from length to avoid use of Hibernate QL reserved word."""
-        self.pduStatus = 0
+        self.pduStatus = pduStatus
         """ PDU Status Record. Described in 6.2.67. This field is not present in earlier DIS versions """
         self.padding = 0
         """ zero filled array of padding"""
@@ -3709,19 +4039,26 @@ class PduHeader( object ):
 class PduSuperclass( object ):
     """The superclass for all PDUs, including classic and Live Entity (LE) PDUs. This incorporates the PduHeader record, section 7.2.2"""
 
-    def __init__(self):
+    def __init__(self,
+                 protocolVersion=7,
+                 exerciseID=0,
+                 pduType=0,
+                 protocolFamily=0,
+                 timestamp=0,
+                 pduLength=0,
+                 pduStatus=0):
         """ Initializer for PduSuperclass"""
-        self.protocolVersion = 7
+        self.protocolVersion = protocolVersion
         """ The version of the protocol. 5=DIS-1995, 6=DIS-1998, 7=DIS-2009."""
-        self.exerciseID = 0
+        self.exerciseID = exerciseID
         """ Exercise ID"""
-        self.pduType = 0
+        self.pduType = pduType
         """ Type of pdu, unique for each PDU class"""
-        self.protocolFamily = 0
+        self.protocolFamily = protocolFamily
         """ value that refers to the protocol family, eg SimulationManagement, et"""
-        self.timestamp = 0
+        self.timestamp = timestamp
         """ Timestamp value"""
-        self.length = 0
+        self.length = pduLength
         """ Length, in bytes, of the PDU"""
 
     def serialize(self, outputStream):
@@ -3749,10 +4086,10 @@ class PduSuperclass( object ):
 class CommunicationsNodeID( object ):
     """Identity of a communications node. Section 6.2.48.4"""
 
-    def __init__(self):
+    def __init__(self, entityID=None, elementID=0):
         """ Initializer for CommunicationsNodeID"""
-        self.entityID = EntityID();
-        self.elementID = 0
+        self.entityID = entityID or EntityID()
+        self.elementID = elementID
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -3769,11 +4106,11 @@ class CommunicationsNodeID( object ):
 
 
 class ExpendableDescriptor( object ):
-    """Burst of chaff or expendible device. Section 6.2.19.4"""
+    """Burst of chaff or expendable device. Section 6.2.19.4"""
 
-    def __init__(self):
+    def __init__(self, expendableType=None):
         """ Initializer for ExpendableDescriptor"""
-        self.expendableType = EntityType();
+        self.expendableType = expendableType or EntityType()
         """ Type of the object that exploded"""
         self.padding = 0
         """ Padding"""
@@ -3795,11 +4132,11 @@ class ExpendableDescriptor( object ):
 class PropulsionSystemData( object ):
     """contains information describing the propulsion systems of the entity. This information shall be provided for each active propulsion system defined. Section 6.2.68"""
 
-    def __init__(self):
+    def __init__(self, powerSetting=0.0, engineRpm=0.0):
         """ Initializer for PropulsionSystemData"""
-        self.powerSetting = 0
+        self.powerSetting = powerSetting
         """ powerSetting"""
-        self.engineRpm = 0
+        self.engineRpm = engineRpm
         """ engine RPMs"""
 
     def serialize(self, outputStream):
@@ -3819,11 +4156,11 @@ class PropulsionSystemData( object ):
 class LiveEntityIdentifier( object ):
     """The unique designation of each entity in an event or exercise that is contained in a Live Entity PDU. Section 6.2.54 """
 
-    def __init__(self):
+    def __init__(self, liveSimulationAddress=None, entityNumber=0):
         """ Initializer for LiveEntityIdentifier"""
-        self.liveSimulationAddress = LiveSimulationAddress();
+        self.liveSimulationAddress = liveSimulationAddress or LiveSimulationAddress()
         """ Live Simulation Address record (see 6.2.54) """
-        self.entityNumber = 0
+        self.entityNumber = entityNumber
         """ Live entity number """
 
     def serialize(self, outputStream):
@@ -3843,21 +4180,28 @@ class LiveEntityIdentifier( object ):
 class SeparationVP( object ):
     """Physical separation of an entity from another entity.  Section 6.2.94.6"""
 
-    def __init__(self):
+    def __init__(self,
+                 recordType=2,
+                 reasonForSeparation=0,
+                 preEntityIndicator=0,
+                 padding1=0,
+                 parentEntityID=None,
+                 padding2=0,
+                 stationLocation=0):
         """ Initializer for SeparationVP"""
-        self.recordType = 2
+        self.recordType = recordType
         """ the identification of the Variable Parameter record. Enumeration from EBV"""
-        self.reasonForSeparation = 0
+        self.reasonForSeparation = reasonForSeparation
         """ Reason for separation. EBV"""
-        self.preEntityIndicator = 0
+        self.preEntityIndicator = preEntityIndicator
         """ Whether the entity existed prior to separation EBV"""
-        self.padding1 = 0
+        self.padding1 = padding1
         """ padding"""
-        self.parentEntityID = EntityID();
+        self.parentEntityID = parentEntityID or EntityID()
         """ ID of parent"""
-        self.padding2 = 0
+        self.padding2 = padding2
         """ padding"""
-        self.stationLocation = 0
+        self.stationLocation = stationLocation
         """ Station separated from"""
 
     def serialize(self, outputStream):
@@ -3887,13 +4231,13 @@ class SeparationVP( object ):
 class EmitterSystem( object ):
     """This field shall specify information about a particular emitter system. Section 6.2.23."""
 
-    def __init__(self):
+    def __init__(self, emitterName=0, emitterFunction=0, emitterIDNumber=0):
         """ Initializer for EmitterSystem"""
-        self.emitterName = 0
+        self.emitterName = emitterName
         """ Name of the emitter, 16 bit enumeration"""
-        self.emitterFunction = 0
+        self.emitterFunction = emitterFunction
         """ function of the emitter, 8 bit enumeration"""
-        self.emitterIDNumber = 0
+        self.emitterIDNumber = emitterIDNumber
         """ emitter ID, 8 bit enumeration"""
 
     def serialize(self, outputStream):
@@ -3915,9 +4259,9 @@ class EmitterSystem( object ):
 class PduStatus( object ):
     """PDU Status. These are a series of bit fields. Represented here as just a byte. Section 6.2.67"""
 
-    def __init__(self):
+    def __init__(self, pduStatus=0):
         """ Initializer for PduStatus"""
-        self.pduStatus = 0
+        self.pduStatus = pduStatus
         """ Bit fields. The semantics of the bit fields depend on the PDU type"""
 
     def serialize(self, outputStream):
@@ -3936,12 +4280,12 @@ class PduStatus( object ):
 class LiveEntityPdu( PduSuperclass ):
     """The live entity PDUs have a header with some different field names, but the same length. Section 9.3.2"""
 
-    def __init__(self):
+    def __init__(self, subprotocolNumber=0):
         """ Initializer for LiveEntityPdu"""
         super(LiveEntityPdu, self).__init__()
-        self.subprotocolNumber = 0
+        self.subprotocolNumber = subprotocolNumber
         """ Subprotocol used to decode the PDU. Section 13 of EBV."""
-        self.padding = 0
+        self.padding = padding
         """ zero-filled array of padding"""
 
     def serialize(self, outputStream):
@@ -3963,10 +4307,10 @@ class LiveEntityPdu( PduSuperclass ):
 class Pdu( PduSuperclass ):
     """Adds some fields to the the classic PDU"""
 
-    def __init__(self):
+    def __init__(self, pduStatus=0):
         """ Initializer for Pdu"""
         super(Pdu, self).__init__()
-        self.pduStatus = 0
+        self.pduStatus = pduStatus
         """ PDU Status Record. Described in 6.2.67. This field is not present in earlier DIS versions """
         self.padding = 0
         """ zero-filled array of padding"""
@@ -4032,24 +4376,31 @@ class LogisticsFamilyPdu( Pdu ):
 class EntityStateUpdatePdu( EntityInformationFamilyPdu ):
     """Nonstatic information about a particular entity may be communicated by issuing an Entity State Update PDU. Section 7.2.5. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 entityID=None,
+                 numberOfVariableParameters=0,
+                 entityLinearVelocity=None,
+                 entityLocation=None,
+                 entityOrientation=None,
+                 entityAppearance=0,
+                 variableParameters=None):
         """ Initializer for EntityStateUpdatePdu"""
         super(EntityStateUpdatePdu, self).__init__()
-        self.entityID = EntityID();
+        self.entityID = entityID or EntityID()
         """ This field shall identify the entity issuing the PDU, and shall be represented by an Entity Identifier record (see 6.2.28)."""
         self.padding1 = 0
         """ Padding"""
-        self.numberOfVariableParameters = 0
+        self.numberOfVariableParameters = numberOfVariableParameters
         """ This field shall specify the number of variable parameters present. This field shall be represented by an 8-bit unsigned integer (see Annex I)."""
-        self.entityLinearVelocity = Vector3Float();
+        self.entityLinearVelocity = entityLinearVelocity or Vector3Float()
         """ This field shall specify an entitys linear velocity. The coordinate system for an entitys linear velocity depends on the dead reckoning algorithm used. This field shall be represented by a Linear Velocity Vector record [see 6.2.95 item c)])."""
-        self.entityLocation = Vector3Double();
+        self.entityLocation = entityLocation or Vector3Double()
         """ This field shall specify an entitys physical location in the simulated world and shall be represented by a World Coordinates record (see 6.2.97)."""
-        self.entityOrientation = EulerAngles();
+        self.entityOrientation = entityOrientation or EulerAngles()
         """ This field shall specify an entitys orientation and shall be represented by an Euler Angles record (see 6.2.33)."""
-        self.entityAppearance = 0
-        """ This field shall specify the dynamic changes to the entitys appearance attributes. This field shall be represented by an Entity Appearance record (see 6.2.26)."""
-        self.variableParameters = []
+        self.entityAppearance = entityAppearance
+        """ This field shall specify the dynamic changes to the entity's appearance attributes. This field shall be represented by an Entity Appearance record (see 6.2.26)."""
+        self.variableParameters = variableParameters or []
         """ This field shall specify the parameter values for each Variable Parameter record that is included (see 6.2.93 and Annex I)."""
         self.pduType = 67
         """ initialize value """
@@ -4093,20 +4444,25 @@ class EntityStateUpdatePdu( EntityInformationFamilyPdu ):
 class ServiceRequestPdu( LogisticsFamilyPdu ):
     """Service Request PDU shall be used to communicate information associated with                            one entity requesting a service from another). Section 7.4.2 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestingEntityID=None,
+                 servicingEntityID=None,
+                 serviceTypeRequested=0,
+                 numberOfSupplyTypes=0,
+                 supplies=None):
         """ Initializer for ServiceRequestPdu"""
         super(ServiceRequestPdu, self).__init__()
-        self.requestingEntityID = EntityID();
+        self.requestingEntityID = requestingEntityID or EntityID()
         """ Entity that is requesting service (see 6.2.28), Section 7.4.2"""
-        self.servicingEntityID = EntityID();
+        self.servicingEntityID = servicingEntityID or EntityID()
         """ Entity that is providing the service (see 6.2.28), Section 7.4.2"""
-        self.serviceTypeRequested = 0
+        self.serviceTypeRequested = serviceTypeRequested
         """ Type of service requested, Section 7.4.2"""
-        self.numberOfSupplyTypes = 0
+        self.numberOfSupplyTypes = numberOfSupplyTypes
         """ How many requested, Section 7.4.2"""
         self.serviceRequestPadding = 0
         """ padding"""
-        self.supplies = []
+        self.supplies = supplies or []
         self.pduType = 5
         """ initialize value """
 
@@ -4143,14 +4499,17 @@ class ServiceRequestPdu( LogisticsFamilyPdu ):
 class RepairCompletePdu( LogisticsFamilyPdu ):
     """Section 7.4.6. Service Request PDU is received and repair is complete. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 receivingEntityID=None,
+                 repairingEntityID=None,
+                 repair=0):
         """ Initializer for RepairCompletePdu"""
         super(RepairCompletePdu, self).__init__()
-        self.receivingEntityID = EntityID();
+        self.receivingEntityID = receivingEntityID or EntityID()
         """ Entity that is receiving service.  See 6.2.28"""
-        self.repairingEntityID = EntityID();
+        self.repairingEntityID = repairingEntityID or EntityID()
         """ Entity that is supplying.  See 6.2.28"""
-        self.repair = 0
+        self.repair = repair
         """ Enumeration for type of repair.  See 6.2.74"""
         self.padding4 = 0
         """ padding, number prevents conflict with superclass ivar name"""
@@ -4201,24 +4560,31 @@ class SyntheticEnvironmentFamilyPdu( Pdu ):
 class CollisionPdu( EntityInformationFamilyPdu ):
     """Section 7.2.3 Collisions between entities shall be communicated by issuing a Collision PDU. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 issuingEntityID=None,
+                 collidingEntityID=None,
+                 eventID=None,
+                 collisionType=0,
+                 velocity=None,
+                 mass=0.0,
+                 location=None):
         """ Initializer for CollisionPdu"""
         super(CollisionPdu, self).__init__()
-        self.issuingEntityID = EntityID();
+        self.issuingEntityID = issuingEntityID or EntityID()
         """ This field shall identify the entity that is issuing the PDU, and shall be represented by an Entity Identifier record (see 6.2.28)."""
-        self.collidingEntityID = EntityID();
+        self.collidingEntityID = collidingEntityID or EntityID()
         """ This field shall identify the entity that has collided with the issuing entity (see 5.3.3.4). This field shall be represented by an Entity Identifier record (see 6.2.28)."""
-        self.eventID = EventIdentifier();
+        self.eventID = eventID or EventIdentifier()
         """ This field shall contain an identification generated by the issuing simulation application to associate related collision events. This field shall be represented by an Event Identifier record (see 6.2.34)."""
-        self.collisionType = 0
+        self.collisionType = collisionType
         """ This field shall identify the type of collision. The Collision Type field shall be represented by an 8-bit record of enumerations"""
         self.pad = 0
         """ some padding"""
-        self.velocity = Vector3Float();
+        self.velocity = velocity or Vector3Float()
         """ This field shall contain the velocity (at the time the collision is detected) of the issuing entity. The velocity shall be represented in world coordinates. This field shall be represented by the Linear Velocity Vector record [see 6.2.95 item c)]."""
-        self.mass = 0
+        self.mass = mass
         """ This field shall contain the mass of the issuing entity, and shall be represented by a 32-bit floating point number representing kilograms."""
-        self.location = Vector3Float();
+        self.location = location or Vector3Float()
         """ This field shall specify the location of the collision with respect to the entity with which the issuing entity collided. The Location field shall be represented by an Entity Coordinate Vector record [see 6.2.95 item a)]."""
         self.pduType = 4
         """ initialize value """
@@ -4256,14 +4622,17 @@ class CollisionPdu( EntityInformationFamilyPdu ):
 class RepairResponsePdu( LogisticsFamilyPdu ):
     """Section 7.4.7. Sent after repair complete PDU. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 receivingEntityID=None,
+                 repairingEntityID=None,
+                 repairResult=0):
         """ Initializer for RepairResponsePdu"""
         super(RepairResponsePdu, self).__init__()
-        self.receivingEntityID = EntityID();
+        self.receivingEntityID = receivingEntityID or EntityID()
         """ Entity that requested repairs.  See 6.2.28"""
-        self.repairingEntityID = EntityID();
+        self.repairingEntityID = repairingEntityID or EntityID()
         """ Entity that is repairing.  See 6.2.28"""
-        self.repairResult = 0
+        self.repairResult = repairResult
         """ Result of repair operation"""
         self.padding1 = 0
         """ padding"""
@@ -4297,12 +4666,12 @@ class RepairResponsePdu( LogisticsFamilyPdu ):
 class SimulationManagementFamilyPdu( Pdu ):
     """Section 7.5 Abstract superclass for PDUs relating to the simulation itself. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self, originatingEntityID=None, receivingEntityID=None):
         """ Initializer for SimulationManagementFamilyPdu"""
         super(SimulationManagementFamilyPdu, self).__init__()
-        self.originatingEntityID = EntityID();
+        self.originatingEntityID = originatingEntityID or EntityID()
         """ Entity that is sending message"""
-        self.receivingEntityID = EntityID();
+        self.receivingEntityID = receivingEntityID or EntityID()
         """ Entity that is intended to receive message"""
         self.protocolFamily = 5
         """ initialize value """
@@ -4326,20 +4695,26 @@ class SimulationManagementFamilyPdu( Pdu ):
 class DataQueryPdu( SimulationManagementFamilyPdu ):
     """Section 7.5.9. Request for data from an entity. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestID=0,
+                 timeInterval=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for DataQueryPdu"""
         super(DataQueryPdu, self).__init__()
         self.requestID = 0
         """ ID of request"""
         self.timeInterval = 0
         """ time issues between issues of Data PDUs. Zero means send once only."""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datum records"""
-        self.fixedDatums = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ variable length list of fixed datums"""
-        self.variableDatums = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ variable length list of variable length datums"""
         self.pduType = 18
         """ initialize value """
@@ -4349,12 +4724,12 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
         super( DataQueryPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
         outputStream.write_unsigned_int(self.timeInterval);
-        outputStream.write_unsigned_int( len(self.fixedDatums));
-        outputStream.write_unsigned_int( len(self.variableDatums));
-        for anObj in self.fixedDatums:
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
+        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatums:
+        for anObj in self.variableDatumRecords:
             anObj.serialize(outputStream)
 
 
@@ -4370,12 +4745,12 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatums.append(element)
+            self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatums.append(element)
+            self.variableDatumRecords.append(element)
 
 
 
@@ -4383,26 +4758,35 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
 class LinearObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
     """: Information abut the addition or modification of a synthecic enviroment object that      is anchored to the terrain with a single point and has size or orientation. Section 7.10.5 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 objectID=None,
+                 referencedObjectID=None,
+                 updateNumber=0,
+                 forceID=0,
+                 numberOfSegments=0,
+                 requesterID=None,
+                 receivingID=None,
+                 objectType=None,
+                 linearSegmentParameters=None):
         """ Initializer for LinearObjectStatePdu"""
         super(LinearObjectStatePdu, self).__init__()
-        self.objectID = EntityID();
+        self.objectID = objectID or EntityID()
         """ Object in synthetic environment"""
-        self.referencedObjectID = EntityID();
+        self.referencedObjectID = referencedObjectID or EntityID()
         """ Object with which this point object is associated"""
-        self.updateNumber = 0
+        self.updateNumber = updateNumber
         """ unique update number of each state transition of an object"""
-        self.forceID = 0
+        self.forceID = forceID
         """ force ID"""
-        self.numberOfSegments = 0
+        self.numberOfSegments = numberOfSegments
         """ number of linear segment parameters"""
-        self.requesterID = SimulationAddress();
+        self.requesterID = requesterID or SimulationAddress()
         """ requesterID"""
-        self.receivingID = SimulationAddress();
+        self.receivingID = receivingID or SimulationAddress()
         """ receiver ID"""
-        self.objectType = ObjectType();
+        self.objectType = objectType or ObjectType()
         """ Object type"""
-        self.linearSegmentParameters = []
+        self.linearSegmentParameters = linearSegmentParameters or []
         """ Linear segment parameters"""
         self.pduType = 44
         """ initialize value """
@@ -4446,10 +4830,10 @@ class LinearObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
 class CreateEntityPdu( SimulationManagementFamilyPdu ):
     """Section 7.5.2. Create a new entity. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self, requestID=0):
         """ Initializer for CreateEntityPdu"""
         super(CreateEntityPdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ Identifier for the request.  See 6.2.75"""
         self.pduType = 11
         """ initialize value """
@@ -4492,24 +4876,32 @@ class RadioCommunicationsFamilyPdu( Pdu ):
 class IntercomSignalPdu( RadioCommunicationsFamilyPdu ):
     """ Actual transmission of intercome voice data. Section 7.7.5. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 entityID=None,
+                 communicationsDeviceID=0,
+                 encodingScheme=0,
+                 tdlType=0,
+                 sampleRate=0,
+                 dataLength=0,
+                 samples=0,
+                 data=None):
         """ Initializer for IntercomSignalPdu"""
         super(IntercomSignalPdu, self).__init__()
-        self.entityID = EntityID();
+        self.entityID = entityID or EntityID()
         """ entity ID"""
-        self.communicationsDeviceID = 0
+        self.communicationsDeviceID = communicationsDeviceID
         """ ID of communications device"""
-        self.encodingScheme = 0
+        self.encodingScheme = encodingScheme
         """ encoding scheme"""
-        self.tdlType = 0
+        self.tdlType = tdlType
         """ tactical data link type"""
-        self.sampleRate = 0
+        self.sampleRate = sampleRate
         """ sample rate"""
-        self.dataLength = 0
+        self.dataLength = dataLength
         """ data length"""
-        self.samples = 0
+        self.samples = samples
         """ samples"""
-        self.data = []
+        self.data = data or []
         """ data bytes"""
         self.pduType = 31
         """ initialize value """
@@ -4551,10 +4943,10 @@ class IntercomSignalPdu( RadioCommunicationsFamilyPdu ):
 class RemoveEntityPdu( SimulationManagementFamilyPdu ):
     """Section 7.5.3 The removal of an entity from an exercise shall be communicated with a Remove Entity PDU. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self, requestID=0):
         """ Initializer for RemoveEntityPdu"""
         super(RemoveEntityPdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ This field shall identify the specific and unique start/resume request being made by the SM"""
         self.pduType = 12
         """ initialize value """
@@ -4576,20 +4968,24 @@ class RemoveEntityPdu( SimulationManagementFamilyPdu ):
 class ResupplyReceivedPdu( LogisticsFamilyPdu ):
     """Section 7.4.4. Receipt of supplies is communicated by issuing Resupply Received PDU. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 receivingEntityID=None,
+                 supplyingEntityID=None,
+                 numberOfSupplyTypes=0,
+                 supplies=None):
         """ Initializer for ResupplyReceivedPdu"""
         super(ResupplyReceivedPdu, self).__init__()
-        self.receivingEntityID = EntityID();
+        self.receivingEntityID = receivingEntityID or EntityID()
         """ Entity that is receiving service.  Shall be represented by Entity Identifier record (see 6.2.28)"""
-        self.supplyingEntityID = EntityID();
+        self.supplyingEntityID = supplyingEntityID or EntityID()
         """ Entity that is supplying.  Shall be represented by Entity Identifier record (see 6.2.28)"""
-        self.numberOfSupplyTypes = 0
+        self.numberOfSupplyTypes = numberOfSupplyTypes
         """ How many supplies are taken by receiving entity"""
         self.padding1 = 0
         """ padding"""
         self.padding2 = 0
         """ padding"""
-        self.supplies = []
+        self.supplies = supplies or []
         """ Type and amount of supplies for each specified supply type.  See 6.2.85 for supply quantity record."""
         self.pduType = 7
         """ initialize value """
@@ -4627,12 +5023,14 @@ class ResupplyReceivedPdu( LogisticsFamilyPdu ):
 class WarfareFamilyPdu( Pdu ):
     """abstract superclass for fire and detonation pdus that have shared information. Section 7.3 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 firingEntityID=None,
+                 targetEntityID=None):
         """ Initializer for WarfareFamilyPdu"""
         super(WarfareFamilyPdu, self).__init__()
-        self.firingEntityID = EntityID();
+        self.firingEntityID = firingEntityID or EntityID()
         """ ID of the entity that shot"""
-        self.targetEntityID = EntityID();
+        self.targetEntityID = targetEntityID or EntityID()
         """ ID of the entity that is being shot at"""
         self.protocolFamily = 2
         """ initialize value """
@@ -4656,38 +5054,52 @@ class WarfareFamilyPdu( Pdu ):
 class CollisionElasticPdu( EntityInformationFamilyPdu ):
     """Information about elastic collisions in a DIS exercise shall be communicated using a Collision-Elastic PDU. Section 7.2.4. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 issuingEntityID=None,
+                 collidingEntityID=None,
+                 collisionEventID=None,
+                 contactVelocity=None,
+                 mass=0.0,
+                 locationOfImpact=None,
+                 collisionIntermediateResultXX=0.0,
+                 collisionIntermediateResultXY=0.0,
+                 collisionIntermediateResultXZ=0.0,
+                 collisionIntermediateResultYY=0.0,
+                 collisionIntermediateResultYZ=0.0,
+                 collisionIntermediateResultZZ=0.0,
+                 unitSurfaceNormal=None,
+                 coefficientOfRestitution=0.0):
         """ Initializer for CollisionElasticPdu"""
         super(CollisionElasticPdu, self).__init__()
-        self.issuingEntityID = EntityID();
+        self.issuingEntityID = issuingEntityID or EntityID()
         """ This field shall identify the entity that is issuing the PDU and shall be represented by an Entity Identifier record (see 6.2.28)"""
-        self.collidingEntityID = EntityID();
+        self.collidingEntityID = collidingEntityID or EntityID()
         """ This field shall identify the entity that has collided with the issuing entity. This field shall be a valid identifier of an entity or server capable of responding to the receipt of this Collision-Elastic PDU. This field shall be represented by an Entity Identifier record (see 6.2.28)."""
-        self.collisionEventID = EventIdentifier();
+        self.collisionEventID = collisionEventID or EventIdentifier()
         """ This field shall contain an identification generated by the issuing simulation application to associate related collision events. This field shall be represented by an Event Identifier record (see 6.2.34)."""
         self.pad = 0
         """ some padding"""
-        self.contactVelocity = Vector3Float();
+        self.contactVelocity = contactVelocity or Vector3Float()
         """ This field shall contain the velocity at the time the collision is detected at the point the collision is detected. The velocity shall be represented in world coordinates. This field shall be represented by the Linear Velocity Vector record [see 6.2.95 item c)]"""
-        self.mass = 0
+        self.mass = mass
         """ This field shall contain the mass of the issuing entity and shall be represented by a 32-bit floating point number representing kilograms"""
-        self.locationOfImpact = Vector3Float();
+        self.locationOfImpact = locationOfImpact or Vector3Float()
         """ This field shall specify the location of the collision with respect to the entity with which the issuing entity collided. This field shall be represented by an Entity Coordinate Vector record [see 6.2.95 item a)]."""
-        self.collisionIntermediateResultXX = 0
+        self.collisionIntermediateResultXX = colllisionIntermediateResultXX
         """ These six records represent the six independent components of a positive semi-definite matrix formed by pre-multiplying and post-multiplying the tensor of inertia, by the anti-symmetric matrix generated by the moment arm, and shall be represented by 32-bit floating point numbers (see 5.3.4.4)"""
-        self.collisionIntermediateResultXY = 0
+        self.collisionIntermediateResultXY = collisionIntermediateResultXY
         """ tensor values"""
-        self.collisionIntermediateResultXZ = 0
+        self.collisionIntermediateResultXZ = collisionIntermediateResultXZ
         """ tensor values"""
-        self.collisionIntermediateResultYY = 0
+        self.collisionIntermediateResultYY = collisionIntermediateResultYY
         """ tensor values"""
-        self.collisionIntermediateResultYZ = 0
+        self.collisionIntermediateResultYZ = collisionIntermediateResultYZ
         """ tensor values"""
-        self.collisionIntermediateResultZZ = 0
+        self.collisionIntermediateResultZZ = collisionIntermediateResultZZ
         """ tensor values"""
-        self.unitSurfaceNormal = Vector3Float();
+        self.unitSurfaceNormal = unitSurfaceNormal or Vector3Float()
         """ This record shall represent the normal vector to the surface at the point of collision detection. The surface normal shall be represented in world coordinates. This field shall be represented by an Entity Coordinate Vector record [see 6.2.95 item a)]."""
-        self.coefficientOfRestitution = 0
+        self.coefficientOfRestitution = coefficientOfRestitution
         """ This field shall represent the degree to which energy is conserved in a collision and shall be represented by a 32-bit floating point number. In addition, it represents a free parameter by which simulation application developers may tune their collision interactions."""
         self.pduType = 66
         """ initialize value """
@@ -4739,20 +5151,26 @@ class CollisionElasticPdu( EntityInformationFamilyPdu ):
 class ActionRequestPdu( SimulationManagementFamilyPdu ):
     """Section 7.5.7. Request from simulation manager to a managed entity to perform a specified action. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestID=0,
+                 actionID=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for ActionRequestPdu"""
         super(ActionRequestPdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ identifies the request being made by the simulaton manager"""
-        self.actionID = 0
+        self.actionID = actionID
         """ identifies the particular action being requested(see Section 7 of SISO-REF-010)."""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datum records"""
-        self.fixedDatums = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ variable length list of fixed datums"""
-        self.variableDatums = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ variable length list of variable length datums"""
         self.pduType = 16
         """ initialize value """
@@ -4762,12 +5180,12 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
         super( ActionRequestPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
         outputStream.write_unsigned_int(self.actionID);
-        outputStream.write_unsigned_int( len(self.fixedDatums));
-        outputStream.write_unsigned_int( len(self.variableDatums));
-        for anObj in self.fixedDatums:
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
+        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatums:
+        for anObj in self.variableDatumRecords:
             anObj.serialize(outputStream)
 
 
@@ -4783,12 +5201,12 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatums.append(element)
+            self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatums.append(element)
+            self.variableDatumRecords.append(element)
 
 
 
@@ -4796,14 +5214,14 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
 class AcknowledgePdu( SimulationManagementFamilyPdu ):
     """Section 7.5.6. Acknowledge the receipt of a start/resume, stop/freeze, or RemoveEntityPDU. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self, acknowledgeFlag=0, responseFlag=0, requestID=0):
         """ Initializer for AcknowledgePdu"""
         super(AcknowledgePdu, self).__init__()
-        self.acknowledgeFlag = 0
+        self.acknowledgeFlag = acknowledgeFlag
         """ type of message being acknowledged"""
-        self.responseFlag = 0
+        self.responseFlag = responseFlag
         """ Whether or not the receiving entity was able to comply with the request"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID that is unique"""
         self.pduType = 15
         """ initialize value """
@@ -4827,7 +5245,7 @@ class AcknowledgePdu( SimulationManagementFamilyPdu ):
 
 
 class DistributedEmissionsFamilyPdu( Pdu ):
-    """Section 5.3.7. Electronic Emissions. Abstract superclass for distirubted emissions PDU"""
+    """Section 5.3.7. Electronic Emissions. Abstract superclass for distributed emissions PDU"""
 
     def __init__(self):
         """ Initializer for DistributedEmissionsFamilyPdu"""
@@ -4850,12 +5268,12 @@ class DistributedEmissionsFamilyPdu( Pdu ):
 class SimulationManagementWithReliabilityFamilyPdu( Pdu ):
     """Section 5.3.12: Abstract superclass for reliable simulation management PDUs"""
 
-    def __init__(self):
+    def __init__(self, originatingEntityID=None, receivingEntityID=None):
         """ Initializer for SimulationManagementWithReliabilityFamilyPdu"""
         super(SimulationManagementWithReliabilityFamilyPdu, self).__init__()
-        self.originatingEntityID = EntityID();
+        self.originatingEntityID = originatingEntityID or EntityID()
         """ Object originatig the request"""
-        self.receivingEntityID = EntityID();
+        self.receivingEntityID = receivingEntityID or EntityID()
         """ Object with which this point object is associated"""
         self.protocolFamily = 10
         """ initialize value """
@@ -4879,26 +5297,33 @@ class SimulationManagementWithReliabilityFamilyPdu( Pdu ):
 class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.6: request from a simulation manager to a managed entity to perform a specified action. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requiredReliabilityService=0,
+                 requestID=0,
+                 actionID=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for ActionRequestReliablePdu"""
         super(ActionRequestReliablePdu, self).__init__()
-        self.requiredReliabilityService = 0
+        self.requiredReliabilityService = requiredReliabilityService
         """ level of reliability service used for this transaction"""
         self.pad1 = 0
         """ padding"""
         self.pad2 = 0
         """ padding"""
-        self.requestID = 0
+        self.requestID = requestID
         """ request ID"""
-        self.actionID = 0
+        self.actionID = actionID
         """ request ID"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ variable datum record count"""
-        self.fixedDatumRecords = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ Fixed datum records"""
-        self.variableDatumRecords = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ Variable datum records"""
         self.pduType = 56
         """ initialize value """
@@ -4948,33 +5373,43 @@ class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class DesignatorPdu( DistributedEmissionsFamilyPdu ):
     """Section 5.3.7.2. Handles designating operations. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 designatingEntityID=None,
+                 codeName=0,
+                 designatedEntityID=None,
+                 designatorCode=0,
+                 designatorPower=0.0,
+                 designatorWavelength=0.0,
+                 designatorSpotWrtDesignated=None,
+                 designatorSpotLocation=None,
+                 deadReckoningAlgorithm=0,
+                 entityLinearAcceleration=None):
         """ Initializer for DesignatorPdu"""
         super(DesignatorPdu, self).__init__()
-        self.designatingEntityID = EntityID();
+        self.designatingEntityID = designatingEntityID or EntityID()
         """ ID of the entity designating"""
-        self.codeName = 0
+        self.codeName = codeName
         """ This field shall specify a unique emitter database number assigned to  differentiate between otherwise similar or identical emitter beams within an emitter system."""
-        self.designatedEntityID = EntityID();
+        self.designatedEntityID = designatedEntityID or EntityID()
         """ ID of the entity being designated"""
-        self.designatorCode = 0
+        self.designatorCode = designatorCode
         """ This field shall identify the designator code being used by the designating entity """
-        self.designatorPower = 0
+        self.designatorPower = designatorPower
         """ This field shall identify the designator output power in watts"""
-        self.designatorWavelength = 0
+        self.designatorWavelength = designatorWavelength
         """ This field shall identify the designator wavelength in units of microns"""
-        self.designatorSpotWrtDesignated = Vector3Float();
-        """ designtor spot wrt the designated entity"""
-        self.designatorSpotLocation = Vector3Double();
-        """ designtor spot wrt the designated entity"""
-        self.deadReckoningAlgorithm = 0
+        self.designatorSpotWrtDesignated = designatorSpotWrtDesignated or Vector3Float()
+        """ designator spot wrt the designated entity"""
+        self.designatorSpotLocation = designatorSpotLocation or Vector3Double()
+        """ designator spot wrt the designated entity"""
+        self.deadReckoningAlgorithm = deadReckoningAlgorithm
         """ Dead reckoning algorithm"""
         self.padding1 = 0
         """ padding"""
         self.padding2 = 0
         """ padding"""
-        self.entityLinearAcceleration = Vector3Float();
-        """ linear accelleration of entity"""
+        self.entityLinearAcceleration = entityLinearAcceleration or Vector3Float()
+        """ linear acceleration of entity"""
         self.pduType = 24
         """ initialize value """
 
@@ -5017,18 +5452,22 @@ class DesignatorPdu( DistributedEmissionsFamilyPdu ):
 class StopFreezePdu( SimulationManagementFamilyPdu ):
     """Section 7.5.5. Stop or freeze an enity (or exercise). COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 realWorldTime=None,
+                 reason=0,
+                 frozenBehavior=0,
+                 requestID=0):
         """ Initializer for StopFreezePdu"""
         super(StopFreezePdu, self).__init__()
-        self.realWorldTime = ClockTime();
+        self.realWorldTime = realWorldTime or ClockTime()
         """ real-world(UTC) time at which the entity shall stop or freeze in the exercise"""
-        self.reason = 0
+        self.reason = reason
         """ Reason the simulation was stopped or frozen (see section 7 of SISO-REF-010) represented by an 8-bit enumeration"""
-        self.frozenBehavior = 0
+        self.frozenBehavior = frozenBehavior
         """ Internal behavior of the entity(or simulation) and its appearance while frozen to the other participants"""
         self.padding1 = 0
         """ padding"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID that is unique"""
         self.pduType = 14
         """ initialize value """
@@ -5058,33 +5497,46 @@ class StopFreezePdu( SimulationManagementFamilyPdu ):
 class EntityStatePdu( EntityInformationFamilyPdu ):
     """Represents the postion and state of one entity in the world. Section 7.2.2. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 entityID=None,
+                 forceId=0,
+                 numberOfVariableParameters=0,
+                 entityType=None,
+                 alternativeEntityType=None,
+                 entityLinearVelocity=None,
+                 entityLocation=None,
+                 entityOrientation=None,
+                 entityAppearance=0,
+                 deadReckoningParameters=None,
+                 marking=None,
+                 capabilities=0,
+                 variableParameters=None):
         """ Initializer for EntityStatePdu"""
         super(EntityStatePdu, self).__init__()
-        self.entityID = EntityID();
+        self.entityID = entityID or EntityID()
         """ Unique ID for an entity that is tied to this state information"""
-        self.forceId = 0
+        self.forceId = forceId
         """ What force this entity is affiliated with, eg red, blue, neutral, etc"""
-        self.numberOfVariableParameters = 0
+        self.numberOfVariableParameters = numberOfVariableParameters
         """ How many variable parameters are in the variable length list. In earlier versions of DIS these were known as articulation parameters"""
-        self.entityType = EntityType();
+        self.entityType = entityType or EntityType()
         """ Describes the type of entity in the world"""
-        self.alternativeEntityType = EntityType();
-        self.entityLinearVelocity = Vector3Float();
+        self.alternativeEntityType = alternativeEntityType or EntityType()
+        self.entityLinearVelocity = entityLinearVelocity or Vector3Float()
         """ Describes the speed of the entity in the world"""
-        self.entityLocation = Vector3Double();
+        self.entityLocation = entityLocation or Vector3Double()
         """ describes the location of the entity in the world"""
-        self.entityOrientation = EulerAngles();
+        self.entityOrientation = entityOrientation or EulerAngles()
         """ describes the orientation of the entity, in euler angles"""
-        self.entityAppearance = 0
+        self.entityAppearance = entityAppearance
         """ a series of bit flags that are used to help draw the entity, such as smoking, on fire, etc."""
-        self.deadReckoningParameters = DeadReckoningParameters();
+        self.deadReckoningParameters = deadReckoningParameters or DeadReckoningParameters()
         """ parameters used for dead reckoning"""
-        self.marking = EntityMarking();
+        self.marking = marking or EntityMarking()
         """ characters that can be used for debugging, or to draw unique strings on the side of entities in the world"""
-        self.capabilities = 0
+        self.capabilities = capabilities
         """ a series of bit flags"""
-        self.variableParameters = []
+        self.variableParameters = variableParameters or []
         """ variable length list of variable parameters. In earlier DIS versions this was articulation parameters."""
         self.pduType = 1
         """ initialize value """
@@ -5134,7 +5586,7 @@ class EntityStatePdu( EntityInformationFamilyPdu ):
 
 
 class EntityManagementFamilyPdu( Pdu ):
-    """ Managment of grouping of PDUs, and more. Section 7.8"""
+    """ Management of grouping of PDUs, and more. Section 7.8"""
 
     def __init__(self):
         """ Initializer for EntityManagementFamilyPdu"""
@@ -5157,14 +5609,17 @@ class EntityManagementFamilyPdu( Pdu ):
 class StartResumePdu( SimulationManagementFamilyPdu ):
     """Section 7.5.4. Start or resume an exercise. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 realWorldTime=None,
+                 simulationTime=None,
+                 requestID=0):
         """ Initializer for StartResumePdu"""
         super(StartResumePdu, self).__init__()
-        self.realWorldTime = ClockTime();
+        self.realWorldTime = realWorldTime or ClockTime()
         """ This field shall specify the real-world time (UTC) at which the entity is to start/resume in the exercise. This information shall be used by the participating simulation applications to start/resume an exercise synchronously. This field shall be represented by a Clock Time record (see 6.2.16)."""
-        self.simulationTime = ClockTime();
+        self.simulationTime = simulationTime or ClockTime()
         """ The reference time within a simulation exercise. This time is established ahead of time by simulation management and is common to all participants in a particular exercise. Simulation time may be either Absolute Time or Relative Time. This field shall be represented by a Clock Time record (see 6.2.16)"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Identifier for the specific and unique start/resume request"""
         self.pduType = 13
         """ initialize value """
@@ -5190,50 +5645,69 @@ class StartResumePdu( SimulationManagementFamilyPdu ):
 class TransmitterPdu( RadioCommunicationsFamilyPdu ):
     """Detailed information about a radio transmitter. This PDU requires manually written code to complete, since the modulation parameters are of variable length. Section 7.7.2 UNFINISHED"""
 
-    def __init__(self):
+    def __init__(self,
+                 radioReferenceID=None,
+                 radioNumber=0,
+                 radioEntityType=None,
+                 transmitState=0,
+                 inputSource=0,
+                 variableTransmitterParameterCount=0,
+                 antennaLocation=None,
+                 relativeAntennaLocation=None,
+                 antennaPatternType=0,
+                 antennaPatternCount=0,
+                 frequency=0,
+                 transmitFrequencyBandwidth=0.0,
+                 power=0.0,
+                 modulationType=None,
+                 cryptoSystem=0,
+                 cryptoKeyId=0,
+                 modulationParameterCount=0,
+                 modulationParametersList=None,
+                 antennaPatternList=None):
         """ Initializer for TransmitterPdu"""
         super(TransmitterPdu, self).__init__()
-        self.radioReferenceID = EntityID();
+        self.radioReferenceID = radioReferenceID or EntityID()
         """ ID of the entitythat is the source of the communication"""
-        self.radioNumber = 0
+        self.radioNumber = radioNumber
         """ particular radio within an entity"""
-        self.radioEntityType = EntityType();
+        self.radioEntityType = radioEntityType or EntityType()
         """ Type of radio"""
-        self.transmitState = 0
+        self.transmitState = transmitState
         """ transmit state"""
-        self.inputSource = 0
+        self.inputSource = inputSource
         """ input source"""
-        self.variableTransmitterParameterCount = 0
+        self.variableTransmitterParameterCount = variableTransmitterParameterCount
         """ count field"""
-        self.antennaLocation = Vector3Double();
+        self.antennaLocation = antennaLocation or Vector3Double()
         """ Location of antenna"""
-        self.relativeAntennaLocation = Vector3Float();
+        self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float()
         """ relative location of antenna"""
-        self.antennaPatternType = 0
+        self.antennaPatternType = antennaPatternType
         """ antenna pattern type"""
-        self.antennaPatternCount = 0
+        self.antennaPatternCount = antennaPatternCount
         """ atenna pattern length"""
-        self.frequency = 0
+        self.frequency = frequency
         """ frequency"""
-        self.transmitFrequencyBandwidth = 0
+        self.transmitFrequencyBandwidth = transmitFrequencyBandwidth
         """ transmit frequency Bandwidth"""
-        self.power = 0
+        self.power = power
         """ transmission power"""
-        self.modulationType = ModulationType();
+        self.modulationType = modulationType or ModulationType()
         """ modulation"""
-        self.cryptoSystem = 0
+        self.cryptoSystem = cryptoSystem
         """ crypto system enumeration"""
-        self.cryptoKeyId = 0
+        self.cryptoKeyId = cryptoKeyId
         """ crypto system key identifer"""
-        self.modulationParameterCount = 0
+        self.modulationParameterCount = modulationParameterCount
         """ how many modulation parameters we have"""
         self.padding2 = 0
         """ padding2"""
         self.padding3 = 0
         """ padding3"""
-        self.modulationParametersList = []
+        self.modulationParametersList = modulationParametersList or []
         """ variable length list of modulation parameters"""
-        self.antennaPatternList = []
+        self.antennaPatternList = antennaPatternList or []
         """ variable length list of antenna pattern records"""
         self.pduType = 25
         """ initialize value """
@@ -5324,18 +5798,23 @@ class TransmitterPdu( RadioCommunicationsFamilyPdu ):
 class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
     """Section 5.3.7.1. Information about active electronic warfare (EW) emissions and active EW countermeasures shall be communicated using an Electromagnetic Emission PDU."""
 
-    def __init__(self):
+    def __init__(self,
+                 emittingEntityID=None,
+                 eventID=None,
+                 stateUpdateIndicator=0,
+                 numberOfSystems=0,
+                 systems=None):
         """ Initializer for ElectronicEmissionsPdu"""
         super(ElectronicEmissionsPdu, self).__init__()
-        self.emittingEntityID = EntityID();
+        self.emittingEntityID = emittingEntityID or EntityID()
         """ ID of the entity emitting"""
-        self.eventID = EventIdentifier();
+        self.eventID = eventID or EventIdentifier()
         """ ID of event"""
-        self.stateUpdateIndicator = 0
+        self.stateUpdateIndicator = stateUpdateIndicator
         """ This field shall be used to indicate if the data in the PDU represents a state update or just data that has changed since issuance of the last Electromagnetic Emission PDU [relative to the identified entity and emission system(s)]."""
-        self.numberOfSystems = 0
+        self.numberOfSystems = numberOfSystems
         """ This field shall specify the number of emission systems being described in the current PDU."""
-        self.systems = []
+        self.systems = systems or []
         """ Electronic emmissions systems THIS IS WRONG. It has the WRONG class type and will cause problems in any marshalling."""
         self.pduType = 23
         """ initialize value """
@@ -5371,16 +5850,25 @@ class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
             self.systems.append(element)
 
 class EmissionSystemBeamRecord():
-    def __init__(self):
-        self.beamDataLength = 0
-        self.beamIDNumber = 0
-        self.beamParameterIndex = 0
-        self.fundamentalParameterData = EEFundamentalParameterData()
-        self.beamFunction = 0
-        self.numberOfTargetsInTrackJam = 0
-        self.highDensityTrackJam = 0
-        self.jammingModeSequence = 0
-        self.trackJamRecords = [];
+    def __init__(self,
+                 beamDataLength=0,
+                 beamIDNumber=0,
+                 beamParameterIndex=0,
+                 fundamentalParameterData=None,
+                 beamFunction=0,
+                 numberOfTargetsInTrackJam=0,
+                 highDensityTrackJam=0,
+                 jammingModeSequence=0,
+                trackJamRecords=None):
+        self.beamDataLength = beamDataLength
+        self.beamIDNumber = beamIDNumber
+        self.beamParameterIndex = beamParameterIndex
+        self.fundamentalParameterData = fundamentalParameterData or EEFundamentalParameterData()
+        self.beamFunction = beamFunction
+        self.numberOfTargetsInTrackJam = numberOfTargetsInTrackJam
+        self.highDensityTrackJam = highDensityTrackJam
+        self.jammingModeSequence = jammingModeSequence
+        self.trackJamRecords = trackJamRecords or []
 
     def serialize(self, outputStream):
         outputStream.write_unsigned_byte(self.beamDataLength);
@@ -5413,18 +5901,23 @@ class EmissionSystemBeamRecord():
             self.trackJamRecords.append(element)
 
 class EmissionSystemRecord():
-    def __init__(self):
-        self.systemDataLength = 0
+    def __init__(self,
+                 systemDataLength=0,
+                 numberOfBeams=0,
+                 emitterSystem=None,
+                 location=None,
+                 beamRecords=None):
+        self.systemDataLength = systemDataLength
         """  this field shall specify the length of this emitter system's data in 32-bit words."""
-        self.numberOfBeams = 0
+        self.numberOfBeams = numberOfBeams
         """ the number of beams being described in the current PDU for the emitter system being described. """
         self.paddingForEmissionsPdu = 0
         """ padding"""
-        self.emitterSystem = EmitterSystem();
+        self.emitterSystem = emitterSystem or EmitterSystem()
         """  information about a particular emitter system and shall be represented by an Emitter System record (see 6.2.23)."""
-        self.location = Vector3Float();
+        self.location = location or Vector3Float()
         """ the location of the antenna beam source with respect to the emitting entity's coordinate system. This location shall be the origin of the emitter coordinate system that shall have the same orientation as the entity coordinate system. This field shall be represented by an Entity Coordinate Vector record see 6.2.95 """
-        self.beamRecords = [];
+        self.beamRecords = beamRecords or []
 
     def serialize(self, outputStream):
         outputStream.write_unsigned_byte(self.systemDataLength);
@@ -5449,20 +5942,24 @@ class EmissionSystemRecord():
 class ResupplyOfferPdu( LogisticsFamilyPdu ):
     """Information used to communicate the offer of supplies by a supplying entity to a receiving entity. Section 7.4.3 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 receivingEntityID=None,
+                 supplyingEntityID=None,
+                 numberOfSupplyTypes=0,
+                 supplies=None):
         """ Initializer for ResupplyOfferPdu"""
         super(ResupplyOfferPdu, self).__init__()
-        self.receivingEntityID = EntityID();
+        self.receivingEntityID = receivingEntityID or EntityID()
         """ Field identifies the Entity and respective Entity Record ID that is receiving service (see 6.2.28), Section 7.4.3"""
-        self.supplyingEntityID = EntityID();
+        self.supplyingEntityID = supplyingEntityID or EntityID()
         """ Identifies the Entity and respective Entity ID Record that is supplying  (see 6.2.28), Section 7.4.3"""
-        self.numberOfSupplyTypes = 0
+        self.numberOfSupplyTypes = numberOfSupplyTypes
         """ How many supplies types are being offered, Section 7.4.3"""
         self.padding1 = 0
         """ padding"""
         self.padding2 = 0
         """ padding"""
-        self.supplies = []
+        self.supplies = supplies or []
         """ A Reord that Specifies the type of supply and the amount of that supply for each of the supply types in numberOfSupplyTypes (see 6.2.85), Section 7.4.3"""
         self.pduType = 6
         """ initialize value """
@@ -5500,26 +5997,32 @@ class ResupplyOfferPdu( LogisticsFamilyPdu ):
 class AttributePdu( EntityInformationFamilyPdu ):
     """Information about individual attributes for a particular entity, other object, or event may be communicated using an Attribute PDU. The Attribute PDU shall not be used to exchange data available in any other PDU except where explicitly mentioned in the PDU issuance instructions within this standard. See 5.3.6 for the information requirements and issuance and receipt rules for this PDU. Section 7.2.6. INCOMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 originatingSimulationAddress=None,
+                 attributeRecordPduType=0,
+                 attributeRecordProtocolVersion=0,
+                 masterAttributeRecordType=0,
+                 actionCode=0,
+                 numberAttributeRecordSet=0):
         """ Initializer for AttributePdu"""
         super(AttributePdu, self).__init__()
-        self.originatingSimulationAddress = SimulationAddress();
+        self.originatingSimulationAddress = originatingSimulationAddress or SimulationAddress()
         """ This field shall identify the simulation issuing the Attribute PDU. It shall be represented by a Simulation Address record (see 6.2.79)."""
         self.padding1 = 0
         """ Padding"""
         self.padding2 = 0
         """ Padding"""
-        self.attributeRecordPduType = 0
+        self.attributeRecordPduType = attributeRecordPduType
         """ This field shall represent the type of the PDU that is being extended or updated, if applicable. It shall be represented by an 8-bit enumeration."""
-        self.attributeRecordProtocolVersion = 0
+        self.attributeRecordProtocolVersion = attributeRecordProtocolVersion
         """ This field shall indicate the Protocol Version associated with the Attribute Record PDU Type. It shall be represented by an 8-bit enumeration."""
-        self.masterAttributeRecordType = 0
+        self.masterAttributeRecordType = masterAttributeRecordType
         """ This field shall contain the Attribute record type of the Attribute records in the PDU if they all have the same Attribute record type. It shall be represented by a 32-bit enumeration."""
-        self.actionCode = 0
+        self.actionCode = actionCode
         """ This field shall identify the action code applicable to this Attribute PDU. The Action Code shall apply to all Attribute records contained in the PDU. It shall be represented by an 8-bit enumeration."""
         self.padding3 = 0
         """ Padding"""
-        self.numberAttributeRecordSet = 0
+        self.numberAttributeRecordSet = numberAttributeRecordSet
         """ This field shall specify the number of Attribute Record Sets that make up the remainder of the PDU. It shall be represented by a 16-bit unsigned integer."""
 
     def serialize(self, outputStream):
@@ -5576,24 +6079,30 @@ class MinefieldFamilyPdu( Pdu ):
 class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.9: initializing or chaning internal state information, reliable. Needs manual intervention to fix     padding on variable datums. UNFINISHED"""
 
-    def __init__(self):
+    def __init__(self,
+                 requiredReliabilityService=0,
+                 requestID=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for SetDataReliablePdu"""
         super(SetDataReliablePdu, self).__init__()
-        self.requiredReliabilityService = 0
+        self.requiredReliabilityService = requiredReliabilityService
         """ level of reliability service used for this transaction"""
         self.pad1 = 0
         """ padding"""
         self.pad2 = 0
         """ padding"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ variable datum record count"""
-        self.fixedDatumRecords = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ Fixed datum records"""
-        self.variableDatumRecords = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ Variable datum records"""
         self.pduType = 59
         """ initialize value """
@@ -5641,20 +6150,25 @@ class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class EventReportPdu( SimulationManagementFamilyPdu ):
     """ Reports occurance of a significant event to the simulation manager. Section 7.5.12. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 eventType=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for EventReportPdu"""
         super(EventReportPdu, self).__init__()
-        self.eventType = 0
+        self.eventType = eventType
         """ Type of event"""
         self.padding1 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datum records"""
-        self.fixedDatums = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ variable length list of fixed datums"""
-        self.variableDatums = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ variable length list of variable length datums"""
         self.pduType = 21
         """ initialize value """
@@ -5664,12 +6178,12 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
         super( EventReportPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.eventType);
         outputStream.write_unsigned_int(self.padding1);
-        outputStream.write_unsigned_int( len(self.fixedDatums));
-        outputStream.write_unsigned_int( len(self.variableDatums));
-        for anObj in self.fixedDatums:
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
+        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatums:
+        for anObj in self.variableDatumRecords:
             anObj.serialize(outputStream)
 
 
@@ -5685,12 +6199,12 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatums.append(element)
+            self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatums.append(element)
+            self.variableDatumRecords.append(element)
 
 
 
@@ -5698,30 +6212,41 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
 class PointObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
     """: Inormation abut the addition or modification of a synthecic enviroment object that is anchored to the terrain with a single point. Section 7.10.4 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 objectID=None,
+                 referencedObjectID=None,
+                 updateNumber=0,
+                 forceID=0,
+                 modifications=0,
+                 objectType=None,
+                 objectLocation=None,
+                 objectOrientation=None,
+                 objectAppearance=0,
+                 requesterID=None,
+                 receivingID=None):
         """ Initializer for PointObjectStatePdu"""
         super(PointObjectStatePdu, self).__init__()
-        self.objectID = EntityID();
+        self.objectID = objectID or EntityID()
         """ Object in synthetic environment"""
-        self.referencedObjectID = EntityID();
+        self.referencedObjectID = referencedObjectID or EntityID();
         """ Object with which this point object is associated"""
-        self.updateNumber = 0
+        self.updateNumber = updateNumber
         """ unique update number of each state transition of an object"""
-        self.forceID = 0
+        self.forceID = forceID
         """ force ID"""
-        self.modifications = 0
+        self.modifications = modifications
         """ modifications"""
-        self.objectType = ObjectType();
+        self.objectType = objectType or ObjectType()
         """ Object type"""
-        self.objectLocation = Vector3Double();
+        self.objectLocation = objectLocation or Vector3Double()
         """ Object location"""
-        self.objectOrientation = EulerAngles();
+        self.objectOrientation = objectOrientation or EulerAngles()
         """ Object orientation"""
-        self.objectAppearance = 0
+        self.objectAppearance = objectAppearance
         """ Object apperance"""
-        self.requesterID = SimulationAddress();
-        """ requesterID"""
-        self.receivingID = SimulationAddress();
+        self.requesterID = requesterID or SimulationAddress()
+        """ requester ID"""
+        self.receivingID = receivingID or SimulationAddress()
         """ receiver ID"""
         self.pad2 = 0
         """ padding"""
@@ -5767,20 +6292,25 @@ class PointObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
 class DataPdu( SimulationManagementFamilyPdu ):
     """ Information issued in response to a data query pdu or a set data pdu is communicated using a data pdu. Section 7.5.11 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestID=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for DataPdu"""
         super(DataPdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ ID of request"""
         self.padding1 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datum records"""
-        self.fixedDatums = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ variable length list of fixed datums"""
-        self.variableDatums = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ variable length list of variable length datums"""
         self.pduType = 20
         """ initialize value """
@@ -5790,12 +6320,12 @@ class DataPdu( SimulationManagementFamilyPdu ):
         super( DataPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
         outputStream.write_unsigned_int(self.padding1);
-        outputStream.write_unsigned_int( len(self.fixedDatums));
-        outputStream.write_unsigned_int( len(self.variableDatums));
-        for anObj in self.fixedDatums:
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
+        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatums:
+        for anObj in self.variableDatumRecords:
             anObj.serialize(outputStream)
 
 
@@ -5811,12 +6341,12 @@ class DataPdu( SimulationManagementFamilyPdu ):
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatums.append(element)
+            self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatums.append(element)
+            self.variableDatumRecords.append(element)
 
 
 
@@ -5824,83 +6354,123 @@ class DataPdu( SimulationManagementFamilyPdu ):
 class FastEntityStatePdu( EntityInformationFamilyPdu ):
     """Represents the postion and state of one entity in the world. This is identical in function to entity state pdu, but generates less garbage to collect in the Java world. Section 7.2.2. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 site=0,
+                 application=0,
+                 entity=0,
+                 forceId=0,
+                 numberOfVariableParameters=0,
+                 entityKind=0,
+                 domain=0,
+                 country=0,
+                 category=0,
+                 subcategory=0,
+                 specific=0,
+                 extra=0,
+                 altEntityKind=0,
+                 altDomain=0,
+                 altCountry=0,
+                 altCategory=0,
+                 altSubcategory=0,
+                 altSpecific=0,
+                 altExtra=0,
+                 xVelocity=0,
+                 yVelocity=0,
+                 zVelocity=0,
+                 xLocation=0,
+                 yLocation=0,
+                 zLocation=0,
+                 psi=0,
+                 theta=0,
+                 phi=0,
+                 entityAppearance=0,
+                 deadReckoningAlgorithm=0,
+                 otherParameters=None,
+                 xAcceleration=0,
+                 yAcceleration=0,
+                 zAcceleration=0,
+                 xAngularVelocity=0,
+                 yAngularVelocity=0,
+                 zAngularVelocity=0,
+                 marking=None,
+                 capabilities=0,
+                 variableParameters=None):
         """ Initializer for FastEntityStatePdu"""
         super(FastEntityStatePdu, self).__init__()
-        self.site = 0
+        self.site = site
         """ The site ID"""
-        self.application = 0
+        self.application = application
         """ The application ID"""
-        self.entity = 0
+        self.entity = entity
         """ the entity ID"""
-        self.forceId = 0
+        self.forceId = forceId
         """ what force this entity is affiliated with, eg red, blue, neutral, etc"""
-        self.numberOfVariableParameters = 0
+        self.numberOfVariableParameters = numberOfVariableParameters
         """ How many variable (nee articulation) parameters are in the variable length list"""
-        self.entityKind = 0
+        self.entityKind = entityKind
         """ Kind of entity"""
-        self.domain = 0
+        self.domain = domain
         """ Domain of entity (air, surface, subsurface, space, etc)"""
-        self.country = 0
+        self.country = country
         """ country to which the design of the entity is attributed"""
-        self.category = 0
+        self.category = category
         """ category of entity"""
-        self.subcategory = 0
+        self.subcategory = subcategory
         """ subcategory of entity"""
-        self.specific = 0
+        self.specific = specific
         """ specific info based on subcategory field"""
-        self.extra = 0
-        self.altEntityKind = 0
+        self.extra = extra
+        self.altEntityKind = altEntityKind
         """ Kind of entity"""
-        self.altDomain = 0
+        self.altDomain = altDomain
         """ Domain of entity (air, surface, subsurface, space, etc)"""
-        self.altCountry = 0
+        self.altCountry = altCountry
         """ country to which the design of the entity is attributed"""
-        self.altCategory = 0
+        self.altCategory = altCategory
         """ category of entity"""
-        self.altSubcategory = 0
+        self.altSubcategory = altSubcategory
         """ subcategory of entity"""
-        self.altSpecific = 0
+        self.altSpecific = altSpecific
         """ specific info based on subcategory field"""
-        self.altExtra = 0
-        self.xVelocity = 0
+        self.altExtra = altExtra
+        self.xVelocity = xVelocity
         """ X velo"""
-        self.yVelocity = 0
+        self.yVelocity = yVelocity
         """ y Value"""
-        self.zVelocity = 0
+        self.zVelocity = zVelocity
         """ Z value"""
-        self.xLocation = 0
+        self.xLocation = xLocation
         """ X value"""
-        self.yLocation = 0
+        self.yLocation = yLocation
         """ y Value"""
-        self.zLocation = 0
+        self.zLocation = zLocation
         """ Z value"""
-        self.psi = 0
-        self.theta = 0
-        self.phi = 0
-        self.entityAppearance = 0
+        self.psi = psi
+        self.theta = theta
+        self.phi = phi
+        self.entityAppearance = entityAppearance
         """ a series of bit flags that are used to help draw the entity, such as smoking, on fire, etc."""
-        self.deadReckoningAlgorithm = 0
+        self.deadReckoningAlgorithm = deadReckoningAlgorithm
         """ enumeration of what dead reckoning algorighm to use"""
-        self.otherParameters =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.otherParameters =  otherParameters or [0] * 15
         """ other parameters to use in the dead reckoning algorithm"""
-        self.xAcceleration = 0
+        self.xAcceleration = xAcceleration
         """ X value"""
-        self.yAcceleration = 0
+        self.yAcceleration = yAcceleration
         """ y Value"""
-        self.zAcceleration = 0
+        self.zAcceleration = zAcceleration
         """ Z value"""
-        self.xAngularVelocity = 0
+        self.xAngularVelocity = xAngularVelocity
         """ X value"""
-        self.yAngularVelocity = 0
+        self.yAngularVelocity = yAngularVelocity
         """ y Value"""
-        self.zAngularVelocity = 0
+        self.zAngularVelocity = zAngularVelocity
         """ Z value"""
-        self.marking =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.marking = marking or [0] * 12
         """ characters that can be used for debugging, or to draw unique strings on the side of entities in the world"""
-        self.capabilities = 0
+        self.capabilities = capabilities
         """ a series of bit flags"""
-        self.variableParameters = []
+        self.variableParameters = variableParameters or []
         """ variable length list of variable parameters. In earlier versions of DIS these were known as articulation parameters"""
         self.pduType = 1
         """ initialize value """
@@ -6020,14 +6590,17 @@ class FastEntityStatePdu( EntityInformationFamilyPdu ):
 class AcknowledgeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.5: Ack receipt of a start-resume, stop-freeze, create-entity or remove enitty (reliable) pdus. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 acknowledgeFlag=0,
+                 responseFlag=0,
+                 requestID=0):
         """ Initializer for AcknowledgeReliablePdu"""
         super(AcknowledgeReliablePdu, self).__init__()
-        self.acknowledgeFlag = 0
+        self.acknowledgeFlag = acknowledgeFlag
         """ ack flags"""
-        self.responseFlag = 0
+        self.responseFlag = responseFlag
         """ response flags"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID"""
         self.pduType = 55
         """ initialize value """
@@ -6053,20 +6626,24 @@ class AcknowledgeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class StartResumeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.3: Start resume simulation, relaible. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 realWorldTime=None,
+                 simulationTime=None,
+                 requiredReliabilityService=0,
+                 requestID=0):
         """ Initializer for StartResumeReliablePdu"""
         super(StartResumeReliablePdu, self).__init__()
-        self.realWorldTime = ClockTime();
+        self.realWorldTime = realWorldTime or ClockTime()
         """ time in real world for this operation to happen"""
-        self.simulationTime = ClockTime();
+        self.simulationTime = simulationTime or ClockTime()
         """ time in simulation for the simulation to resume"""
-        self.requiredReliabilityService = 0
+        self.requiredReliabilityService = requiredReliabilityService
         """ level of reliability service used for this transaction"""
         self.pad1 = 0
         """ padding"""
         self.pad2 = 0
         """ padding"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID"""
         self.pduType = 53
         """ initialize value """
@@ -6098,32 +6675,44 @@ class StartResumeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class ArealObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
     """Information about the addition/modification of an oobject that is geometrically anchored to the terrain with a set of three or more points that come to a closure. Section 7.10.6 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 objectID=None,
+                 referencedObjectID=None,
+                 updateNumber=0,
+                 forceId=0,
+                 modifications=0,
+                 objectType=None,
+                 specificObjectAppearance=0,
+                 generalObjectAppearance=0,
+                 numberOfPoints=0,
+                 requesterID=None,
+                 receivingID=None,
+                 objectLocation=None):
         """ Initializer for ArealObjectStatePdu"""
         super(ArealObjectStatePdu, self).__init__()
-        self.objectID = EntityID();
+        self.objectID = objectID or EntityID()
         """ Object in synthetic environment"""
-        self.referencedObjectID = EntityID();
+        self.referencedObjectID = referencedObjectID or EntityID()
         """ Object with which this point object is associated"""
-        self.updateNumber = 0
+        self.updateNumber = updateNumber
         """ unique update number of each state transition of an object"""
-        self.forceID = 0
+        self.forceID = forceId
         """ force ID"""
-        self.modifications = 0
+        self.modifications = modifications
         """ modifications enumeration"""
-        self.objectType = EntityType();
+        self.objectType = objectType or EntityType()
         """ Object type"""
-        self.specificObjectAppearance = 0
+        self.specificObjectAppearance = specificObjectAppearance
         """ Object appearance"""
-        self.generalObjectAppearance = 0
+        self.generalObjectAppearance = generalObjectAppearance
         """ Object appearance"""
-        self.numberOfPoints = 0
+        self.numberOfPoints = numberOfPoints
         """ Number of points"""
-        self.requesterID = SimulationAddress();
+        self.requesterID = requesterID or SimulationAddress()
         """ requesterID"""
-        self.receivingID = SimulationAddress();
+        self.receivingID = receivingID or SimulationAddress()
         """ receiver ID"""
-        self.objectLocation = []
+        self.objectLocation = objectLocation or []
         """ location of object"""
         self.pduType = 45
         """ initialize value """
@@ -6173,26 +6762,33 @@ class ArealObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
 class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.8: request for data from an entity. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requiredReliabilityService=0,
+                 requestID=0,
+                 timeInterval=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for DataQueryReliablePdu"""
         super(DataQueryReliablePdu, self).__init__()
-        self.requiredReliabilityService = 0
+        self.requiredReliabilityService = requiredReliabilityService
         """ level of reliability service used for this transaction"""
         self.pad1 = 0
         """ padding"""
         self.pad2 = 0
         """ padding"""
-        self.requestID = 0
+        self.requestID = requestID
         """ request ID"""
-        self.timeInterval = 0
+        self.timeInterval = timeInterval
         """ time interval between issuing data query PDUs"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ variable datum record count"""
-        self.fixedDatumRecords = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ Fixed datum records"""
-        self.variableDatumRecords = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ Variable datum records"""
         self.pduType = 58
         """ initialize value """
@@ -6242,32 +6838,44 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class MinefieldStatePdu( MinefieldFamilyPdu ):
     """information about the complete minefield. The minefield presence, perimiter, etc. Section 7.9.2 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 minefieldID=None,
+                 minefieldSequence=0,
+                 forceID=0,
+                 numberOfPerimeterPoints=0,
+                 minefieldType=None,
+                 numberOfMineTypes=0,
+                 minefieldLocation=None,
+                 minefieldOrientation=None,
+                 appearance=0,
+                 protocolMode=0,
+                 perimeterPoints=None,
+                 mineTypes=None):
         """ Initializer for MinefieldStatePdu"""
         super(MinefieldStatePdu, self).__init__()
-        self.minefieldID = MinefieldIdentifier();
+        self.minefieldID = minefield or MinefieldIdentifier()
         """ Minefield ID"""
-        self.minefieldSequence = 0
+        self.minefieldSequence = minefieldSequence
         """ Minefield sequence"""
-        self.forceID = 0
+        self.forceID = forceID
         """ force ID"""
-        self.numberOfPerimeterPoints = 0
+        self.numberOfPerimeterPoints = numberOfPerimeterPoints
         """ Number of permieter points"""
-        self.minefieldType = EntityType();
+        self.minefieldType = minefieldType or EntityType()
         """ type of minefield"""
-        self.numberOfMineTypes = 0
+        self.numberOfMineTypes = numberOfMineTypes
         """ how many mine types"""
-        self.minefieldLocation = Vector3Double();
+        self.minefieldLocation = minefieldLocation or Vector3Double()
         """ location of center of minefield in world coords"""
-        self.minefieldOrientation = EulerAngles();
+        self.minefieldOrientation = minefieldOrientation or EulerAngles()
         """ orientation of minefield"""
-        self.appearance = 0
+        self.appearance = appearance
         """ appearance bitflags"""
-        self.protocolMode = 0
+        self.protocolMode = protocolMode
         """ protocolMode. First two bits are the protocol mode, 14 bits reserved."""
-        self.perimeterPoints = []
+        self.perimeterPoints = perimeterPoints or []
         """ perimeter points for the minefield"""
-        self.mineType = []
+        self.mineTypes = mineTypes or []
         """ Type of mines"""
         self.pduType = 37
         """ initialize value """
@@ -6323,24 +6931,30 @@ class MinefieldStatePdu( MinefieldFamilyPdu ):
 class DataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.10: issued in response to a data query R or set dataR pdu. Needs manual intervention      to fix padding on variable datums. UNFINSIHED"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestID=0,
+                 requiredReliabilityService=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for DataReliablePdu"""
         super(DataReliablePdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID"""
-        self.requiredReliabilityService = 0
+        self.requiredReliabilityService = requiredReliabilityService
         """ level of reliability service used for this transaction"""
         self.pad1 = 0
         """ padding"""
         self.pad2 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ variable datum record count"""
-        self.fixedDatumRecords = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ Fixed datum records"""
-        self.variableDatumRecords = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ Variable datum records"""
         self.pduType = 60
         """ initialize value """
@@ -6388,16 +7002,20 @@ class DataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class CommentPdu( SimulationManagementFamilyPdu ):
     """ Arbitrary messages can be entered into the data stream via use of this PDU. Section 7.5.13 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for CommentPdu"""
         super(CommentPdu, self).__init__()
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datum records"""
-        self.fixedDatums = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ variable length list of fixed datums"""
-        self.variableDatums = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ variable length list of variable length datums"""
         self.pduType = 22
         """ initialize value """
@@ -6405,12 +7023,12 @@ class CommentPdu( SimulationManagementFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( CommentPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int( len(self.fixedDatums));
-        outputStream.write_unsigned_int( len(self.variableDatums));
-        for anObj in self.fixedDatums:
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
+        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatums:
+        for anObj in self.variableDatumRecords:
             anObj.serialize(outputStream)
 
 
@@ -6424,29 +7042,33 @@ class CommentPdu( SimulationManagementFamilyPdu ):
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatums.append(element)
+            self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatums.append(element)
+            self.variableDatumRecords.append(element)
 
 
 
 
 class CommentReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
-    """Section 5.3.12.12: Arbitrary messages. Only reliable this time. Neds manual intervention     to fix padding in variable datums. UNFINISHED"""
+    """Section 5.3.12.12: Arbitrary messages. Only reliable this time. Needs manual intervention to fix padding in variable datums. UNFINISHED"""
 
-    def __init__(self):
+    def __init__(self,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for CommentReliablePdu"""
         super(CommentReliablePdu, self).__init__()
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ variable datum record count"""
-        self.fixedDatumRecords = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ Fixed datum records"""
-        self.variableDatumRecords = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ Variable datum records"""
         self.pduType = 62
         """ initialize value """
@@ -6486,30 +7108,43 @@ class CommentReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class DirectedEnergyFirePdu( WarfareFamilyPdu ):
     """Firing of a directed energy weapon shall be communicated by issuing a Directed Energy Fire PDU Section 7.3.4  COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 munitionType=None,
+                 shotStartTime=None,
+                 cumulativeShotTime=0.0,
+                 apertureEmitterLocation=None,
+                 apertureDiameter=0.0,
+                 wavelength=0.0,
+                 peakIrradiance=0.0,
+                 pulseRepetitionFrequency=0.0,
+                 pulseWidth=0,
+                 flags=0,
+                 pulseShape=0,
+                 numberOfDERecords=0,
+                 dERecords=None):
         """ Initializer for DirectedEnergyFirePdu"""
         super(DirectedEnergyFirePdu, self).__init__()
-        self.munitionType = EntityType();
+        self.munitionType = munitionType or EntityType()
         """ Field shall identify the munition type enumeration for the DE weapon beam, Section 7.3.4 """
-        self.shotStartTime = ClockTime();
+        self.shotStartTime = shotStartTime or ClockTime()
         """ Field shall indicate the simulation time at start of the shot, Section 7.3.4 """
-        self.commulativeShotTime = 0
+        self.cumulativeShotTime = cumulativeShotTime
         """ Field shall indicate the current cumulative duration of the shot, Section 7.3.4 """
-        self.ApertureEmitterLocation = Vector3Float();
+        self.apertureEmitterLocation = apertureEmitterLocation or Vector3Float()
         """ Field shall identify the location of the DE weapon aperture/emitter, Section 7.3.4 """
-        self.apertureDiameter = 0
+        self.apertureDiameter = apertureDiameter
         """ Field shall identify the beam diameter at the aperture/emitter, Section 7.3.4 """
-        self.wavelength = 0
+        self.wavelength = wavelength
         """ Field shall identify the emissions wavelength in units of meters, Section 7.3.4 """
-        self.peakIrradiance = 0
+        self.peakIrradiance = peakIrradiance
         """ Field shall identify the current peak irradiance of emissions in units of Watts per square meter, Section 7.3.4 """
-        self.pulseRepetitionFrequency = 0
+        self.pulseRepetitionFrequency = pulseRepetitionFrequency
         """ field shall identify the current pulse repetition frequency in units of cycles per second (Hertz), Section 7.3.4 """
-        self.pulseWidth = 0
+        self.pulseWidth = pulseWidth
         """ field shall identify the pulse width emissions in units of seconds, Section 7.3.4"""
-        self.flags = 0
+        self.flags = flags
         """ 16bit Boolean field shall contain various flags to indicate status information needed to process a DE, Section 7.3.4 """
-        self.pulseShape = 0
+        self.pulseShape = pulseShape
         """ Field shall identify the pulse shape and shall be represented as an 8-bit enumeration, Section 7.3.4 """
         self.padding1 = 0
         """ padding, Section 7.3.4 """
@@ -6517,9 +7152,9 @@ class DirectedEnergyFirePdu( WarfareFamilyPdu ):
         """ padding, Section 7.3.4 """
         self.padding3 = 0
         """ padding, Section 7.3.4 """
-        self.numberOfDERecords = 0
+        self.numberOfDERecords = numberOfDERecords
         """ Field shall specify the number of DE records, Section 7.3.4 """
-        self.dERecords = []
+        self.dERecords = dERecords or []
         """ Fields shall contain one or more DE records, records shall conform to the variable record format (Section6.2.82), Section 7.3.4"""
         self.pduType = 68
         """ initialize value """
@@ -6577,28 +7212,37 @@ class DirectedEnergyFirePdu( WarfareFamilyPdu ):
 class DetonationPdu( WarfareFamilyPdu ):
     """Detonation or impact of munitions, as well as, non-munition explosions, the burst or initial bloom of chaff, and the ignition of a flare shall be indicated. Section 7.3.3  COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 explodingEntityID=None,
+                 eventID=None,
+                 velocity=None,
+                 locationInWordCoordinates=None,
+                 descriptor=None,
+                 locationOfEntityCoordinates=None,
+                 detonationResult=0,
+                 numberOfVariableParameters=0,
+                 variableParameters=None):
         """ Initializer for DetonationPdu"""
         super(DetonationPdu, self).__init__()
-        self.explodingEntityID = EntityID();
+        self.explodingEntityID = explodingEntityID or EntityID()
         """ ID of the expendable entity, Section 7.3.3 """
-        self.eventID = EventIdentifier();
+        self.eventID = eventID or EventIdentifier()
         """ ID of event, Section 7.3.3"""
-        self.velocity = Vector3Float();
+        self.velocity = velocity or Vector3Float()
         """ velocity of the munition immediately before detonation/impact, Section 7.3.3 """
-        self.locationInWorldCoordinates = Vector3Double();
+        self.locationInWorldCoordinates = locationInWordCoordinates or Vector3Double()
         """ location of the munition detonation, the expendable detonation, Section 7.3.3 """
-        self.descriptor = MunitionDescriptor();
+        self.descriptor = descriptor or MunitionDescriptor()
         """ Describes the detonation represented, Section 7.3.3 """
-        self.locationOfEntityCoordinates = Vector3Float();
+        self.locationOfEntityCoordinates = locationOfEntityCoordinates or Vector3Float()
         """ Velocity of the ammunition, Section 7.3.3 """
-        self.detonationResult = 0
+        self.detonationResult = detonationResult
         """ result of the detonation, Section 7.3.3 """
-        self.numberOfVariableParameters = 0
+        self.numberOfVariableParameters = numberOfVariableParameters
         """ How many articulation parameters we have, Section 7.3.3 """
         self.pad = 0
         """ padding"""
-        self.variableParameters = []
+        self.variableParameters = variableParameters or []
         """ specify the parameter values for each Variable Parameter record, Section 7.3.3 """
         self.pduType = 3
         """ initialize value """
@@ -6644,20 +7288,25 @@ class DetonationPdu( WarfareFamilyPdu ):
 class SetDataPdu( SimulationManagementFamilyPdu ):
     """Section 7.5.10. Change state information with the data contained in this. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestID=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for SetDataPdu"""
         super(SetDataPdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ ID of request"""
         self.padding1 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datum records"""
-        self.fixedDatums = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ variable length list of fixed datums"""
-        self.variableDatums = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ variable length list of variable length datums"""
         self.pduType = 19
         """ initialize value """
@@ -6667,12 +7316,12 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
         super( SetDataPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
         outputStream.write_unsigned_int(self.padding1);
-        outputStream.write_unsigned_int( len(self.fixedDatums));
-        outputStream.write_unsigned_int( len(self.variableDatums));
-        for anObj in self.fixedDatums:
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
+        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatums:
+        for anObj in self.variableDatumRecords:
             anObj.serialize(outputStream)
 
 
@@ -6688,12 +7337,12 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatums.append(element)
+            self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatums.append(element)
+            self.variableDatumRecords.append(element)
 
 
 
@@ -6701,24 +7350,30 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
 class RecordQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.13: A request for one or more records of data from an entity. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestID=0,
+                 requiredReliabilityService=0,
+                 eventType=0,
+                 time=0,
+                 numberOfRecords=0,
+                 recordIDs=None):
         """ Initializer for RecordQueryReliablePdu"""
         super(RecordQueryReliablePdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ request ID"""
-        self.requiredReliabilityService = 0
+        self.requiredReliabilityService = requiredReliabilityService
         """ level of reliability service used for this transaction"""
         self.pad1 = 0
         """ padding. The spec is unclear and contradictory here."""
         self.pad2 = 0
         """ padding"""
-        self.eventType = 0
+        self.eventType = eventType
         """ event type"""
-        self.time = 0
+        self.time = time
         """ time"""
-        self.numberOfRecords = 0
+        self.numberOfRecords = numberOfRecords
         """ numberOfRecords"""
-        self.recordIDs = []
+        self.recordIDs = recordIDs or []
         """ record IDs"""
         self.pduType = 63
         """ initialize value """
@@ -6760,20 +7415,26 @@ class RecordQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class ActionResponsePdu( SimulationManagementFamilyPdu ):
     """Section 7.5.8. response to an action request PDU. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestID=0,
+                 requestStatus=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for ActionResponsePdu"""
         super(ActionResponsePdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID that is unique"""
-        self.requestStatus = 0
+        self.requestStatus = requestStatus
         """ Status of response"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datum records"""
-        self.fixedDatums = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ variable length list of fixed datums"""
-        self.variableDatums = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ variable length list of variable length datums"""
         self.pduType = 17
         """ initialize value """
@@ -6783,12 +7444,12 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
         super( ActionResponsePdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID);
         outputStream.write_unsigned_int(self.requestStatus);
-        outputStream.write_unsigned_int( len(self.fixedDatums));
-        outputStream.write_unsigned_int( len(self.variableDatums));
-        for anObj in self.fixedDatums:
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords));
+        outputStream.write_unsigned_int( len(self.variableDatumRecords));
+        for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatums:
+        for anObj in self.variableDatumRecords:
             anObj.serialize(outputStream)
 
 
@@ -6804,12 +7465,12 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatums.append(element)
+            self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatums.append(element)
+            self.variableDatumRecords.append(element)
 
 
 
@@ -6817,18 +7478,21 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
 class EntityDamageStatusPdu( WarfareFamilyPdu ):
     """shall be used to communicate detailed damage information sustained by an entity regardless of the source of the damage Section 7.3.5  COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 damagedEntityID=None,
+                 numberOfDamageDescriptions=0,
+                 damageDescriptionRecords=None):
         """ Initializer for EntityDamageStatusPdu"""
         super(EntityDamageStatusPdu, self).__init__()
-        self.damagedEntityID = EntityID();
+        self.damagedEntityID = damagedEntityID or EntityID()
         """ Field shall identify the damaged entity (see 6.2.28), Section 7.3.4 COMPLETE"""
         self.padding1 = 0
         """ Padding."""
         self.padding2 = 0
         """ Padding."""
-        self.numberOfDamageDescription = 0
+        self.numberOfDamageDescriptions = numberOfDamageDescriptions
         """ field shall specify the number of Damage Description records, Section 7.3.5"""
-        self.damageDescriptionRecords = []
+        self.damageDescriptionRecords = damageDescriptionRecords or []
         """ Fields shall contain one or more Damage Description records (see 6.2.17) and may contain other Standard Variable records, Section 7.3.5"""
         self.pduType = 69
         """ initialize value """
@@ -6864,22 +7528,29 @@ class EntityDamageStatusPdu( WarfareFamilyPdu ):
 class FirePdu( WarfareFamilyPdu ):
     """ The firing of a weapon or expendable shall be communicated by issuing a Fire PDU. Sectioin 7.3.2. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 munitionExpendableID=None,
+                 eventID=None,
+                 fireMissionIndex=0,
+                 locationInWorldCoordinates=None,
+                 descriptor=None,
+                 velocity=None,
+                 range_=0.0):
         """ Initializer for FirePdu"""
         super(FirePdu, self).__init__()
-        self.munitionExpendibleID = EntityID();
+        self.munitionExpendableID = munitionExpendableID or EntityID()
         """ This field shall specify the entity identification of the fired munition or expendable. This field shall be represented by an Entity Identifier record (see 6.2.28)."""
-        self.eventID = EventIdentifier();
+        self.eventID = eventID or EventIdentifier()
         """ This field shall contain an identification generated by the firing entity to associate related firing and detonation events. This field shall be represented by an Event Identifier record (see 6.2.34)."""
-        self.fireMissionIndex = 0
+        self.fireMissionIndex = fireMissionIndex
         """ This field shall identify the fire mission (see 5.4.3.3). This field shall be representedby a 32-bit unsigned integer."""
-        self.locationInWorldCoordinates = Vector3Double();
+        self.locationInWorldCoordinates = locationInWorldCoordinates or Vector3Double()
         """ This field shall specify the location, in world coordinates, from which the munition was launched, and shall be represented by a World Coordinates record (see 6.2.97)."""
-        self.descriptor = MunitionDescriptor();
+        self.descriptor = descriptor or MunitionDescriptor()
         """ This field shall describe the firing or launch of a munition or expendable represented by one of the following types of Descriptor records: Munition Descriptor (6.2.20.2) or Expendable Descriptor (6.2.20.4)."""
-        self.velocity = Vector3Float();
+        self.velocity = velocity or Vector3Float()
         """ This field shall specify the velocity of the fired munition at the point when the issuing simulation application intends the externally visible effects of the launch (e.g. exhaust plume or muzzle blast) to first become apparent. The velocity shall be represented in world coordinates. This field shall be represented by a Linear Velocity Vector record [see 6.2.95 item c)]."""
-        self.range = 0
+        self.range = range_  # range is a built-in function in Python
         """ This field shall specify the range that an entitys fire control system has assumed in computing the fire control solution. This field shall be represented by a 32-bit floating point number in meters. For systems where range is unknown or unavailable, this field shall contain a value of zero."""
         self.pduType = 2
         """ initialize value """
@@ -6913,18 +7584,22 @@ class FirePdu( WarfareFamilyPdu ):
 class ReceiverPdu( RadioCommunicationsFamilyPdu ):
     """ Communication of a receiver state. Section 7.7.4 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 receiverState=0,
+                 receivedPower=0.0,
+                 transmitterEntityID=None,
+                 transmitterRadioId=0):
         """ Initializer for ReceiverPdu"""
         super(ReceiverPdu, self).__init__()
-        self.receiverState = 0
+        self.receiverState = receiverState
         """ encoding scheme used, and enumeration"""
         self.padding1 = 0
         """ padding"""
-        self.receivedPower = 0
+        self.receivedPower = receivedPower
         """ received power"""
-        self.transmitterEntityId = EntityID();
+        self.transmitterEntityID = transmitterEntityID or EntityID()
         """ ID of transmitter"""
-        self.transmitterRadioId = 0
+        self.transmitterRadioId = transmitterRadioId
         """ ID of transmitting radio"""
         self.pduType = 27
         """ initialize value """
@@ -6954,32 +7629,43 @@ class ReceiverPdu( RadioCommunicationsFamilyPdu ):
 class UaPdu( DistributedEmissionsFamilyPdu ):
     """ Information about underwater acoustic emmissions. This requires manual cleanup.  The beam data records should ALL be a the finish, rather than attached to each emitter system. Section 7.6.4. UNFINISHED"""
 
-    def __init__(self):
+    def __init__(self,
+                 emittingEntityID=None,
+                 eventID=None,
+                 stateChangeIndicator=0,
+                 passiveParameterIndex=0,
+                 propulsionPlantConfiguration=0,
+                 numberOfShafts=0,
+                 numberOfAPAs=0,
+                 numberOfUAEmitterSystems=0,
+                 shaftRPMs=None,
+                 apaData=None,
+                 emitterSystems=None):
         """ Initializer for UaPdu"""
         super(UaPdu, self).__init__()
-        self.emittingEntityID = EntityID();
+        self.emittingEntityID = emittingEntityID or EntityID()
         """ ID of the entity that is the source of the emission"""
-        self.eventID = EventIdentifier();
+        self.eventID = eventID or EventIdentifier()
         """ ID of event"""
-        self.stateChangeIndicator = 0
+        self.stateChangeIndicator = stateChangeIndicator
         """ This field shall be used to indicate whether the data in the UA PDU represent a state update or data that have changed since issuance of the last UA PDU"""
         self.pad = 0
         """ padding"""
-        self.passiveParameterIndex = 0
+        self.passiveParameterIndex = passiveParameterIndex
         """ This field indicates which database record (or file) shall be used in the definition of passive signature (unintentional) emissions of the entity. The indicated database record (or  file) shall define all noise generated as a function of propulsion plant configurations and associated  auxiliaries."""
-        self.propulsionPlantConfiguration = 0
+        self.propulsionPlantConfiguration = propulsionPlantConfiguration
         """ This field shall specify the entity propulsion plant configuration. This field is used to determine the passive signature characteristics of an entity."""
-        self.numberOfShafts = 0
+        self.numberOfShafts = numberOfShafts
         """  This field shall represent the number of shafts on a platform"""
-        self.numberOfAPAs = 0
+        self.numberOfAPAs = numberOfAPAs
         """ This field shall indicate the number of APAs described in the current UA PDU"""
-        self.numberOfUAEmitterSystems = 0
+        self.numberOfUAEmitterSystems = numberOfUAEmitterSystems
         """ This field shall specify the number of UA emitter systems being described in the current UA PDU"""
-        self.shaftRPMs = []
+        self.shaftRPMs = shaftRPMs or []
         """ shaft RPM values. THIS IS WRONG. It has the wrong class in the list."""
-        self.apaData = []
+        self.apaData = apaData or []
         """ apaData. THIS IS WRONG. It has the worng class in the list."""
-        self.emitterSystems = []
+        self.emitterSystems = emitterSystems or []
         """ THIS IS WRONG. It has the wrong class in the list."""
         self.pduType = 29
         """ initialize value """
@@ -7039,32 +7725,44 @@ class UaPdu( DistributedEmissionsFamilyPdu ):
 
 
 class IntercomControlPdu( RadioCommunicationsFamilyPdu ):
-    """ Detailed inofrmation about the state of an intercom device and the actions it is requestion         of another intercom device, or the response to a requested action. Required manual intervention to fix the intercom parameters,        which can be of varialbe length. Section 7.7.5 UNFINSISHED"""
+    """ Detailed inofrmation about the state of an intercom device and the actions it is requesting of another intercom device, or the response to a requested action. Required manual intervention to fix the intercom parameters, which can be of variable length. Section 7.7.5 UNFINSISHED"""
 
-    def __init__(self):
+    def __init__(self,
+                 controlType=0,
+                 communicationsChannelType=0,
+                 sourceEntityID=None,
+                 sourceCommunicationsDeviceID=0,
+                 sourceLineID=0,
+                 transmitPriority=0,
+                 transmitLineState=0,
+                 command=0,
+                 masterEntityID=None,
+                 masterCommunicationsDeviceID=0,
+                 intercomParametersLength=0,
+                 intercomParameters=None):
         """ Initializer for IntercomControlPdu"""
         super(IntercomControlPdu, self).__init__()
-        self.controlType = 0
+        self.controlType = controlType
         """ control type"""
-        self.communicationsChannelType = 0
+        self.communicationsChannelType = communicationsChannelType
         """ control type"""
-        self.sourceEntityID = EntityID();
+        self.sourceEntityID = sourceEntityID or EntityID()
         """ Source entity ID"""
-        self.sourceCommunicationsDeviceID = 0
+        self.sourceCommunicationsDeviceID = sourceCommunicationsDeviceID
         """ The specific intercom device being simulated within an entity."""
-        self.sourceLineID = 0
+        self.sourceLineID = sourceLineID
         """ Line number to which the intercom control refers"""
-        self.transmitPriority = 0
+        self.transmitPriority = transmitPriority
         """ priority of this message relative to transmissons from other intercom devices"""
-        self.transmitLineState = 0
+        self.transmitLineState = transmitLineState
         """ current transmit state of the line"""
-        self.command = 0
+        self.command = command
         """ detailed type requested."""
-        self.masterEntityID = EntityID();
+        self.masterEntityID = masterEntityID or EntityID()
         """ eid of the entity that has created this intercom channel."""
-        self.masterCommunicationsDeviceID = 0
+        self.masterCommunicationsDeviceID = masterCommunicationsDeviceID
         """ specific intercom device that has created this intercom channel"""
-        self.intercomParametersLength = 0
+        self.intercomParametersLength = intercomParametersLength
         """ number of intercom parameters"""
         self.intercomParameters = []
         """ ^^^This is wrong the length of the data field is variable. Using a long for now."""
@@ -7114,27 +7812,35 @@ class IntercomControlPdu( RadioCommunicationsFamilyPdu ):
 
 
 class SignalPdu( RadioCommunicationsFamilyPdu ):
-    """ Detailed information about a radio transmitter. This PDU requires manually written code to complete. The encodingScheme field can be used in multiple        ways, which requires hand-written code to finish. Section 7.7.3. UNFINISHED"""
+    """ Detailed information about a radio transmitter. This PDU requires manually written code to complete. The encodingScheme field can be used in multiple ways, which requires hand-written code to finish. Section 7.7.3. UNFINISHED"""
 
-    def __init__(self):
+    def __init__(self,
+                 entityID=None,
+                 radioID=0,
+                 encodingScheme=0,
+                 tdlType=0,
+                 sampleRate=0,
+                 dataLength=0,
+                 samples=0,
+                 data=None):
         """ Initializer for SignalPdu"""
         super(SignalPdu, self).__init__()
 
-        self.entityID = EntityID()
+        self.entityID = entityID or EntityID()
 
-        self.radioID = 0
+        self.radioID = radioID
 
-        self.encodingScheme = 0
+        self.encodingScheme = encodingScheme
         """ encoding scheme used, and enumeration"""
-        self.tdlType = 0
+        self.tdlType = tdlType
         """ tdl type"""
-        self.sampleRate = 0
+        self.sampleRate = sampleRate
         """ sample rate"""
-        self.dataLength = 0
+        self.dataLength = dataLength
         """ length od data"""
-        self.samples = 0
+        self.samples = samples
         """ number of samples"""
-        self.data = []
+        self.data = data or []
         """ list of eight bit values"""
         self.pduType = 26
         """ initialize value """
@@ -7175,16 +7881,16 @@ class SignalPdu( RadioCommunicationsFamilyPdu ):
 class RemoveEntityReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.2: Removal of an entity , reliable. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self, requiredReliabilityService=0, requestID=0):
         """ Initializer for RemoveEntityReliablePdu"""
         super(RemoveEntityReliablePdu, self).__init__()
-        self.requiredReliabilityService = 0
+        self.requiredReliabilityService = requiredReliabilityService
         """ level of reliability service used for this transaction"""
         self.pad1 = 0
         """ padding"""
         self.pad2 = 0
         """ padding"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID"""
         self.pduType = 52
         """ initialize value """
@@ -7212,24 +7918,32 @@ class RemoveEntityReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class SeesPdu( DistributedEmissionsFamilyPdu ):
     """ SEES PDU, supplemental emissions entity state information. Section 7.6.6 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 originatingEntityID=None,
+                 infraredSignatureRepresentationIndex=0,
+                 acousticSignatureRepresentationIndex=0,
+                 radarCrossSectionSignatureRepresentationIndex=0,
+                 numberOfPropulsionSystems=0,
+                 numberOfVectoringNozzleSystems=0,
+                 propulsionSystemData=None,
+                 vectoringSystemData=None):
         """ Initializer for SeesPdu"""
         super(SeesPdu, self).__init__()
-        self.orginatingEntityID = EntityID();
+        self.orginatingEntityID = originatingEntityID or EntityID()
         """ Originating entity ID"""
-        self.infraredSignatureRepresentationIndex = 0
+        self.infraredSignatureRepresentationIndex = infraredSignatureRepresentationIndex
         """ IR Signature representation index"""
-        self.acousticSignatureRepresentationIndex = 0
+        self.acousticSignatureRepresentationIndex = acousticSignatureRepresentationIndex
         """ acoustic Signature representation index"""
-        self.radarCrossSectionSignatureRepresentationIndex = 0
+        self.radarCrossSectionSignatureRepresentationIndex = radarCrossSectionSignatureRepresentationIndex
         """ radar cross section representation index"""
-        self.numberOfPropulsionSystems = 0
+        self.numberOfPropulsionSystems = numberOfPropulsionSystems
         """ how many propulsion systems"""
-        self.numberOfVectoringNozzleSystems = 0
+        self.numberOfVectoringNozzleSystems = numberOfVectoringNozzleSystems
         """ how many vectoring nozzle systems"""
-        self.propulsionSystemData = []
+        self.propulsionSystemData = propulsionSystemData or []
         """ variable length list of propulsion system data"""
-        self.vectoringSystemData = []
+        self.vectoringSystemData = vectoringSystemData or []
         """ variable length list of vectoring system data"""
         self.pduType = 30
         """ initialize value """
@@ -7277,16 +7991,16 @@ class SeesPdu( DistributedEmissionsFamilyPdu ):
 class CreateEntityReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.1: creation of an entity , reliable. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self, requiredReliabilityService=0, requestID=0):
         """ Initializer for CreateEntityReliablePdu"""
         super(CreateEntityReliablePdu, self).__init__()
-        self.requiredReliabilityService = 0
+        self.requiredReliabilityService = requiredReliabilityService
         """ level of reliability service used for this transaction"""
         self.pad1 = 0
         """ padding"""
         self.pad2 = 0
         """ padding"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID"""
         self.pduType = 51
         """ initialize value """
@@ -7314,20 +8028,25 @@ class CreateEntityReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class StopFreezeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.4: Stop freeze simulation, relaible. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 realWorldTime=None,
+                 reason=0,
+                 frozenBehavior=0,
+                 requiredReliabilityService=0,
+                 requestID=0):
         """ Initializer for StopFreezeReliablePdu"""
         super(StopFreezeReliablePdu, self).__init__()
-        self.realWorldTime = ClockTime();
+        self.realWorldTime = realWorldTime or ClockTime()
         """ time in real world for this operation to happen"""
-        self.reason = 0
+        self.reason = reason
         """ Reason for stopping/freezing simulation"""
-        self.frozenBehavior = 0
+        self.frozenBehavior = frozenBehavior
         """ internal behvior of the simulation while frozen"""
-        self.requiredReliablityService = 0
+        self.requiredReliablityService = requiredReliabilityService
         """ reliablity level"""
         self.pad1 = 0
         """ padding"""
-        self.requestID = 0
+        self.requestID = requestID
         """ Request ID"""
         self.pduType = 54
         """ initialize value """
@@ -7357,22 +8076,27 @@ class StopFreezeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 
 
 class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
-    """Section 5.3.12.11: reports the occurance of a significatnt event to the simulation manager. Needs manual     intervention to fix padding in variable datums. UNFINISHED."""
+    """Section 5.3.12.11: reports the occurance of a significant event to the simulation manager. Needs manual intervention to fix padding in variable datums. UNFINISHED."""
 
-    def __init__(self):
+    def __init__(self,
+                 eventType=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for EventReportReliablePdu"""
         super(EventReportReliablePdu, self).__init__()
-        self.eventType = 0
+        self.eventType = eventType
         """ Event type"""
         self.pad1 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ variable datum record count"""
-        self.fixedDatumRecords = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ Fixed datum records"""
-        self.variableDatumRecords = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ Variable datum records"""
         self.pduType = 61
         """ initialize value """
@@ -7416,18 +8140,23 @@ class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class MinefieldResponseNackPdu( MinefieldFamilyPdu ):
     """proivde the means to request a retransmit of a minefield data pdu. Section 7.9.5 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 minefieldID=None,
+                 requestingEntityID=None,
+                 requestID=0,
+                 numberOfMissingPdus=0,
+                 missingPduSequenceNumbers=None):
         """ Initializer for MinefieldResponseNackPdu"""
         super(MinefieldResponseNackPdu, self).__init__()
-        self.minefieldID = EntityID();
+        self.minefieldID = minefieldID or EntityID()
         """ Minefield ID"""
-        self.requestingEntityID = EntityID();
+        self.requestingEntityID = requestingEntityID or EntityID()
         """ entity ID making the request"""
-        self.requestID = 0
+        self.requestID = requestID
         """ request ID"""
-        self.numberOfMissingPdus = 0
+        self.numberOfMissingPdus = numberOfMissingPdus
         """ how many pdus were missing"""
-        self.missingPduSequenceNumbers = []
+        self.missingPduSequenceNumbers = missingPduSequenceNumbers or []
         """ PDU sequence numbers that were missing"""
         self.pduType = 40
         """ initialize value """
@@ -7463,20 +8192,26 @@ class MinefieldResponseNackPdu( MinefieldFamilyPdu ):
 class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
     """Section 5.3.12.7: Response from an entity to an action request PDU. COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 requestID=0,
+                 responseStatus=0,
+                 numberOfFixedDatumRecords=0,
+                 numberOfVariableDatumRecords=0,
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for ActionResponseReliablePdu"""
         super(ActionResponseReliablePdu, self).__init__()
-        self.requestID = 0
+        self.requestID = requestID
         """ request ID"""
-        self.responseStatus = 0
+        self.responseStatus = responseStatus
         """ status of response"""
-        self.numberOfFixedDatumRecords = 0
+        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = 0
+        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ variable datum record count"""
-        self.fixedDatumRecords = []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ Fixed datum records"""
-        self.variableDatumRecords = []
+        self.variableDatumRecords = variableDatumRecords or []
         """ Variable datum records"""
         self.pduType = 57
         """ initialize value """
@@ -7520,20 +8255,26 @@ class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
 class IsPartOfPdu( EntityManagementFamilyPdu ):
     """ The joining of two or more simulation entities is communicated by this PDU. Section 7.8.5 COMPLETE"""
 
-    def __init__(self):
+    def __init__(self,
+                 originatingEntityID=None,
+                 receivingEntityID=None,
+                 relationship=None,
+                 partLocation=None,
+                 namedLocationID=None,
+                 partEntityType=None):
         """ Initializer for IsPartOfPdu"""
         super(IsPartOfPdu, self).__init__()
-        self.orginatingEntityID = EntityID();
+        self.orginatingEntityID = originatingEntityID or EntityID()
         """ ID of entity originating PDU"""
-        self.receivingEntityID = EntityID();
+        self.receivingEntityID = receivingEntityID or EntityID()
         """ ID of entity receiving PDU"""
-        self.relationship = Relationship();
+        self.relationship = relationship or Relationship()
         """ relationship of joined parts"""
-        self.partLocation = Vector3Float();
+        self.partLocation = partLocation or Vector3Float()
         """ location of part; centroid of part in host's coordinate system. x=range, y=bearing, z=0"""
-        self.namedLocationID = NamedLocationIdentification();
+        self.namedLocationID = namedLocationID or NamedLocationIdentification()
         """ named location"""
-        self.partEntityType = EntityType();
+        self.partEntityType = partEntityType or EntityType()
         """ entity type"""
         self.pduType = 36
         """ initialize value """
