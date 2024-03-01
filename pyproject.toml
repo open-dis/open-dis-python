@@ -2,7 +2,7 @@
 name = "opendis"
 version = "0.1.0"
 description = ""
-authors = ["Scott Robertson <scott.peter.robertson@gmail.com>"]
+authors = ["Don McGregor <mcgredo@nps.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
