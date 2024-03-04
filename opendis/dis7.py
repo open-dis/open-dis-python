@@ -663,33 +663,6 @@ class NamedLocationIdentification( object ):
 
 
 
-class FourByteChunk( object ):
-    """32 bit piece of data"""
-
-    def __init__(self):
-        """ Initializer for FourByteChunk"""
-        self.otherParameters =  [ 0, 0, 0, 0]
-        """ four bytes of arbitrary data"""
-
-    def serialize(self, outputStream):
-        """serialize the class """
-        for idx in range(0, 4):
-            outputStream.write_byte( self.otherParameters[ idx ] )
-
-
-
-    def parse(self, inputStream):
-        """"Parse a message. This may recursively call embedded objects."""
-
-        self.otherParameters = [0]*4
-        for idx in range(0, 4):
-            val = inputStream.read_byte()
-
-            self.otherParameters[  idx  ] = val
-
-
-
-
 class ModulationParameters( object ):
     """Modulation parameters associated with a specific radio system. INCOMPLETE. 6.2.58 """
 
@@ -702,34 +675,6 @@ class ModulationParameters( object ):
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
-
-
-
-
-class OneByteChunk( object ):
-    """8 bit piece of data"""
-
-    def __init__(self):
-        """ Initializer for OneByteChunk"""
-        self.otherParameters =  [ 0]
-        """ one byte of arbitrary data"""
-
-    def serialize(self, outputStream):
-        """serialize the class """
-        for idx in range(0, 1):
-            outputStream.write_byte( self.otherParameters[ idx ] )
-
-
-
-    def parse(self, inputStream):
-        """"Parse a message. This may recursively call embedded objects."""
-
-        self.otherParameters = [0]*1
-        for idx in range(0, 1):
-            val = inputStream.read_byte()
-
-            self.otherParameters[  idx  ] = val
-
 
 
 
@@ -1228,33 +1173,6 @@ class RecordSpecificationElement( object ):
 
 
 
-class EightByteChunk( object ):
-    """64 bit piece of data"""
-
-    def __init__(self):
-        """ Initializer for EightByteChunk"""
-        self.otherParameters =  [ 0, 0, 0, 0, 0, 0, 0, 0]
-        """ Eight bytes of arbitrary data"""
-
-    def serialize(self, outputStream):
-        """serialize the class """
-        for idx in range(0, 8):
-            outputStream.write_byte( self.otherParameters[ idx ] )
-
-
-
-    def parse(self, inputStream):
-        """"Parse a message. This may recursively call embedded objects."""
-
-        self.otherParameters = [0] * 8
-        for idx in range(0, 8):
-            val = inputStream.read_byte()
-
-            self.otherParameters[  idx  ] = val
-
-
-
-
 class AntennaLocation( object ):
     """Location of the radiating portion of the antenna, specified in world coordinates and entity coordinates. Section 6.2.8"""
 
@@ -1521,33 +1439,6 @@ class UAFundamentalParameter( object ):
         self.azimuthalBeamwidthHorizontal = inputStream.read_float()
         self.beamCenterDepressionElevation = inputStream.read_float()
         self.beamwidthDownElevation = inputStream.read_float()
-
-
-
-class TwoByteChunk( object ):
-    """16 bit piece of data"""
-
-    def __init__(self):
-        """ Initializer for TwoByteChunk"""
-        self.otherParameters =  [ 0, 0]
-        """ two bytes of arbitrary data"""
-
-    def serialize(self, outputStream):
-        """serialize the class """
-        for idx in range(0, 2):
-            outputStream.write_byte( self.otherParameters[ idx ] )
-
-
-
-    def parse(self, inputStream):
-        """"Parse a message. This may recursively call embedded objects."""
-
-        self.otherParameters = [0]*2
-        for idx in range(0, 2):
-            val = inputStream.read_byte()
-
-            self.otherParameters[  idx  ] = val
-
 
 
 
