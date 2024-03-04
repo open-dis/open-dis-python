@@ -7,28 +7,28 @@ class DataQueryDatumSpecification( object ):
     """List of fixed and variable datum records. Section 6.2.17 """
 
     def __init__(self,
-                numberOfFixedDatumRecords=0,
-                numberOfVariableDatumRecords=0,
-                fixedDatumIDList=None,
-                variableDatumIDList=None):
+                numberOfFixedDatums=0,
+                numberOfVariableDatums=0,
+                fixedDatumIDs=None,
+                variableDatumIDs=None):
         """ Initializer for DataQueryDatumSpecification"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
+        self.numberOfFixedDatums = numberOfFixedDatums
         """ Number of fixed datums"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
+        self.numberOfVariableDatums = numberOfVariableDatums
         """ Number of variable datums"""
-        self.fixedDatumIDList = fixedDatumIDList or []
+        self.fixedDatumIDs = fixedDatumIDs or []
         """ variable length list fixed datum IDs"""
-        self.variableDatumIDList = variableDatumIDList or []
+        self.variableDatumIDs = variableDatumIDs or []
         """ variable length list variable datum IDs"""
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int( len(self.fixedDatumIDList))
-        outputStream.write_unsigned_int( len(self.variableDatumIDList))
-        for anObj in self.fixedDatumIDList:
+        outputStream.write_unsigned_int( len(self.fixedDatumIDs))
+        outputStream.write_unsigned_int( len(self.variableDatumIDs))
+        for anObj in self.fixedDatumIDs:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatumIDList:
+        for anObj in self.variableDatumIDs:
             anObj.serialize(outputStream)
 
 
@@ -36,17 +36,17 @@ class DataQueryDatumSpecification( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
+        self.numberOfFixedDatums = inputStream.read_unsigned_int()
+        self.numberOfVariableDatums = inputStream.read_unsigned_int()
+        for idx in range(0, self.numberOfFixedDatums):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatumIDList.append(element)
+            self.fixedDatumIDs.append(element)
 
-        for idx in range(0, self.numberOfVariableDatumRecords):
+        for idx in range(0, self.numberOfVariableDatums):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatumIDList.append(element)
+            self.variableDatumIDs.append(element)
 
 
 
@@ -1929,26 +1929,26 @@ class DatumSpecification( object ):
     def __init__(self,
                  numberOfFixedDatumRecords=0,
                  numberOfVariableDatumRecords=0,
-                 fixedDatumIDList=None,
-                 variableDatumIDList=None):
+                 fixedDatumRecords=None,
+                 variableDatumRecords=None):
         """ Initializer for DatumSpecification"""
         self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
         """ Number of fixed datums"""
         self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         """ Number of variable datums"""
-        self.fixedDatumIDList = fixedDatumIDList or []
+        self.fixedDatumRecords = fixedDatumRecords or []
         """ variable length list fixed datums"""
-        self.variableDatumIDList = variableDatumIDList or []
+        self.variableDatumRecords = variableDatumRecords or []
         """ variable length list variable datums"""
 
     def serialize(self, outputStream):
         """serialize the class """
-        outputStream.write_unsigned_int( len(self.fixedDatumIDList))
-        outputStream.write_unsigned_int( len(self.variableDatumIDList))
-        for anObj in self.fixedDatumIDList:
+        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
+        outputStream.write_unsigned_int( len(self.variableDatumRecords))
+        for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatumIDList:
+        for anObj in self.variableDatumRecords:
             anObj.serialize(outputStream)
 
 
@@ -1961,12 +1961,12 @@ class DatumSpecification( object ):
         for idx in range(0, self.numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatumIDList.append(element)
+            self.fixedDatumRecords.append(element)
 
         for idx in range(0, self.numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatumIDList.append(element)
+            self.variableDatumRecords.append(element)
 
 
 
@@ -4698,23 +4698,23 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
     def __init__(self,
                  requestID=0,
                  timeInterval=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 numberOfFixedDatumIDs=0,
+                 numberOfVariableDatumIDs=0,
+                 fixedDatumIDs=None,
+                 variableDatumIDs=None):
         """ Initializer for DataQueryPdu"""
         super(DataQueryPdu, self).__init__()
         self.requestID = 0
         """ ID of request"""
         self.timeInterval = 0
         """ time issues between issues of Data PDUs. Zero means send once only."""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
+        self.numberOfFixedDatumIDs = numberOfFixedDatumIDs
         """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
+        self.numberOfVariableDatumIDs = numberOfVariableDatumIDs
         """ Number of variable datum records"""
-        self.fixedDatumRecords = fixedDatumRecords or []
+        self.fixedDatumIDs = fixedDatumIDs or []
         """ variable length list of fixed datums"""
-        self.variableDatumRecords = variableDatumRecords or []
+        self.variableDatumIDs = variableDatumIDs or []
         """ variable length list of variable length datums"""
         self.pduType = 18
         """ initialize value """
@@ -4724,12 +4724,12 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
         super( DataQueryPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.timeInterval)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
+        outputStream.write_unsigned_int( len(self.fixedDatumIDs))
+        outputStream.write_unsigned_int( len(self.variableDatumIDs))
+        for anObj in self.fixedDatumIDs:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatumRecords:
+        for anObj in self.variableDatumIDs:
             anObj.serialize(outputStream)
 
 
@@ -4740,17 +4740,17 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
         super( DataQueryPdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
         self.timeInterval = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
+        self.numberOfFixedDatumIDs = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumIDs = inputStream.read_unsigned_int()
+        for idx in range(0, self.numberOfFixedDatumIDs):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
+            self.fixedDatumIDs.append(element)
 
-        for idx in range(0, self.numberOfVariableDatumRecords):
+        for idx in range(0, self.numberOfVariableDatumIDs):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatumRecords.append(element)
+            self.variableDatumIDs.append(element)
 
 
 
@@ -5157,7 +5157,7 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
                  numberOfFixedDatumRecords=0,
                  numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 variableDatumRecordList=None):
         """ Initializer for ActionRequestPdu"""
         super(ActionRequestPdu, self).__init__()
         self.requestID = requestID
@@ -6766,10 +6766,10 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
                  requiredReliabilityService=0,
                  requestID=0,
                  timeInterval=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 numberOfFixedDatumIDs=0,
+                 numberOfVariableDatumIDs=0,
+                 fixedDatumIDs=None,
+                 variableDatumIDs=None):
         """ Initializer for DataQueryReliablePdu"""
         super(DataQueryReliablePdu, self).__init__()
         self.requiredReliabilityService = requiredReliabilityService
@@ -6782,13 +6782,13 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """ request ID"""
         self.timeInterval = timeInterval
         """ time interval between issuing data query PDUs"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
+        self.numberOfFixedDatumIDs = numberOfFixedDatumIDs
         """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
+        self.numberOfVariableDatumIDs = numberOfVariableDatumIDs
         """ variable datum record count"""
-        self.fixedDatumRecords = fixedDatumRecords or []
+        self.fixedDatumIDs = fixedDatumIDs or []
         """ Fixed datum records"""
-        self.variableDatumRecords = variableDatumRecords or []
+        self.variableDatumIDs = variableDatumIDs or []
         """ Variable datum records"""
         self.pduType = 58
         """ initialize value """
@@ -6801,12 +6801,12 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         outputStream.write_unsigned_byte(self.pad2)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.timeInterval)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
+        outputStream.write_unsigned_int( len(self.fixedDatumIDs))
+        outputStream.write_unsigned_int( len(self.variableDatumIDs))
+        for anObj in self.fixedDatumIDs:
             anObj.serialize(outputStream)
 
-        for anObj in self.variableDatumRecords:
+        for anObj in self.variableDatumIDs:
             anObj.serialize(outputStream)
 
 
@@ -6820,17 +6820,17 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.pad2 = inputStream.read_unsigned_byte()
         self.requestID = inputStream.read_unsigned_int()
         self.timeInterval = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
+        self.numberOfFixedDatumIDs = inputStream.read_unsigned_int()
+        self.numberOfVariableDatumIDs = inputStream.read_unsigned_int()
+        for idx in range(0, self.numberOfFixedDatumIDs):
             element = FixedDatum()
             element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
+            self.fixedDatumIDs.append(element)
 
-        for idx in range(0, self.numberOfVariableDatumRecords):
+        for idx in range(0, self.numberOfVariableDatumIDs):
             element = VariableDatum()
             element.parse(inputStream)
-            self.variableDatumRecords.append(element)
+            self.variableDatumIDs.append(element)
 
 
 
