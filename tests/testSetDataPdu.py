@@ -24,10 +24,10 @@ class TestSetDataPdu(unittest.TestCase):
 
         self.assertEqual(0, pdu.numberOfFixedDatumRecords)
         self.assertEqual(1, pdu.numberOfVariableDatumRecords)
-        self.assertEqual(0, len(pdu.fixedDatums))
-        self.assertEqual(1, len(pdu.variableDatums))
+        self.assertEqual(0, len(pdu.fixedDatumRecords))
+        self.assertEqual(1, len(pdu.variableDatumRecords))
 
-        datum = pdu.variableDatums[0]
+        datum = pdu.variableDatumRecords[0]
         self.assertEqual(1, datum.variableDatumID)
         self.assertEqual(64, datum.variableDatumLength)
         self.assertEqual(b'allunits', bytes(datum.variableData))
@@ -37,7 +37,7 @@ class TestSetDataPdu(unittest.TestCase):
         self.assertEqual(112, pdu.length)
 
         self.assertEqual(3, pdu.numberOfVariableDatumRecords)
-        self.assertEqual(3, len(pdu.variableDatums))
+        self.assertEqual(3, len(pdu.variableDatumRecords))
 
 
 if __name__ == '__main__':
