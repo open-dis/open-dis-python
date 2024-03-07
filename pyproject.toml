@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "opendis"
+version = "1.0"
+description='implementation of DIS, IEEE-1278.1'
+authors = ["Don McGregor <mcgredo@nps.edu>"]
+readme = "README.md"
+repository = 'https://github.com/open-dis/open-dis-python'
+documentation = "https://open-dis.org/"
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator"
+ ]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.26.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -47,3 +47,7 @@ pdoc --html --html-dir docs opendis
 ```
 
 The docs will be generated in the `docs/opendis` folder.
+
+## Poetry setup
+1. `poetry install` or `poetry update`
+1. `poetry run python examples/dis_receiver.py` or `poetry shell` && `python examples/dis_receiver.py`
