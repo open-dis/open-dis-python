@@ -1762,8 +1762,8 @@ class DatumSpecification:
     """List of fixed and variable datum records. Section 6.2.18"""
 
     def __init__(self,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for DatumSpecification"""
         self.fixedDatumRecords = fixedDatumRecords or []
         """variable length list fixed datums"""
@@ -4784,8 +4784,8 @@ class ActionRequestPdu(SimulationManagementFamilyPdu):
     def __init__(self,
                  requestID=0,
                  actionID=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for ActionRequestPdu"""
         super(ActionRequestPdu, self).__init__()
         self.requestID = requestID
@@ -4916,8 +4916,8 @@ class ActionRequestReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
                  requiredReliabilityService=0,
                  requestID=0,
                  actionID=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for ActionRequestReliablePdu"""
         super(ActionRequestReliablePdu, self).__init__()
         self.requiredReliabilityService = requiredReliabilityService
@@ -5672,8 +5672,8 @@ class SetDataReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
     def __init__(self,
                  requiredReliabilityService=0,
                  requestID=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for SetDataReliablePdu"""
         super(SetDataReliablePdu, self).__init__()
         self.requiredReliabilityService = requiredReliabilityService
@@ -5731,8 +5731,8 @@ class EventReportPdu(SimulationManagementFamilyPdu):
 
     def __init__(self,
                  eventType=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for EventReportPdu"""
         super(EventReportPdu, self).__init__()
         self.eventType = eventType
@@ -5844,8 +5844,8 @@ class DataPdu(SimulationManagementFamilyPdu):
 
     def __init__(self,
                  requestID=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for DataPdu"""
         super(DataPdu, self).__init__()
         self.requestID = requestID
@@ -6443,8 +6443,8 @@ class DataReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
     def __init__(self,
                  requestID=0,
                  requiredReliabilityService=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for DataReliablePdu"""
         super(DataReliablePdu, self).__init__()
         self.requestID = requestID
@@ -6501,8 +6501,8 @@ class CommentPdu(SimulationManagementFamilyPdu):
     """Arbitrary messages can be entered into the data stream via use of this PDU. Section 7.5.13 COMPLETE"""
 
     def __init__(self,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for CommentPdu"""
         super(CommentPdu, self).__init__()
         # Use DatumSpecification
@@ -6543,8 +6543,8 @@ class CommentReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
     """Section 5.3.12.12: Arbitrary messages. Only reliable this time. Needs manual intervention to fix padding in variable datums. UNFINISHED"""
 
     def __init__(self,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for CommentReliablePdu"""
         super(CommentReliablePdu, self).__init__()
         # Use DatumSpecification
@@ -6761,8 +6761,8 @@ class SetDataPdu(SimulationManagementFamilyPdu):
 
     def __init__(self,
                  requestID=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for SetDataPdu"""
         super(SetDataPdu, self).__init__()
         self.requestID = requestID
@@ -6874,8 +6874,8 @@ class ActionResponsePdu(SimulationManagementFamilyPdu):
     def __init__(self,
                  requestID=0,
                  requestStatus=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for ActionResponsePdu"""
         super(ActionResponsePdu, self).__init__()
         self.requestID = requestID
@@ -7502,8 +7502,8 @@ class EventReportReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
 
     def __init__(self,
                  eventType=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for EventReportReliablePdu"""
         super(EventReportReliablePdu, self).__init__()
         self.eventType = eventType
@@ -7604,8 +7604,8 @@ class ActionResponseReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
                  responseStatus=0,
                  numberOfFixedDatumRecords=0,
                  numberOfVariableDatumRecords=0,
-                 fixedDatumRecords=None,
-                 variableDatumRecords=None):
+                 fixedDatumRecords: list["FixedDatum"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
         """Initializer for ActionResponseReliablePdu"""
         super(ActionResponseReliablePdu, self).__init__()
         self.requestID = requestID
