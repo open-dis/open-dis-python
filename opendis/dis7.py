@@ -2,6 +2,16 @@
 #This code is licensed under the BSD software license
 #
 
+# Type aliases (for readability)
+enum8 = int
+enum16 = int
+enum32 = int
+uint8 = int
+uint16 = int
+uint32 = int
+float32 = float
+struct8 = bytes
+
 
 class DataQueryDatumSpecification:
     """Number and identification of fixed and variable datum records. Section 6.2.17"""
@@ -102,13 +112,16 @@ class RequestID:
 
 
 class IFFData:
-    """repeating element if IFF Data specification record"""
+    """repeating element of IFF Data specification record"""
 
-    def __init__(self, recordType=0, recordLength=0, iffData=None):
+    def __init__(self,
+                 recordType: enum32 = 0,
+                 recordLength: uint16 = 0,
+                 iffData=None):
         """Initializer for IFFData"""
         self.recordType = recordType
         """enumeration for type of record"""
-        self.recordLength = recordLength
+        self.recordLength: uint16 = recordLength
         """length of record. Should be padded to 32 bit boundary."""
         self.iffData = iffData or []
         """IFF data."""
@@ -315,11 +328,18 @@ class ProtocolMode:
 
 
 class AngleDeception:
-    """The Angle Deception attribute record may be used to communicate discrete values that are associated with angle deception jamming that cannot be referenced to an emitter mode. The values provided in the record records (provided in the associated Electromagnetic Emission PDU). (The victim radar beams are those that are targeted by the jammer.) Section 6.2.21.2.2"""
+    """Section 6.2.21.2.2
+
+    The Angle Deception attribute record may be used to communicate discrete
+    values that are associated with angle deception jamming that cannot be
+    referenced to an emitter mode. The values provided in the record records
+    (provided in the associated Electromagnetic Emission PDU). (The victim
+    radar beams are those that are targeted by the jammer.)
+    """
+    recordType: enum32 = 3501  # [UID 66] Variable Record Type
+    recordLength: uint16 = 48
 
     def __init__(self,
-                 recordType=3501,
-                 recordLength=48,
                  emitterNumber=0,
                  beamNumber=0,
                  stateIndicator=0,
@@ -332,8 +352,6 @@ class AngleDeception:
                  elevationPullRate=0.0,
                  elevationPullAcceleration=0.0):
         """Initializer for AngleDeception"""
-        self.recordType = recordType
-        self.recordLength = recordLength
         self.padding = 0
         self.emitterNumber = emitterNumber
         self.beamNumber = beamNumber
@@ -371,8 +389,8 @@ class AngleDeception:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int()
-        self.recordLength = inputStream.read_unsigned_short()
+        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
+        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
         self.padding = inputStream.read_unsigned_short()
         self.emitterNumber = inputStream.read_unsigned_byte()
         self.beamNumber = inputStream.read_unsigned_byte()
@@ -390,7 +408,11 @@ class AngleDeception:
 
 
 class EntityAssociation:
-    """Association or disassociation of two entities.  Section 6.2.94.4.3"""
+    """Section 6.2.94.4.3
+
+    Association or disassociation of two entities.
+    """
+    recordType: enum8 = 4  # [UID 56] Variable Parameter Record Type
 
     def __init__(self,
                  changeIndicator=0,
@@ -402,8 +424,6 @@ class EntityAssociation:
                  groupMemberType=0,
                  groupNumber=0):
         """Initializer for EntityAssociation"""
-        self.recordType = 4
-        """the identification of the Variable Parameter record. Enumeration from EBV"""
         self.changeIndicator = changeIndicator
         """Indicates if this VP has changed since last issuance"""
         self.associationStatus = associationStatus
@@ -436,7 +456,7 @@ class EntityAssociation:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte()
+        self.recordType = inputStream.read_unsigned_byte()  # TODO: validate
         self.changeIndicator = inputStream.read_unsigned_byte()
         self.associationStatus = inputStream.read_unsigned_byte()
         self.associationType = inputStream.read_unsigned_byte()
@@ -472,7 +492,17 @@ class VectoringNozzleSystem:
 
 
 class FalseTargetsAttribute:
-    """The False Targets attribute record shall be used to communicate discrete values that are associated with false targets jamming that cannot be referenced to an emitter mode. The values provided in the False Targets attribute record shall be considered valid only for the victim radar beams listed in the jamming beam's Track/Jam Data records (provided in the associated Electromagnetic Emission PDU). Section 6.2.21.3"""
+    """Section 6.2.21.3
+    
+    The False Targets attribute record shall be used to communicate discrete
+    values that are associated with false targets jamming that cannot be
+    referenced to an emitter mode. The values provided in the False Targets
+    attribute record shall be considered valid only for the victim radar beams
+    listed in the jamming beam's Track/Jam Data records (provided in the
+    associated Electromagnetic Emission PDU).
+    """
+    recordType: enum32 = 3502
+    recordLength: uint16 = 48
 
     def __init__(self,
                  emitterNumber=0,
@@ -485,8 +515,6 @@ class FalseTargetsAttribute:
                  keepTime=0.0,
                  echoSpacing=0.0):
         """Initializer for FalseTargetsAttribute"""
-        self.recordType = 3502
-        self.recordLength = 48
         self.padding = 0
         self.emitterNumber = emitterNumber
         self.beamNumber = beamNumber
@@ -518,8 +546,8 @@ class FalseTargetsAttribute:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int()
-        self.recordLength = inputStream.read_unsigned_short()
+        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
+        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
         self.padding = inputStream.read_unsigned_short()
         self.emitterNumber = inputStream.read_unsigned_byte()
         self.beamNumber = inputStream.read_unsigned_byte()
@@ -603,12 +631,18 @@ class RadioType:
 
 
 class NamedLocationIdentification:
-    """Information about the discrete positional relationship of the part entity with respect to the its host entity Section 6.2.62"""
+    """Section 6.2.62
 
-    def __init__(self, stationName=0, stationNumber=0):
+    Information about the discrete positional relationship of the part entity
+    with respect to the its host entity.
+    """
+
+    def __init__(self,
+                 stationName: enum16 = 0,  # [UID 212]
+                 stationNumber: uint16 = 0):
         """Initializer for NamedLocationIdentification"""
         self.stationName = stationName
-        """the station name within the host at which the part entity is located. If the part entity is On Station, this field shall specify the representation of the parts location data fields. This field shall be specified by a 16-bit enumeration"""
+        """the station name within the host at which the part entity is located. If the part entity is On Station, this field shall specify the representation of the parts location data fields."""
         self.stationNumber = stationNumber
         """the number of the particular wing station, cargo hold etc., at which the part is attached."""
 
@@ -661,7 +695,12 @@ class EulerAngles:
 
 
 class DirectedEnergyPrecisionAimpoint:
-    """DE Precision Aimpoint Record. Section 6.2.20.3"""
+    """Section 6.2.20.3
+
+    DE Precision Aimpoint Record.
+    """
+    recordType: enum32 = 4000
+    recordLength: uint16 = 88
 
     def __init__(self,
                  targetSpotLocation=None,
@@ -676,10 +715,6 @@ class DirectedEnergyPrecisionAimpoint:
                  beamSpotCrossSectionOrientationAngle=0.0,
                  peakIrradiance=0.0):
         """Initializer for DirectedEnergyPrecisionAimpoint"""
-        self.recordType = 4000
-        """Type of Record"""
-        self.recordLength = 88
-        """Length of Record"""
         self.padding = 0
         """Padding"""
         self.targetSpotLocation = targetSpotLocation or Vector3Double()
@@ -729,8 +764,8 @@ class DirectedEnergyPrecisionAimpoint:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int()
-        self.recordLength = inputStream.read_unsigned_short()
+        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
+        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
         self.padding = inputStream.read_unsigned_short()
         self.targetSpotLocation.parse(inputStream)
         self.targetSpotEntityLocation.parse(inputStream)
@@ -856,15 +891,14 @@ class BeamAntennaPattern:
 
 class AttachedParts:
     """Removable parts that may be attached to an entity.  Section 6.2.93.3"""
+    recordType: enum8 = 1  # [UID 56]  Variable Parameter Record Type
 
     def __init__(self,
                  detachedIndicator=0,
-                 partAttachedTo=0,
+                 partAttachedTo: uint16 = 0,
                  parameterType=0,
                  parameterValue=0):
         """Initializer for AttachedParts"""
-        self.recordType = 1
-        """the identification of the Variable Parameter record. Enumeration from EBV"""
         self.detachedIndicator = detachedIndicator
         """0 = attached, 1 = detached. See I.2.3.1 for state transition diagram"""
         self.partAttachedTo = partAttachedTo
@@ -885,7 +919,7 @@ class AttachedParts:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte()
+        self.recordType = inputStream.read_unsigned_byte()  # TODO: validate
         self.detachedIndicator = inputStream.read_unsigned_byte()
         self.partAttachedTo = inputStream.read_unsigned_short()
         self.parameterType = inputStream.read_unsigned_int()
@@ -893,11 +927,14 @@ class AttachedParts:
 
 
 class VariableTransmitterParameters:
-    """Relates to radios. NOT COMPLETE. Section 6.2.94"""
+    """Section 6.2.94
+    
+    Relates to radios. NOT COMPLETE.
+    """
 
-    def __init__(self, recordType=0, recordLength=4):
+    def __init__(self, recordType: enum32 = 0, recordLength: uint16 = 4):
         """Initializer for VariableTransmitterParameters"""
-        self.recordType = recordType
+        self.recordType = recordType  # [UID 66]  Variable Parameter Record Type
         """Type of VTP. Enumeration from EBV"""
         self.recordLength = recordLength
         """Length, in bytes"""
@@ -915,9 +952,16 @@ class VariableTransmitterParameters:
 
 
 class Attribute:
-    """Used to convey information for one or more attributes. Attributes conform to the standard variable record format of 6.2.82. Section 6.2.10. NOT COMPLETE"""
+    """Section 6.2.10.
 
-    def __init__(self, recordType=0, recordLength=0, recordSpecificFields=0):
+    Used to convey information for one or more attributes. Attributes conform
+    to the standard variable record format of 6.2.82. NOT COMPLETE
+    """
+
+    def __init__(self,
+                 recordType: enum32 = 0,
+                 recordLength: uint16 = 0,
+                 recordSpecificFields=0):
         """Initializer for Attribute"""
         self.recordType = recordType
         self.recordLength = recordLength
@@ -931,7 +975,6 @@ class Attribute:
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
-
         self.recordType = inputStream.read_unsigned_int()
         self.recordLength = inputStream.read_unsigned_short()
         self.recordSpecificFields = inputStream.read_long()
@@ -962,17 +1005,19 @@ class RecordQuerySpecification:
 
 
 class ArticulatedParts:
-    """articulated parts for movable parts and a combination of moveable/attached parts of an entity. Section 6.2.94.2"""
+    """Section 6.2.94.2
+    
+    Articulated parts for movable parts and a combination of moveable/attached
+    parts of an entity.
+    """
+    recordType: enum8 = 0  # [UID 56] Variable Parameter Record Type
 
     def __init__(self,
-                 recordType=0,
-                 changeIndicator=0,
-                 partAttachedTo=0,
-                 parameterType=0,
-                 parameterValue=0):
+                 changeIndicator: uint8 = 0,
+                 partAttachedTo: uint16 = 0,
+                 parameterType: enum32 = 0,
+                 parameterValue: float32 = 0):
         """Initializer for ArticulatedParts"""
-        self.recordType = recordType
-        """the identification of the Variable Parameter record. Enumeration from EBV"""
         self.changeIndicator = changeIndicator
         """indicate the change of any parameter for any articulated part. Starts at zero, incremented for each change"""
         self.partAttachedTo = partAttachedTo
@@ -993,7 +1038,7 @@ class ArticulatedParts:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte()
+        self.recordType = inputStream.read_unsigned_byte()    # TODO: validate
         self.changeIndicator = inputStream.read_unsigned_byte()
         self.partAttachedTo = inputStream.read_unsigned_short()
         self.parameterType = inputStream.read_unsigned_int()
@@ -1194,10 +1239,14 @@ class FixedDatum:
 
 
 class VariableParameter:
-    """specification of additional information associated with an entity or detonation, not otherwise accounted for in a PDU 6.2.94.1"""
+    """Section 6.2.94.1
+    
+    Specification of additional information associated with an entity or
+    detonation, not otherwise accounted for in a PDU.
+    """
 
     def __init__(self,
-                 recordType=0,
+                 recordType: enum8 = 0,
                  variableParameterFields1=0,
                  variableParameterFields2=0,
                  variableParameterFields3=0,
@@ -1350,23 +1399,25 @@ class UAFundamentalParameter:
 
 
 class DirectedEnergyDamage:
-    """Damage sustained by an entity due to directed energy. Location of the damage based on a relative x,y,z location from the center of the entity. Section 6.2.15.2"""
+    """Section 6.2.15.2
+    
+    Damage sustained by an entity due to directed energy. Location of the
+    damage based on a relative x,y,z location from the center of the entity.
+    """
+    recordType: enum32 = 4500  # [UID 66] Variable Record Type
+    recordLength: uint16 = 40  # in bytes
 
     def __init__(self,
                  damageLocation=None,
-                 damageDiameter=0,
-                 temperature=-273.15,
-                 componentIdentification=0,
-                 componentDamageStatus=0,
-                 componentVisualDamageStatus=0,
-                 componentVisualSmokeColor=0,
+                 damageDiameter: float32 = 0.0,
+                 temperature: float32 = -273.15,
+                 componentIdentification: enum8 = 0,  # [UID 314]
+                 componentDamageStatus: enum8 = 0,  # [UID 315]
+                 componentVisualDamageStatus: struct8 = b'0',  # [UID 317]
+                 componentVisualSmokeColor: enum8 = 0,  # [UID 316]
                  fireEventID=None):
         """Initializer for DirectedEnergyDamage"""
-        self.recordType = 4500
-        """DE Record Type."""
-        self.recordLength = 40
-        """DE Record Length (bytes)."""
-        self.padding = 0
+        self.padding: uint16 = 0
         """padding."""
         self.damageLocation = damageLocation or Vector3Float()
         """location of damage, relative to center of entity"""
@@ -1384,7 +1435,7 @@ class DirectedEnergyDamage:
         """enumeration"""
         self.fireEventID = fireEventID or EventIdentifier()
         """For any component damage resulting this field shall be set to the fire event ID from that PDU."""
-        self.padding2 = 0
+        self.padding2: uint16 = 0
         """padding"""
 
     def serialize(self, outputStream):
@@ -1405,8 +1456,8 @@ class DirectedEnergyDamage:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int()
-        self.recordLength = inputStream.read_unsigned_short()
+        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
+        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
         self.padding = inputStream.read_unsigned_short()
         self.damageLocation.parse(inputStream)
         self.damageDiameter = inputStream.read_float()
@@ -1750,20 +1801,23 @@ class DatumSpecification:
 
 
 class DirectedEnergyAreaAimpoint:
-    """DE Precision Aimpoint Record. NOT COMPLETE. Section 6.2.20.2"""
+    """Section 6.2.20.2
+
+    DE Precision Aimpoint Record. NOT COMPLETE
+    """
+    recordType: enum32 = 4001  # [UID 66]
 
     def __init__(self,
-                 recordLength=0,
-                 beamAntennaPatternRecordCount=0,
-                 directedEnergyTargetEnergyDepositionRecordCount=0,
+                 recordLength: uint16 = 0,
+                 beamAntennaPatternRecordCount: uint16 = 0,
+                 directedEnergyTargetEnergyDepositionRecordCount: uint16 = 0,
                  beamAntennaParameterList=None,
                  directedEnergyTargetEnergyDepositionList=None):
         """Initializer for DirectedEnergyAreaAimpoint"""
-        self.recordType = 4001
         """Type of Record enumeration"""
         self.recordLength = recordLength
         """Length of Record"""
-        self.padding = 0
+        self.padding: uint16 = 0
         """Padding"""
         self.beamAntennaPatternRecordCount = beamAntennaPatternRecordCount
         """Number of beam antenna pattern records"""
@@ -1791,8 +1845,8 @@ class DirectedEnergyAreaAimpoint:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int()
-        self.recordLength = inputStream.read_unsigned_short()
+        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
+        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
         self.padding = inputStream.read_unsigned_short()
         self.beamAntennaPatternRecordCount = inputStream.read_unsigned_short()
         self.directedEnergyTargetEnergyDepositionRecordCount = inputStream.read_unsigned_short(
@@ -1870,16 +1924,21 @@ class Expendable:
 
 
 class IOCommunicationsNode:
-    """A communications node that is part of a simulted communcations network. Section 6.2.49.2"""
+    """Section 6.2.49.2
 
-    def __init__(self, communicationsNodeType=0, communicationsNodeID=None):
+    A communications node that is part of a simulted communcations network.
+    """
+    recordType: enum32 = 5501  # [UID 66]
+    recordLength: uint16 = 16
+
+    def __init__(self,
+                 communicationsNodeType: enum8 = 0,
+                 communicationsNodeID: "CommunicationsNodeID" | None = None):
         """Initializer for IOCommunicationsNode"""
-        self.recordType = 5501
-        self.recordLength = 16
         self.communcationsNodeType = communicationsNodeType
         self.padding = 0
-        self.communicationsNodeID = communicationsNodeID or CommunicationsNodeID(
-        )
+        self.communicationsNodeID = (communicationsNodeID
+                                     or CommunicationsNodeID())
 
     def serialize(self, outputStream):
         """serialize the class"""
@@ -1892,8 +1951,8 @@ class IOCommunicationsNode:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_int()
-        self.recordLength = inputStream.read_unsigned_short()
+        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
+        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
         self.communcationsNodeType = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
         self.communicationsNodeID.parse(inputStream)
@@ -2235,21 +2294,24 @@ class EngineFuel:
 
 
 class IOEffect:
-    """Effect of IO on an entity. Section 6.2.49.3"""
+    """Section 6.2.49.3
+
+    Effect of IO on an entity.
+    """
+    recordType: enum32 = 5500
+    recordLength: uint16 = 16
 
     def __init__(self,
-                 ioStatus=0,
-                 ioLinkType=0,
-                 ioEffect=None,
-                 ioEffectDutyCycle=0,
-                 ioEffectDuration=0,
-                 ioProcess=0):
+                 ioStatus: enum8 = 0,  # [UID 290]
+                 ioLinkType: enum8 = 0,  # [UID 291]
+                 ioEffect: enum8 = 0,  # [UID 292]
+                 ioEffectDutyCycle: uint8 = 0,  # 0% to 100%, 1% increments
+                 ioEffectDuration: uint16 = 0,  # in seconds
+                 ioProcess: enum16 = 0):  # [UID 293]
         """Initializer for IOEffect"""
-        self.recordType = 5500
-        self.recordLength = 16
         self.ioStatus = ioStatus
         self.ioLinkType = ioLinkType
-        self.ioEffect = ioEffect or EntityID()
+        self.ioEffect = ioEffect
         self.ioEffectDutyCycle = ioEffectDutyCycle
         self.ioEffectDuration = ioEffectDuration
         self.ioProcess = ioProcess
@@ -2261,7 +2323,7 @@ class IOEffect:
         outputStream.write_unsigned_short(self.recordLength)
         outputStream.write_unsigned_byte(self.ioStatus)
         outputStream.write_unsigned_byte(self.ioLinkType)
-        self.ioEffect.serialize(outputStream)
+        outputStream.write_unsigned_byte(self.ioEffect)
         outputStream.write_unsigned_byte(self.ioEffectDutyCycle)
         outputStream.write_unsigned_short(self.ioEffectDuration)
         outputStream.write_unsigned_short(self.ioProcess)
@@ -2269,12 +2331,11 @@ class IOEffect:
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
-
-        self.recordType = inputStream.read_unsigned_int()
-        self.recordLength = inputStream.read_unsigned_short()
+        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
+        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
         self.ioStatus = inputStream.read_unsigned_byte()
         self.ioLinkType = inputStream.read_unsigned_byte()
-        self.ioEffect.parse(inputStream)
+        self.ioEffect = inputStream.read_unsigned_byte()
         self.ioEffectDutyCycle = inputStream.read_unsigned_byte()
         self.ioEffectDuration = inputStream.read_unsigned_short()
         self.ioProcess = inputStream.read_unsigned_short()
@@ -2453,23 +2514,25 @@ class EventIdentifier:
 
 
 class BlankingSector:
-    """The Blanking Sector attribute record may be used to convey persistent areas within a scan volume where emitter power for a specific active emitter beam is reduced to an insignificant value. Section 6.2.21.2"""
+    """Section 6.2.21.2
+    
+    The Blanking Sector attribute record may be used to convey persistent areas
+    within a scan volume where emitter power for a specific active emitter beam
+    is reduced to an insignificant value."""
+    recordType: enum32 = 3500
+    recordLength: uint16 = 40
 
     def __init__(self,
-                 recordType=3500,
-                 recordLength=40,
-                 emitterNumber=0,
-                 beamNumber=0,
-                 stateIndicator=0,
-                 leftAzimuth=0.0,
-                 rightAzimuth=0.0,
-                 lowerElevation=0.0,
-                 upperElevation=0.0,
-                 residualPower=0.0):
+                 emitterNumber: uint8 = 0,
+                 beamNumber: uint8 = 0,
+                 stateIndicator: enum8 = 0,  # [UID 300]
+                 leftAzimuth: float32 = 0.0,  # 0 - 2pi radian
+                 rightAzimuth: float32 = 0.0,  # 0 - 2pi radian
+                 lowerElevation: float32 = 0.0,  # -pi/2 to pi/2 radian
+                 upperElevation: float32 = 0.0,  # -pi/2 to pi/2 radian
+                 residualPower: float32 = 0.0):  # in dBm
         """Initializer for BlankingSector"""
-        self.recordType = 3500
-        self.recordLength = 40
-        self.padding = 0
+        self.padding: uint16 = 0
         self.emitterNumber = emitterNumber
         self.beamNumber = beamNumber
         self.stateIndicator = stateIndicator
@@ -2479,8 +2542,8 @@ class BlankingSector:
         self.lowerElevation = lowerElevation
         self.upperElevation = upperElevation
         self.residualPower = residualPower
-        self.padding3 = 0
-        self.padding4 = 0
+        self.padding3: uint32 = 0
+        self.padding4: uint32 = 0
 
     def serialize(self, outputStream):
         """serialize the class"""
@@ -2502,8 +2565,8 @@ class BlankingSector:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_int()
-        self.recordLength = inputStream.read_unsigned_short()
+        self.recordType = inputStream.read_int()  # TODO: validate
+        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
         self.padding = inputStream.read_unsigned_short()
         self.emitterNumber = inputStream.read_unsigned_byte()
         self.beamNumber = inputStream.read_unsigned_byte()
@@ -2676,14 +2739,17 @@ class FundamentalOperationalData:
 
 
 class IntercomCommunicationsParameters:
-    """Intercom communcations parameters. Section 6.2.47.  This requires hand coding"""
+    """Section 6.2.47
+
+    Intercom communcations parameters.  This requires hand coding.  INCOMPLETE
+    """
 
     def __init__(self, recordType=0, recordLength=0, recordSpecificField=0):
         """Initializer for IntercomCommunicationsParameters"""
-        self.recordType = recordType
+        self.recordType: enum16 = recordType  # [UID 185]
         """Type of intercom parameters record"""
-        self.recordLength = recordLength
-        """length of record"""
+        self.recordLength: uint16 = recordLength
+        """length of record-specific fields"""  # padded to multiple of 32 bits
         self.recordSpecificField = recordSpecificField
         """This is a placeholder."""
 
@@ -3360,20 +3426,22 @@ class UnattachedIdentifier:
 
 
 class EntityTypeVP:
-    """Association or disassociation of two entities.  Section 6.2.94.5"""
+    """Section 6.2.94.5
 
-    def __init__(self, recordType=3, changeIndicator=0, entityType=None):
+    Association or disassociation of two entities.
+    """
+    recordType: enum8 = 3  # [UID 56]
+
+    def __init__(self,
+                 changeIndicator: enum8 = 0,
+                 entityType: "EntityType" | None = None):
         """Initializer for EntityTypeVP"""
-        self.recordType = recordType
         """the identification of the Variable Parameter record. Enumeration from EBV"""
-        self.changeIndicator = changeIndicator
+        self.changeIndicator = changeIndicator  # [UID 320]
         """Indicates if this VP has changed since last issuance"""
-        self.entityType = entityType or EntityType()
-        """"""
-        self.padding = 0
-        """padding"""
-        self.padding1 = 0
-        """padding"""
+        self.entityType = entityType or EntityType()  # 64 bits
+        self.padding: uint16 = 0
+        self.padding1: uint32 = 0
 
     def serialize(self, outputStream):
         """serialize the class"""
@@ -3806,30 +3874,29 @@ class LiveEntityIdentifier:
 
 
 class SeparationVP:
-    """Physical separation of an entity from another entity.  Section 6.2.94.6"""
+    """Section 6.2.94.6
+
+    Physical separation of an entity from another entity.
+    """
+    recordType: enum8 = 2
 
     def __init__(self,
-                 recordType=2,
                  reasonForSeparation=0,
                  preEntityIndicator=0,
-                 padding1=0,
-                 parentEntityID=None,
-                 padding2=0,
-                 stationLocation=0):
+                 parentEntityID: "EntityID" | None = None,
+                 stationLocation: "NamedLocationIdentification" | None = None):
         """Initializer for SeparationVP"""
-        self.recordType = recordType
-        """the identification of the Variable Parameter record. Enumeration from EBV"""
-        self.reasonForSeparation = reasonForSeparation
+        self.reasonForSeparation: enum8 = reasonForSeparation  # [UID 282]
         """Reason for separation. EBV"""
-        self.preEntityIndicator = preEntityIndicator
+        self.preEntityIndicator: enum8 = preEntityIndicator  # [UID 283]
         """Whether the entity existed prior to separation EBV"""
-        self.padding1 = padding1
+        self.padding1: uint8 = 0
         """padding"""
         self.parentEntityID = parentEntityID or EntityID()
         """ID of parent"""
-        self.padding2 = padding2
+        self.padding2: uint16 = 0
         """padding"""
-        self.stationLocation = stationLocation
+        self.stationLocation = stationLocation or NamedLocationIdentification()
         """Station separated from"""
 
     def serialize(self, outputStream):
@@ -3845,7 +3912,7 @@ class SeparationVP:
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.recordType = inputStream.read_unsigned_byte()
+        self.recordType = inputStream.read_unsigned_byte()  # TODO: validate
         self.reasonForSeparation = inputStream.read_unsigned_byte()
         self.preEntityIndicator = inputStream.read_unsigned_byte()
         self.padding1 = inputStream.read_unsigned_byte()
