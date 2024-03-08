@@ -4599,31 +4599,38 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
         """ ID of request"""
         self.timeInterval = 0
         """ time issues between issues of Data PDUs. Zero means send once only."""
-        self.numberOfFixedDatumIDs = numberOfFixedDatumIDs
-        """ Number of fixed datum records"""
-        self.numberOfVariableDatumIDs = numberOfVariableDatumIDs
-        """ Number of variable datum records"""
-        self.fixedDatumIDs = fixedDatumIDs or []
-        """ variable length list of fixed datums"""
-        self.variableDatumIDs = variableDatumIDs or []
-        """ variable length list of variable length datums"""
+        # Use DataQueryDatumSpecification
+        self._dataQuery = DataQueryDatumSpecification(
+            numberOfFixedDatumIDs,
+            numberOfVariableDatumIDs,
+            fixedDatumIDs or [],
+            variableDatumIDs or []
+        )
         self.pduType = 18
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumIDs(self) -> int:
+        return self._dataQuery.numberOfFixedDatumIDs
+
+    @property
+    def numberOfVariableDatumIDs(self) -> int:
+        return self._dataQuery.numberOfVariableDatumIDs
+
+    @property
+    def fixedDatumIDs(self) -> list[int]:
+        return self._dataQuery.fixedDatumIDs
+
+    @property
+    def variableDatumIDs(self) -> list[int]:
+        return self._dataQuery.variableDatumIDs
 
     def serialize(self, outputStream):
         """serialize the class """
         super( DataQueryPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.timeInterval)
-        outputStream.write_unsigned_int( len(self.fixedDatumIDs))
-        outputStream.write_unsigned_int( len(self.variableDatumIDs))
-        for anObj in self.fixedDatumIDs:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumIDs:
-            anObj.serialize(outputStream)
-
-
+        self._dataQuery.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -4631,19 +4638,7 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
         super( DataQueryPdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
         self.timeInterval = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumIDs = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumIDs = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumIDs):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumIDs.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumIDs):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumIDs.append(element)
-
-
+        self._dataQuery.parse(inputStream)
 
 
 class LinearObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
@@ -5048,38 +5043,45 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
                  numberOfFixedDatumRecords=0,
                  numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
-                 variableDatumRecordList=None):
+                 variableDatumRecords=None):
         """ Initializer for ActionRequestPdu"""
         super(ActionRequestPdu, self).__init__()
         self.requestID = requestID
         """ identifies the request being made by the simulaton manager"""
         self.actionID = actionID
         """ identifies the particular action being requested(see Section 7 of SISO-REF-010)."""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ Number of variable datum records"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ variable length list of fixed datums"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ variable length list of variable length datums"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 16
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
         super( ActionRequestPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.actionID)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -5087,19 +5089,7 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
         super( ActionRequestPdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
         self.actionID = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class AcknowledgePdu( SimulationManagementFamilyPdu ):
@@ -5208,16 +5198,31 @@ class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """ request ID"""
         self.actionID = actionID
         """ request ID"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ variable datum record count"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ Fixed datum records"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ Variable datum records"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 56
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -5227,15 +5232,7 @@ class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         outputStream.write_unsigned_byte(self.pad2)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.actionID)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -5246,19 +5243,7 @@ class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.pad2 = inputStream.read_unsigned_byte()
         self.requestID = inputStream.read_unsigned_int()
         self.actionID = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class DesignatorPdu( DistributedEmissionsFamilyPdu ):
@@ -5987,16 +5972,31 @@ class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """ padding"""
         self.requestID = requestID
         """ Request ID"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ variable datum record count"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ Fixed datum records"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ Variable datum records"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 59
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -6005,15 +6005,7 @@ class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         outputStream.write_unsigned_short(self.pad1)
         outputStream.write_unsigned_byte(self.pad2)
         outputStream.write_unsigned_int(self.requestID)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -6023,19 +6015,7 @@ class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.pad1 = inputStream.read_unsigned_short()
         self.pad2 = inputStream.read_unsigned_byte()
         self.requestID = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class EventReportPdu( SimulationManagementFamilyPdu ):
@@ -6053,14 +6033,13 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
         """ Type of event"""
         self.padding1 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ Number of variable datum records"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ variable length list of fixed datums"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ variable length list of variable length datums"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 21
         """ initialize value """
 
@@ -6069,14 +6048,7 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
         super( EventReportPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.eventType)
         outputStream.write_unsigned_int(self.padding1)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
+        self._datums.serialize(outputStream)
 
 
     def parse(self, inputStream):
@@ -6085,19 +6057,7 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
         super( EventReportPdu, self).parse(inputStream)
         self.eventType = inputStream.read_unsigned_int()
         self.padding1 = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class PointObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
@@ -6195,31 +6155,38 @@ class DataPdu( SimulationManagementFamilyPdu ):
         """ ID of request"""
         self.padding1 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ Number of variable datum records"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ variable length list of fixed datums"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ variable length list of variable length datums"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 20
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
         super( DataPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.padding1)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -6227,19 +6194,7 @@ class DataPdu( SimulationManagementFamilyPdu ):
         super( DataPdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
         self.padding1 = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class FastEntityStatePdu( EntityInformationFamilyPdu ):
@@ -6673,16 +6628,31 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """ request ID"""
         self.timeInterval = timeInterval
         """ time interval between issuing data query PDUs"""
-        self.numberOfFixedDatumIDs = numberOfFixedDatumIDs
-        """ Fixed datum record count"""
-        self.numberOfVariableDatumIDs = numberOfVariableDatumIDs
-        """ variable datum record count"""
-        self.fixedDatumIDs = fixedDatumIDs or []
-        """ Fixed datum records"""
-        self.variableDatumIDs = variableDatumIDs or []
-        """ Variable datum records"""
+        # Use DataQueryDatumSpecification
+        self._dataQuery = DataQueryDatumSpecification(
+            numberOfFixedDatumIDs,
+            numberOfVariableDatumIDs,
+            fixedDatumIDs or [],
+            variableDatumIDs or []
+        )
         self.pduType = 58
         """ initialize value """
+
+    @property
+    def numberofFixedDatumIDs(self) -> int:
+        return self._dataQuery.numberOfFixedDatumIDs
+
+    @property
+    def numberofVariableDatumIDs(self) -> int:
+        return self._dataQuery.numberOfVariableDatumIDs
+
+    @property
+    def fixedDatumIDs(self) -> list[int]:
+        return self._dataQuery.fixedDatumIDs
+
+    @property
+    def variableDatumIDs(self) -> list[int]:
+        return self._dataQuery.variableDatumIDs
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -6692,15 +6662,7 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         outputStream.write_unsigned_byte(self.pad2)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.timeInterval)
-        outputStream.write_unsigned_int( len(self.fixedDatumIDs))
-        outputStream.write_unsigned_int( len(self.variableDatumIDs))
-        for anObj in self.fixedDatumIDs:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumIDs:
-            anObj.serialize(outputStream)
-
-
+        self._dataQuery.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -6711,19 +6673,7 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.pad2 = inputStream.read_unsigned_byte()
         self.requestID = inputStream.read_unsigned_int()
         self.timeInterval = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumIDs = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumIDs = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumIDs):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumIDs.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumIDs):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumIDs.append(element)
-
-
+        self._dataQuery.parse(inputStream)
 
 
 class MinefieldStatePdu( MinefieldFamilyPdu ):
@@ -6839,16 +6789,31 @@ class DataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """ padding"""
         self.pad2 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ variable datum record count"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ Fixed datum records"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ Variable datum records"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 60
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
@@ -6857,15 +6822,7 @@ class DataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         outputStream.write_unsigned_byte(self.requiredReliabilityService)
         outputStream.write_unsigned_short(self.pad1)
         outputStream.write_unsigned_byte(self.pad2)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -6875,19 +6832,7 @@ class DataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.requiredReliabilityService = inputStream.read_unsigned_byte()
         self.pad1 = inputStream.read_unsigned_short()
         self.pad2 = inputStream.read_unsigned_byte()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class CommentPdu( SimulationManagementFamilyPdu ):
@@ -6900,47 +6845,42 @@ class CommentPdu( SimulationManagementFamilyPdu ):
                  variableDatumRecords=None):
         """ Initializer for CommentPdu"""
         super(CommentPdu, self).__init__()
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ Number of variable datum records"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ variable length list of fixed datums"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ variable length list of variable length datums"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 22
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
         super( CommentPdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( CommentPdu, self).parse(inputStream)
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class CommentReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
@@ -6953,47 +6893,42 @@ class CommentReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
                  variableDatumRecords=None):
         """ Initializer for CommentReliablePdu"""
         super(CommentReliablePdu, self).__init__()
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ variable datum record count"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ Fixed datum records"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ Variable datum records"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 62
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
         super( CommentReliablePdu, self ).serialize(outputStream)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( CommentReliablePdu, self).parse(inputStream)
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class DirectedEnergyFirePdu( WarfareFamilyPdu ):
@@ -7191,31 +7126,38 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
         """ ID of request"""
         self.padding1 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ Number of variable datum records"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ variable length list of fixed datums"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ variable length list of variable length datums"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 19
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
         super( SetDataPdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.padding1)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -7223,19 +7165,7 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
         super( SetDataPdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
         self.padding1 = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class RecordQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
@@ -7319,31 +7249,38 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
         """ Request ID that is unique"""
         self.requestStatus = requestStatus
         """ Status of response"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Number of fixed datum records"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ Number of variable datum records"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ variable length list of fixed datums"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ variable length list of variable length datums"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 17
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
         super( ActionResponsePdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.requestStatus)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -7351,19 +7288,7 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
         super( ActionResponsePdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
         self.requestStatus = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class EntityDamageStatusPdu( WarfareFamilyPdu ):
@@ -7981,31 +7906,38 @@ class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """ Event type"""
         self.pad1 = 0
         """ padding"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ variable datum record count"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ Fixed datum records"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ Variable datum records"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 61
         """ initialize value """
+
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return self._datums.numberOfFixedDatumRecords
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return self._datums.numberOfVariableDatumRecords
+
+    @property
+    def fixedDatumRecords(self) -> list["FixedDatum"]:
+        return self._datums.fixedDatumRecords
+
+    @property
+    def variableDatumRecords(self) -> list["VariableDatum"]:
+        return self._datums.variableDatumRecords
 
     def serialize(self, outputStream):
         """serialize the class """
         super( EventReportReliablePdu, self ).serialize(outputStream)
         outputStream.write_unsigned_short(self.eventType)
         outputStream.write_unsigned_int(self.pad1)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -8013,19 +7945,7 @@ class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         super( EventReportReliablePdu, self).parse(inputStream)
         self.eventType = inputStream.read_unsigned_short()
         self.pad1 = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class MinefieldResponseNackPdu( MinefieldFamilyPdu ):
@@ -8096,14 +8016,13 @@ class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         """ request ID"""
         self.responseStatus = responseStatus
         """ status of response"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """ Fixed datum record count"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """ variable datum record count"""
-        self.fixedDatumRecords = fixedDatumRecords or []
-        """ Fixed datum records"""
-        self.variableDatumRecords = variableDatumRecords or []
-        """ Variable datum records"""
+        # Use DatumSpecification
+        self._datums = DatumSpecification(
+            numberOfFixedDatumRecords,
+            numberOfVariableDatumRecords,
+            fixedDatumRecords or [],
+            variableDatumRecords or []
+        )
         self.pduType = 57
         """ initialize value """
 
@@ -8112,15 +8031,7 @@ class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         super( ActionResponseReliablePdu, self ).serialize(outputStream)
         outputStream.write_unsigned_int(self.requestID)
         outputStream.write_unsigned_int(self.responseStatus)
-        outputStream.write_unsigned_int( len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int( len(self.variableDatumRecords))
-        for anObj in self.fixedDatumRecords:
-            anObj.serialize(outputStream)
-
-        for anObj in self.variableDatumRecords:
-            anObj.serialize(outputStream)
-
-
+        self._datums.serialize(outputStream)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -8128,19 +8039,7 @@ class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         super( ActionResponseReliablePdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
         self.responseStatus = inputStream.read_unsigned_int()
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumRecords.append(element)
-
-        for idx in range(0, self.numberOfVariableDatumRecords):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumRecords.append(element)
-
-
+        self._datums.parse(inputStream)
 
 
 class IsPartOfPdu( EntityManagementFamilyPdu ):
