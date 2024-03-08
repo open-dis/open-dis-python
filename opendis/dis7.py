@@ -40,11 +40,11 @@ class DataQueryDatumSpecification:
         """serialize the class"""
         outputStream.write_unsigned_int(self.numberOfFixedDatumIDs)
         outputStream.write_unsigned_int(self.numberOfVariableDatumIDs)
-        for anObj in self.fixedDatumIDs:
-            anObj.serialize(outputStream)
+        for datumID in self.fixedDatumIDs:
+            outputStream.write_unsigned_int(datumID)
 
-        for anObj in self.variableDatumIDs:
-            anObj.serialize(outputStream)
+        for datumID in self.variableDatumIDs:
+            outputStream.write_unsigned_int(datumID)
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
@@ -52,14 +52,12 @@ class DataQueryDatumSpecification:
         numberOfFixedDatumIDs = inputStream.read_unsigned_int()
         numberOfVariableDatumIDs = inputStream.read_unsigned_int()
         for idx in range(0, numberOfFixedDatumIDs):
-            element = FixedDatum()
-            element.parse(inputStream)
-            self.fixedDatumIDs.append(element)
+            datumID = inputStream.read_unsigned_int()
+            self.fixedDatumIDs.append(datumID)
 
         for idx in range(0, numberOfVariableDatumIDs):
-            element = VariableDatum()
-            element.parse(inputStream)
-            self.variableDatumIDs.append(element)
+            datumID = inputStream.read_unsigned_int()
+            self.variableDatumIDs.append(datumID)
 
 
 class RadioIdentifier:

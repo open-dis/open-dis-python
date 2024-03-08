@@ -1,0 +1,484 @@
+"""warfare.py
+
+18 Warfare Attributes and Interactions
+"""
+import enum
+
+
+# [UID 6]
+class ForceID(enum.IntEnum):
+    """18.1 Force ID [UID 6]"""
+    OTHER = 0
+    FRIENDLY = 1
+    OPPOSING = 2
+    NEUTRAL = 3
+    FRIENDLY_2 = 4
+    OPPOSING_2 = 5
+    NEUTRAL_2 = 6
+    FRIENDLY_3 = 7
+    OPPOSING_3 = 8
+    NEUTRAL_3 = 9
+    FRIENDLY_4 = 10
+    OPPOSING_4 = 11
+    NEUTRAL_4 = 12
+    FRIENDLY_5 = 13
+    OPPOSING_5 = 14
+    NEUTRAL_5 = 15
+    FRIENDLY_6 = 16
+    OPPOSING_6 = 17
+    NEUTRAL_6 = 18
+    FRIENDLY_7 = 19
+    OPPOSING_7 = 20
+    NEUTRAL_7 = 21
+    FRIENDLY_8 = 22
+    OPPOSING_8 = 23
+    NEUTRAL_8 = 24
+    FRIENDLY_9 = 25
+    OPPOSING_9 = 26
+    NEUTRAL_9 = 27
+    FRIENDLY_10 = 28
+    OPPOSING_10 = 29
+    NEUTRAL_10 = 30
+
+
+# [UID 62]
+class DetonationResult(enum.IntEnum):
+    """18.2 Detonation Result [UID 62]"""
+    OTHER = 0
+    ENTITY_IMPACT = 1
+    ENTITY_PROXIMATE_DETONATION = 2
+    GROUND_IMPACT = 3
+    GROUND_PROXIMATE_DETONATION = 4
+    DETONATION = 5
+    NONE_OR_NO_DETONATION_DUD = 6
+    HE_HIT_SMALL = 7
+    HE_HIT_MEDIUM = 8
+    HE_HIT_LARGE = 9
+    ARMOR_PIERCING_HIT = 10
+    DIRT_BLAST_SMALL = 11
+    DIRT_BLAST_MEDIUM = 12
+    DIRT_BLAST_LARGE = 13
+    WATER_BLAST_SMALL = 14
+    WATER_BLAST_MEDIUM = 15
+    WATER_BLAST_LARGE = 16
+    AIR_HIT = 17
+    BUILDING_HIT_SMALL = 18
+    BUILDING_HIT_MEDIUM = 19
+    BUILDING_HIT_LARGE = 20
+    MINE_CLEARING_LINE_CHARGE = 21
+    ENVIRONMENT_OBJECT_IMPACT = 22
+    ENVIRONMENT_OBJECT_PROXIMATE_DETONATION = 23
+    WATER_IMPACT = 24
+    AIR_BURST = 25
+    KILL_WITH_FRAGMENT_TYPE_1 = 26
+    KILL_WITH_FRAGMENT_TYPE_2 = 27
+    KILL_WITH_FRAGMENT_TYPE_3 = 28
+    KILL_WITH_FRAGMENT_TYPE_1_AFTER_FLY_OUT_FAILURE = 29
+    KILL_WITH_FRAGMENT_TYPE_2_AFTER_FLY_OUT_FAILURE = 30
+    MISS_DUE_TO_FLY_OUT_FAILURE = 31
+    MISS_DUE_TO_END_GAME_FAILURE = 32
+    MISS_DUE_TO_FLY_OUT_AND_END_GAME_FAILURE = 33
+
+
+"""18.3 Munition Descriptor"""
+
+# [UID 60]
+class WarheadID(enum.IntEnum):
+    """18.3.1 Warhead [UID 60]"""
+    OTHER = 0
+    CARGO = 10  # Variable Submunitions
+    FUEL_AIR_EXPLOSIVE = 20
+    GLASS_BEADS = 30
+    ONE_UM = 31
+    FIVE_UM = 32
+    TEN_UM = 33
+    HE = 1000  # High Explosive
+    HE_PLASTIC = 1100
+    HE_INCENDIARY = 1200
+    HE_FRAGMENTATION = 1300
+    HE_ANTITANK = 1400
+    HE_BOMBLETS = 1500
+    HE_SHAPED_CHARGE = 1600
+    HE_CONTINUOUS_ROD = 1610
+    HE_TUNGSTEN_BALL = 1615
+    HE_BLAST_FRAGMENTATION = 1620
+    HE_STEERABLE_DARTS_WITH_HE = 1625
+    HE_DARTS = 1630
+    HE_FLECHETTES = 1635
+    HE_DIRECTED_FRAGMENTATION = 1640
+    HE_SEMI_ARMOR_PIERCING = 1645
+    HE_SHAPED_CHARGE_FRAGMENTATION = 1650
+    HE_SEMI_ARMOR_PIERCING_FRAGMENTATION = 1655
+    HE_HOLLOW_CHARGE = 1660
+    HE_DOUBLE_HOLLOW_CHARGE = 1665
+    HE_GENERAL_PURPOSE = 1670
+    HE_BLAST_PENETRATOR = 1675
+    HE_ROD_PENETRATOR = 1680
+    HE_ANTIPERSONNEL = 1685
+    HE_SHAPED_CHARGE_FRAGMENTATION_INCENDIARY = 1690
+    HE_PENETRATOR_BLAST_FRAGMENTATION = 1695
+    SMOKE = 2000
+    WP_WHITE_PHOSPHORUS = 2005
+    FOGO_Fog_Oil = 2010
+    HC_HexaChloroEthane = 2015
+    ILLUMINATION = 3000
+    PRACTICE = 4000
+    BLANK = 4001
+    DUMMY = 4002
+    KINETIC = 5000
+    MINES = 6000
+    NUCLEAR = 7000
+    NUCLEAR_IMT = 7010
+    NUCLEAR_VARIOUS_YIELDS_START = 7011
+    NUCLEAR_VARIOUS_YIELDS_END = 7999
+    CHEMICAL_GENERAL = 8000
+    CHEMICAL_BLISTER_AGENT = 8100
+    HD_MUSTARD = 8110
+    THICKENED_HD_MUSTARD = 8115
+    DUSTY_HD_MUSTARD = 8120
+    L_LEWISITE = 8125
+    HN3_NITROGEN_MUSTARD = 8130
+    HL_MUSTARD_LEWISITE = 8135
+    CX_PHOSGENE_OXIME = 8140
+    DMMP_PHOSPHATE_DIMETHYL_HYDROGEN = 8145
+    DMHP_PHOSPHITE = 8150
+    DMA_DIMETHYL_ACRYLATE = 8155
+    DEM = 8160
+    P_XLENE = 8165
+    CHEMICAL_BLOOD_AGENT = 8200
+    AC_HCN = 8210
+    CK_CNCI = 8215
+    CG_PHOSGENE = 8220
+    CHEMICAL_NERVE_AGENT = 8300
+    VX = 8310
+    THICKENED_VX = 8315
+    DUSTY_VX = 8320
+    GA_TABUN = 8325
+    THICKENED_GA_TABUN = 8330
+    DUSTY_GA_TABUN = 8335
+    GB_SARIN = 8340
+    THICKENED_GB_SARIN = 8345
+    DUSTY_GB_SARIN = 8350
+    GD_SOMAN = 8355
+    THICKENED_GD_SOMAN = 8360
+    DUSTY_GD_SOMAN = 8365
+    GF = 8370
+    THICKENED_GF = 8375
+    DUSTY_GF = 8380
+    SVX_SOVIET_VX = 8385
+    BIS = 8410
+    TCP = 8415
+    MS_METHYL_SALICYLATE = 8425
+    TEP = 8430
+    H2O_WATER = 8445
+    TO1_TOXIC_ORGANIC_1 = 8450
+    TO2_TOXIC_ORGANIC_2 = 8455
+    TO3_TOXIC_ORGANIC_3 = 8460
+    SULFUR_HEXAFLUORIDE = 8465
+    AA_ACETIC_ACID = 8470
+    HF_HYDROFLUORIC_ACID = 8475
+    BIOLOGICAL = 9000
+    BIOLOGICAL_VIRUS = 9100
+    BIOLOGICAL_BACTERIA = 9200
+    BIOLOGICAL_RICKETTSIA = 9300
+    BIOLOGICAL_GENETICALLY_MODIFIED_MICROORGANISMS = 9400
+    BIOLOGICAL_TOXIN = 9500
+
+
+# [UID 61]
+class Fuse(enum.IntEnum):
+    """18.3.2 Fuse [UID 61]"""
+    OTHER = 0
+    INTELLIGENT_INFLUENCE = 10
+    SENSOR = 20
+    SELF_DESTRUCT = 30
+    ULTRA_QUICK = 40
+    BODY = 50
+    DEEP_INTRUSION = 60
+    MULTIFUNCTION = 100
+    POINT_DETONATION = 200
+    BASE_DETONATION = 300
+    CONTACT = 1000
+    CONTACT_IMPACT = 1100
+    CONTACT_DELAYED = 1200
+    CONTACT_DELAYED_10MS = 1201
+    CONTACT_DELAYED_20MS = 1202
+    CONTACT_DELAYED_50MS = 1205
+    CONTACT_DELAYED_60MS = 1206
+    CONTACT_DELAYED_100MS = 1210
+    CONTACT_DELAYED_125MS = 1212
+    CONTACT_DELAYED_250MS = 1225
+    CONTACT_DELAYED_5MS = 1250
+    CONTACT_DELAYED_15MS = 1251
+    CONTACT_DELAYED_25MS = 1252
+    CONTACT_DELAYED_30MS = 1253
+    CONTACT_DELAYED_35MS = 1254
+    CONTACT_DELAYED_40MS = 1255
+    CONTACT_DELAYED_45MS = 1256
+    CONTACT_DELAYED_90MS = 1257
+    CONTACT_DELAYED_120MS = 1258
+    CONTACT_DELAYED_180MS = 1259
+    CONTACT_DELAYED_240MS = 1260
+    TIMED = 2000
+    TIMED_PROGRAMMABLE = 2100
+    TIMED_BURNOUT = 2200
+    TIMED_PYROTECHNIC = 2300
+    TIMED_ELECTRONIC = 2400
+    TIMED_BASE_DELAY = 2500
+    TIMED_REINFORCED_NOSE_IMPACT_DELAY = 2600
+    TIMED_SHORT_DELAY_IMPACT = 2700
+    TIMED_SHORT_DELAY_IMPACT_10MS = 2701
+    TIMED_SHORT_DELAY_IMPACT_20MS = 2702
+    TIMED_SHORT_DELAY_IMPACT_50MS = 2705
+    TIMED_SHORT_DELAY_IMPACT_60MS = 2706
+    TIMED_SHORT_DELAY_IMPACT_100MS = 2710
+    TIMED_SHORT_DELAY_IMPACT_125MS = 2712
+    TIMED_SHORT_DELAY_IMPACT_250MS = 2725
+    TIMED_NOSE_MOUNTED_VARIABLE_DELAY = 2800
+    TIMED_LONG_DELAY_SIDE = 2900
+    TIMED_SELECTABLE_DELAY = 2910
+    TIMED_IMPACT = 2920
+    TIMED_SEQUENCE = 2930
+    PROXIMITY = 3000
+    PROXIMITY_ACTIVE_LASER = 3100
+    PROXIMITY_MAGNETIC = 3200
+    PROXIMITY_ACTIVE_RADAR = 3300
+    PROXIMITY_RADIO_FREQUENCY = 3400
+    PROXIMITY_PROGRAMMABLE = 3500
+    PROXIMITY_PROGRAMMABLE_PREFRAGMENTED = 3600
+    PROXIMITY_INFRARED = 3700
+    COMMAND = 4000
+    COMMAND_ELECTRONIC_REMOTELY_SET = 4100
+    ALTITUDE = 5000
+    ALTITUDE_RADIO_ALTIMETER = 5100
+    ALTITUDE_AIR_BURST = 5200
+    DEPTH = 6000
+    ACOUSTIC = 7000
+    PRESSURE = 8000
+    PRESSURE_DELAY = 8010
+    INERT = 8100
+    DUMMY = 8110
+    PRACTICE = 8120
+    PLUG_REPRESENTING = 8130
+    TRAINING = 8150
+    PYROTECHNIC = 9000
+    PYROTECHNIC_DELAY = 9010
+    ELECTRO_OPTICAL = 9100
+    ELECTROMECHANICAL = 9110
+    ELECTROMECHANICAL_NOSE = 9120
+    STRIKERLESS = 9200
+    STRIKERLESS_NOSE_IMPACT = 9210
+    STRIKERLESS_COMPRESSION_IGNITION = 9220
+    COMPRESSION_IGNITION = 9300
+    COMPRESSION_IGNITION_STRIKERLESS_NOSE_IMPACT = 9310
+    PERCUSSION = 9400
+    PERCUSSION_INSTANTANEOUS = 9410
+    ELECTRONIC = 9500
+    ELECTRONIC_INTERNALLY_MOUNTED = 9510
+    ELECTRONIC_RANGE_SETTING = 9520
+    ELECTRONIC_PROGRAMMED = 9530
+    MECHANICAL = 9600
+    MECHANICAL_NOSE = 9610
+    MECHANICAL_TAIL = 9620
+
+
+"""18.4 Explosion Descriptor"""
+
+# [UID 309]
+class ExplosiveMaterialGroup(enum.IntEnum):
+    """18.4.1 Explosive Material Group [UID 309]"""
+    OTHER = 0
+    LIQUID_AVIATION_MISSILE_FUELS = 1
+    LIQUID_OTHER_FUELS = 2
+    LIQUID_EXPLOSIVE_MATERIAL = 3
+    SOLID = 4
+    GASEOUS = 5
+    DUST_MATERIAL = 6
+
+
+# [UID 310]
+class ExplosiveMaterial(enum.IntEnum):
+    """18.4.2 Explosive Material [UID 310]"""
+    NO_STATEMENT = 0
+    AVGAS = 10  # Aviation Gas
+    JET_FUEL = 11  # Unspecified
+    JP_4 = 12  # F-40/JET B
+    JP_5 = 13  # F-44/JET A
+    JP_7 = 14
+    JP_8 = 15  # 
+    JP_10_MISSILE_FUEL = 16
+    JPTS = 17
+    JET_A = 18
+    JET_A_1 = 19
+    JET_B = 20
+    JET_BIOFUEL = 21
+    GASOLINE_PETROL = 151  # Unspecified Octane
+    DIESEL_FUEL = 152  # Unspecified Grade
+    ETHANOL = 153
+    E85_ETHANOL = 154
+    FUEL_OIL = 155
+    KEROSENE = 156
+    CRUDE_OIL = 157
+    LIGHT_CRUDE_OIL = 158
+    LIQUID_PETROLEUM_GAS = 159  # LPG
+    RP_1_ROCKET_FUEL = 160
+    LH_2_ROCKET_FUEL = 161
+    LOX_ROCKET_FUEL = 162
+    ALCOHOL = 164
+    HYDROGEN_LIQUID = 166
+    NITROGLYCERIN = 301  # NG
+    ANFO = 302
+    DYNAMITE = 451
+    TNT = 452
+    RDX = 453
+    PETN = 454
+    HMX = 455
+    C_4 = 456
+    COMPOSITION_C_4 = 457
+    NATURAL_GAS = 601  # NG
+    BUTANE = 602
+    PROPANE = 603
+    HELIUM = 604
+    HYDROGEN_GASEOUS = 605
+    DUST = 801  # Unspecified Type
+    GRAIN_DUST = 802
+    FLOUR_DUST = 803
+    SUGAR_DUST = 804
+
+
+"""18.5 Directed Energy"""
+
+# [UID 312]
+class PulseShape(enum.IntEnum):
+    """18.5.1 Pulse Shape [UID 312]"""
+    OTHER = 0
+    SQUARE_WAVE = 1
+    CONTINUOUS_WAVE = 2
+    GAUSSIAN = 3
+
+
+"""18.5.2 DE Fire Flags [UID 313]
+Name | Bits | Description | Reference
+Weapon On | 0 | Identifies the State of the DE Weapon
+State/Update Flag | 1 | Identifies a DE Weapon State Change | [UID 374]"""
+
+
+"""18.5.3 Beam Spot Shape [UID 311]
+Value Description
+0 Other
+1 Gaussian
+2 Top Hat"""
+# [UID 311]
+class BeamSpotShape(enum.IntEnum):
+    """18.5.3 Beam Spot Shape [UID 311]"""
+    OTHER = 0
+    GAUSSIAN = 1
+    TOP_HAT = 2
+
+
+"""18.5.4 Component Identification [UID 314]
+Value Description
+0 Entity Center (No Specific Component)
+1 Entity Structure
+2 Control System
+3 Control Surface
+4 Engine / Propulsion System
+5 Crew Member
+6 Fuse
+7 Acquisition Sensor
+8 Tracking Sensor
+9 Fuel Tank / Solid Rocket Motor"""
+# [UID 314]
+class ComponentIdentification(enum.IntEnum):
+    """18.5.4 Component Identification [UID 314]"""
+    ENTITY_CENTER = 0  # No Specific Component
+    ENTITY_STRUCTURE = 1
+    CONTROL_SYSTEM = 2
+    CONTROL_SURFACE = 3
+    ENGINE_PROPULSION_SYSTEM = 4
+    CREW_MEMBER = 5
+    FUSE = 6
+    ACQUISITION_SENSOR = 7
+    TRACKING_SENSOR = 8
+    FUEL_TANK_OR_SOLID_ROCKET_MOTOR = 9
+
+
+"""18.5.5 Component Damage Status [UID 315]
+Value Description
+0 No Damage
+1 Minor Damage
+2 Medium Damage
+3 Major Damage
+4 Destroyed"""
+# [UID 315]
+class ComponentDamageStatus(enum.IntEnum):
+    """18.5.5 Component Damage Status [UID 315]"""
+    NO_DAMAGE = 0
+    MINOR_DAMAGE = 1
+    MEDIUM_DAMAGE = 2
+    MAJOR_DAMAGE = 3
+    DESTROYED = 4
+
+
+"""18.5.6 Component Visual Smoke Color [UID 316]
+Value Description
+0 No Smoke
+1 White
+2 Gray
+3 Black"""
+# [UID 316]
+class ComponentVisualSmokeColor(enum.IntEnum):
+    """18.5.6 Component Visual Smoke Color [UID 316]"""
+    NO_SMOKE = 0
+    WHITE = 1
+    GRAY = 2
+    BLACK = 3
+
+
+"""18.5.7 Component Visual Damage Status [UID 317]
+Name | Bits | Description | Reference
+Is Fire Present | 0 | Describes presence of fire at the damage site
+Smoke | 1-2 | Describes presence of smoke emanating from the damage
+site | [UID 375]
+Surface Damage | 3-4 | Describes general surface appearance at the damage site | [UID 376]"""
+
+
+"""18.5.8 State/Update Flag [UID 374]
+Value Description
+0 Update Due to Heartbeat Timer
+1 State Change"""
+# [UID 374]
+class StateUpdateFlag(enum.IntEnum):
+    """18.5.8 State/Update Flag [UID 374]"""
+    UPDATE_DUE_TO_HEARTBEAT_TIMER = 0
+    STATE_CHANGE = 1
+
+
+"""18.5.9 Smoke Component Visual Damage Status [UID 375]
+Value Description
+0 No Smoke
+1 Light Smoke
+2 Moderate Smoke
+3 Heavy Smoke"""
+# [UID 375]
+class SmokeComponentVisualDamageStatus(enum.IntEnum):
+    """18.5.9 Smoke Component Visual Damage Status [UID 375]"""
+    NO_SMOKE = 0
+    LIGHT_SMOKE = 1
+    MODERATE_SMOKE = 2
+    HEAVY_SMOKE = 3
+
+
+"""18.5.10 Surface Damage Component Visual Damage Status [UID 376]
+Value Description
+0 Normal Appearance
+1 Light Charring
+2 Heavy Charring
+3 One or More Holes Burned Completely through Surface"""
+# [UID 376]
+class SurfaceDamageComponentVisualDamageStatus(enum.IntEnum):
+    """18.5.10 Surface Damage Component Visual Damage Status [UID 376]"""
+    NORMAL_APPEARANCE = 0
+    LIGHT_CHARRING = 1
+    HEAVY_CHARRING = 2
+    ONE_OR_MORE_HOLES_BURNED_COMPLETELY_THROUGH_SURFACE = 3
