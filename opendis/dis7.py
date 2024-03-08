@@ -3,7 +3,7 @@
 #
 
 
-class DataQueryDatumSpecification(object):
+class DataQueryDatumSpecification:
     """Number and identification of fixed and variable datum records. Section 6.2.17"""
 
     def __init__(self,
@@ -49,7 +49,7 @@ class DataQueryDatumSpecification(object):
             self.variableDatumIDs.append(element)
 
 
-class RadioIdentifier(object):
+class RadioIdentifier:
     """The unique designation of an attached or unattached radio in an event or exercise Section 6.2.70"""
 
     def __init__(self,
@@ -83,7 +83,7 @@ class RadioIdentifier(object):
         self.radioNumber = inputStream.read_unsigned_short()
 
 
-class RequestID(object):
+class RequestID:
     """A monotonically increasing number inserted into all simulation managment PDUs. This should be a hand-coded thingie, maybe a singleton. Section 6.2.75"""
 
     def __init__(self, requestID=0):
@@ -101,7 +101,7 @@ class RequestID(object):
         self.requestID = inputStream.read_unsigned_int()
 
 
-class IFFData(object):
+class IFFData:
     """repeating element if IFF Data specification record"""
 
     def __init__(self, recordType=0, recordLength=0, iffData=None):
@@ -132,7 +132,7 @@ class IFFData(object):
             self.iffData.append(val)
 
 
-class MunitionDescriptor(object):
+class MunitionDescriptor:
     """Represents the firing or detonation of a munition. Section 6.2.19.2"""
 
     def __init__(self,
@@ -171,7 +171,7 @@ class MunitionDescriptor(object):
         self.rate = inputStream.read_unsigned_short()
 
 
-class MinefieldSensorType(object):
+class MinefieldSensorType:
     """Information about a minefield sensor. Section 6.2.57"""
 
     def __init__(self, sensorType=0):
@@ -189,7 +189,7 @@ class MinefieldSensorType(object):
         self.sensorType = inputStream.read_unsigned_short()
 
 
-class GroupID(object):
+class GroupID:
     """Unique designation of a group of entities contained in the isGroupOfPdu. Represents a group of entities rather than a single entity. Section 6.2.43"""
 
     def __init__(self, simulationAddress=None, groupNumber=0):
@@ -211,7 +211,7 @@ class GroupID(object):
         self.groupNumber = inputStream.read_unsigned_short()
 
 
-class LayerHeader(object):
+class LayerHeader:
     """The identification of the additional information layer number, layer-specific information, and the length of the layer. Section 6.2.51"""
 
     def __init__(self, layerNumber=0, layerSpecificInformation=0, length=0):
@@ -236,7 +236,7 @@ class LayerHeader(object):
         self.length = inputStream.read_unsigned_short()
 
 
-class UnsignedDISInteger(object):
+class UnsignedDISInteger:
     """container class not in specification"""
 
     def __init__(self, val=0):
@@ -254,7 +254,7 @@ class UnsignedDISInteger(object):
         self.val = inputStream.read_unsigned_int()
 
 
-class DeadReckoningParameters(object):
+class DeadReckoningParameters:
     """Not specified in the standard. This is used by the ESPDU"""
 
     def __init__(self,
@@ -296,7 +296,7 @@ class DeadReckoningParameters(object):
         self.entityAngularVelocity.parse(inputStream)
 
 
-class ProtocolMode(object):
+class ProtocolMode:
     """Bit field used to identify minefield data. bits 14-15 are a 2-bit enum, other bits unused. Section 6.2.69"""
 
     def __init__(self, protocolMode=0):
@@ -314,7 +314,7 @@ class ProtocolMode(object):
         self.protocolMode = inputStream.read_unsigned_short()
 
 
-class AngleDeception(object):
+class AngleDeception:
     """The Angle Deception attribute record may be used to communicate discrete values that are associated with angle deception jamming that cannot be referenced to an emitter mode. The values provided in the record records (provided in the associated Electromagnetic Emission PDU). (The victim radar beams are those that are targeted by the jammer.) Section 6.2.21.2.2"""
 
     def __init__(self,
@@ -389,7 +389,7 @@ class AngleDeception(object):
         self.padding3 = inputStream.read_unsigned_int()
 
 
-class EntityAssociation(object):
+class EntityAssociation:
     """Association or disassociation of two entities.  Section 6.2.94.4.3"""
 
     def __init__(self,
@@ -447,7 +447,7 @@ class EntityAssociation(object):
         self.groupNumber = inputStream.read_unsigned_short()
 
 
-class VectoringNozzleSystem(object):
+class VectoringNozzleSystem:
     """Operational data for describing the vectoring nozzle systems Section 6.2.96"""
 
     def __init__(self,
@@ -471,7 +471,7 @@ class VectoringNozzleSystem(object):
         self.verticalDeflectionAngle = inputStream.read_float()
 
 
-class FalseTargetsAttribute(object):
+class FalseTargetsAttribute:
     """The False Targets attribute record shall be used to communicate discrete values that are associated with false targets jamming that cannot be referenced to an emitter mode. The values provided in the False Targets attribute record shall be considered valid only for the victim radar beams listed in the jamming beam's Track/Jam Data records (provided in the associated Electromagnetic Emission PDU). Section 6.2.21.3"""
 
     def __init__(self,
@@ -533,7 +533,7 @@ class FalseTargetsAttribute(object):
         self.echoSpacing = inputStream.read_float()
 
 
-class MinefieldIdentifier(object):
+class MinefieldIdentifier:
     """The unique designation of a minefield Section 6.2.56"""
 
     def __init__(self, simulationAddress=None, minefieldNumber=0):
@@ -555,7 +555,7 @@ class MinefieldIdentifier(object):
         self.minefieldNumber = inputStream.read_unsigned_short()
 
 
-class RadioType(object):
+class RadioType:
     """Identifies the type of radio. Section 6.2.71"""
 
     def __init__(self,
@@ -602,7 +602,7 @@ class RadioType(object):
         self.extra = inputStream.read_unsigned_byte()
 
 
-class NamedLocationIdentification(object):
+class NamedLocationIdentification:
     """Information about the discrete positional relationship of the part entity with respect to the its host entity Section 6.2.62"""
 
     def __init__(self, stationName=0, stationNumber=0):
@@ -624,7 +624,7 @@ class NamedLocationIdentification(object):
         self.stationNumber = inputStream.read_unsigned_short()
 
 
-class ModulationParameters(object):
+class ModulationParameters:
     """Modulation parameters associated with a specific radio system. INCOMPLETE. 6.2.58"""
 
     def __init__(self):
@@ -637,7 +637,7 @@ class ModulationParameters(object):
         """"Parse a message. This may recursively call embedded objects."""
 
 
-class EulerAngles(object):
+class EulerAngles:
     """Three floating point values representing an orientation, psi, theta, and phi, aka the euler angles, in radians. Section 6.2.33"""
 
     def __init__(self, psi=0.0, theta=0.0, phi=0.0):
@@ -660,7 +660,7 @@ class EulerAngles(object):
         self.phi = inputStream.read_float()
 
 
-class DirectedEnergyPrecisionAimpoint(object):
+class DirectedEnergyPrecisionAimpoint:
     """DE Precision Aimpoint Record. Section 6.2.20.3"""
 
     def __init__(self,
@@ -746,7 +746,7 @@ class DirectedEnergyPrecisionAimpoint(object):
         self.padding2 = inputStream.read_unsigned_int()
 
 
-class IffDataSpecification(object):
+class IffDataSpecification:
     """Requires hand coding to be useful. Section 6.2.43"""
 
     def __init__(self, numberOfIffDataRecords=0, iffDataRecords=None):
@@ -772,7 +772,7 @@ class IffDataSpecification(object):
             self.iffDataRecords.append(element)
 
 
-class OwnershipStatus(object):
+class OwnershipStatus:
     """used to convey entity and conflict status information associated with transferring ownership of an entity. Section 6.2.65"""
 
     def __init__(self, entityId=None, ownershipStatus=0):
@@ -798,7 +798,7 @@ class OwnershipStatus(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class BeamAntennaPattern(object):
+class BeamAntennaPattern:
     """Used when the antenna pattern type field has a value of 1. Specifies the direction, pattern, and polarization of radiation from an antenna. Section 6.2.9.2"""
 
     def __init__(self,
@@ -854,7 +854,7 @@ class BeamAntennaPattern(object):
         self.padding3 = inputStream.read_unsigned_int()
 
 
-class AttachedParts(object):
+class AttachedParts:
     """Removable parts that may be attached to an entity.  Section 6.2.93.3"""
 
     def __init__(self,
@@ -892,7 +892,7 @@ class AttachedParts(object):
         self.parameterValue = inputStream.read_long()
 
 
-class VariableTransmitterParameters(object):
+class VariableTransmitterParameters:
     """Relates to radios. NOT COMPLETE. Section 6.2.94"""
 
     def __init__(self, recordType=0, recordLength=4):
@@ -914,7 +914,7 @@ class VariableTransmitterParameters(object):
         self.recordLength = inputStream.read_unsigned_int()
 
 
-class Attribute(object):
+class Attribute:
     """Used to convey information for one or more attributes. Attributes conform to the standard variable record format of 6.2.82. Section 6.2.10. NOT COMPLETE"""
 
     def __init__(self, recordType=0, recordLength=0, recordSpecificFields=0):
@@ -937,7 +937,7 @@ class Attribute(object):
         self.recordSpecificFields = inputStream.read_long()
 
 
-class RecordQuerySpecification(object):
+class RecordQuerySpecification:
     """The identification of the records being queried 6.2.72"""
 
     def __init__(self, numberOfRecords=0, records=None):
@@ -961,7 +961,7 @@ class RecordQuerySpecification(object):
             self.records.append(val)
 
 
-class ArticulatedParts(object):
+class ArticulatedParts:
     """articulated parts for movable parts and a combination of moveable/attached parts of an entity. Section 6.2.94.2"""
 
     def __init__(self,
@@ -1000,7 +1000,7 @@ class ArticulatedParts(object):
         self.parameterValue = inputStream.read_long()
 
 
-class ObjectType(object):
+class ObjectType:
     """The unique designation of an environmental object. Section 6.2.64"""
 
     def __init__(self, domain=0, objectKind=0, category=0, subcategory=0):
@@ -1030,7 +1030,7 @@ class ObjectType(object):
         self.subcategory = inputStream.read_unsigned_byte()
 
 
-class Association(object):
+class Association:
     """An entity's associations with other entities and/or locations. For each association, this record shall specify the type of the association, the associated entity's EntityID and/or the associated location's world coordinates. This record may be used (optionally) in a transfer transaction to send internal state data from the divesting simulation to the acquiring simulation (see 5.9.4). This record may also be used for other purposes. Section 6.2.9"""
 
     def __init__(self,
@@ -1061,7 +1061,7 @@ class Association(object):
         self.associatedLocation.parse(inputStream)
 
 
-class RecordSpecificationElement(object):
+class RecordSpecificationElement:
     """Synthetic record, made up from section 6.2.72. This is used to acheive a repeating variable list element."""
 
     def __init__(self,
@@ -1104,7 +1104,7 @@ class RecordSpecificationElement(object):
         self.pad4 = inputStream.read_unsigned_byte()
 
 
-class AntennaLocation(object):
+class AntennaLocation:
     """Location of the radiating portion of the antenna, specified in world coordinates and entity coordinates. Section 6.2.8"""
 
     def __init__(self, antennaLocation=None, relativeAntennaLocation=None):
@@ -1127,7 +1127,7 @@ class AntennaLocation(object):
         self.relativeAntennaLocation.parse(inputStream)
 
 
-class ObjectIdentifier(object):
+class ObjectIdentifier:
     """The unique designation of an environmental object. Section 6.2.63"""
 
     def __init__(self, simulationAddress=None, objectNumber=0):
@@ -1149,7 +1149,7 @@ class ObjectIdentifier(object):
         self.objectNumber = inputStream.read_unsigned_short()
 
 
-class AggregateIdentifier(object):
+class AggregateIdentifier:
     """The unique designation of each aggrgate in an exercise is specified by an aggregate identifier record. The aggregate ID is not an entity and shall not be treated as such. Section 6.2.3."""
 
     def __init__(self, simulationAddress=None, aggregateID=0):
@@ -1171,7 +1171,7 @@ class AggregateIdentifier(object):
         self.aggregateID = inputStream.read_unsigned_short()
 
 
-class FixedDatum(object):
+class FixedDatum:
     """Fixed Datum Record. Section 6.2.38"""
 
     def __init__(self, fixedDatumID=0, fixedDatumValue=0):
@@ -1193,7 +1193,7 @@ class FixedDatum(object):
         self.fixedDatumValue = inputStream.read_unsigned_int()
 
 
-class VariableParameter(object):
+class VariableParameter:
     """specification of additional information associated with an entity or detonation, not otherwise accounted for in a PDU 6.2.94.1"""
 
     def __init__(self,
@@ -1232,7 +1232,7 @@ class VariableParameter(object):
         self.variableParameterFields4 = inputStream.read_unsigned_byte()
 
 
-class ChangeOptions(object):
+class ChangeOptions:
     """This is wrong and breaks serialization. See section 6.2.13 aka B.2.41"""
 
     def __init__(self):
@@ -1245,7 +1245,7 @@ class ChangeOptions(object):
         """"Parse a message. This may recursively call embedded objects."""
 
 
-class LiveSimulationAddress(object):
+class LiveSimulationAddress:
     """A simulation's designation associated with all Live Entity IDs contained in Live Entity PDUs. Section 6.2.55"""
 
     def __init__(self, liveSiteNumber=0, liveApplicationNumber=0):
@@ -1267,7 +1267,7 @@ class LiveSimulationAddress(object):
         self.liveApplicationNumber = inputStream.read_unsigned_byte()
 
 
-class EntityMarking(object):
+class EntityMarking:
     """Specifies the character set used inthe first byte, followed by 11 characters of text data. Section 6.29"""
 
     def __init__(self, characterSet=0, characters=None):
@@ -1305,7 +1305,7 @@ class EntityMarking(object):
             self.characters[idx] = val
 
 
-class UAFundamentalParameter(object):
+class UAFundamentalParameter:
     """Regeneration parameters for active emission systems that are variable throughout a scenario. Section 6.2.91"""
 
     def __init__(self,
@@ -1349,7 +1349,7 @@ class UAFundamentalParameter(object):
         self.beamwidthDownElevation = inputStream.read_float()
 
 
-class DirectedEnergyDamage(object):
+class DirectedEnergyDamage:
     """Damage sustained by an entity due to directed energy. Location of the damage based on a relative x,y,z location from the center of the entity. Section 6.2.15.2"""
 
     def __init__(self,
@@ -1419,7 +1419,7 @@ class DirectedEnergyDamage(object):
         self.padding2 = inputStream.read_unsigned_short()
 
 
-class ExplosionDescriptor(object):
+class ExplosionDescriptor:
     """Explosion of a non-munition. Section 6.2.19.3"""
 
     def __init__(self,
@@ -1452,7 +1452,7 @@ class ExplosionDescriptor(object):
         self.explosiveForce = inputStream.read_float()
 
 
-class ClockTime(object):
+class ClockTime:
     """Time measurements that exceed one hour are represented by this record. The first field is the hours since the unix epoch (Jan 1 1970, used by most Unix systems and java) and the second field the timestamp units since the top of the hour. Section 6.2.14"""
 
     def __init__(self, hour=0, timePastHour=0):
@@ -1474,7 +1474,7 @@ class ClockTime(object):
         self.timePastHour = inputStream.read_unsigned_int()
 
 
-class SecondaryOperationalData(object):
+class SecondaryOperationalData:
     """Additional operational data for an IFF emitting system and the number of IFF Fundamental Parameter Data records Section 6.2.76."""
 
     def __init__(self,
@@ -1505,7 +1505,7 @@ class SecondaryOperationalData(object):
         )
 
 
-class EnvironmentType(object):
+class EnvironmentType:
     """Description of environmental data in environmental process and gridded data PDUs. Section 6.2.32"""
 
     def __init__(self,
@@ -1553,7 +1553,7 @@ class EnvironmentType(object):
         self.extra = inputStream.read_unsigned_byte()
 
 
-class TotalRecordSets(object):
+class TotalRecordSets:
     """Total number of record sets contained in a logical set of one or more PDUs. Used to transfer ownership, etc Section 6.2.88"""
 
     def __init__(self, totalRecordSets=0):
@@ -1575,7 +1575,7 @@ class TotalRecordSets(object):
         self.padding = inputStream.read_unsigned_short()
 
 
-class MineEntityIdentifier(object):
+class MineEntityIdentifier:
     """The unique designation of a mine contained in the Minefield Data PDU. No espdus are issued for mine entities.  Section 6.2.55"""
 
     def __init__(self, simulationAddress=None, mineEntityNumber=0):
@@ -1597,7 +1597,7 @@ class MineEntityIdentifier(object):
         self.mineEntityNumber = inputStream.read_unsigned_short()
 
 
-class Relationship(object):
+class Relationship:
     """The relationship of the part entity to its host entity. Section 6.2.74."""
 
     def __init__(self, nature=0, position=0):
@@ -1619,7 +1619,7 @@ class Relationship(object):
         self.position = inputStream.read_unsigned_short()
 
 
-class EEFundamentalParameterData(object):
+class EEFundamentalParameterData:
     """Contains electromagnetic emmission regeneration parameters that are variable throught a scenario. Section 6.2.22."""
 
     def __init__(self,
@@ -1678,7 +1678,7 @@ class EEFundamentalParameterData(object):
         self.beamSweepSync = inputStream.read_float()
 
 
-class JammingTechnique(object):
+class JammingTechnique:
     """Jamming technique. Section 6.2.49"""
 
     def __init__(self, kind=0, category=0, subcategory=0, specific=0):
@@ -1704,7 +1704,7 @@ class JammingTechnique(object):
         self.specific = inputStream.read_unsigned_byte()
 
 
-class DatumSpecification(object):
+class DatumSpecification:
     """List of fixed and variable datum records. Section 6.2.18"""
 
     def __init__(self,
@@ -1749,7 +1749,7 @@ class DatumSpecification(object):
             self.variableDatumRecords.append(element)
 
 
-class DirectedEnergyAreaAimpoint(object):
+class DirectedEnergyAreaAimpoint:
     """DE Precision Aimpoint Record. NOT COMPLETE. Section 6.2.20.2"""
 
     def __init__(self,
@@ -1809,7 +1809,7 @@ class DirectedEnergyAreaAimpoint(object):
             self.directedEnergyTargetEnergyDepositionRecordList.append(element)
 
 
-class Vector3Float(object):
+class Vector3Float:
     """Three floating point values, x, y, and z. Section 6.2.95"""
 
     def __init__(self, x=0.0, y=0.0, z=0.0):
@@ -1835,7 +1835,7 @@ class Vector3Float(object):
         self.z = inputStream.read_float()
 
 
-class Expendable(object):
+class Expendable:
     """An entity's expendable (chaff, flares, etc) information. Section 6.2.36"""
 
     def __init__(self,
@@ -1869,7 +1869,7 @@ class Expendable(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class IOCommunicationsNode(object):
+class IOCommunicationsNode:
     """A communications node that is part of a simulted communcations network. Section 6.2.49.2"""
 
     def __init__(self, communicationsNodeType=0, communicationsNodeID=None):
@@ -1899,7 +1899,7 @@ class IOCommunicationsNode(object):
         self.communicationsNodeID.parse(inputStream)
 
 
-class ModulationType(object):
+class ModulationType:
     """Information about the type of modulation used for radio transmission. 6.2.59"""
 
     def __init__(self,
@@ -1933,7 +1933,7 @@ class ModulationType(object):
         self.radioSystem = inputStream.read_unsigned_short()
 
 
-class LinearSegmentParameter(object):
+class LinearSegmentParameter:
     """The specification of an individual segment of a linear segment synthetic environment object in a Linear Object State PDU Section 6.2.52"""
 
     def __init__(self,
@@ -2001,7 +2001,7 @@ class LinearSegmentParameter(object):
         self.padding = inputStream.read_unsigned_int()
 
 
-class SimulationAddress(object):
+class SimulationAddress:
     """A Simulation Address record shall consist of the Site Identification number and the Application Identification number. Section 6.2.79"""
 
     def __init__(self, site=0, application=0):
@@ -2023,7 +2023,7 @@ class SimulationAddress(object):
         self.application = inputStream.read_unsigned_short()
 
 
-class SystemIdentifier(object):
+class SystemIdentifier:
     """The ID of the IFF emitting system. NOT COMPLETE. Section 6.2.87"""
 
     def __init__(self,
@@ -2057,7 +2057,7 @@ class SystemIdentifier(object):
         self.changeOptions.parse(inputStream)
 
 
-class TrackJamData(object):
+class TrackJamData:
     """Track-Jam data Section 6.2.89"""
 
     def __init__(self, entityID=None, emitterNumber=0, beamNumber=0):
@@ -2083,7 +2083,7 @@ class TrackJamData(object):
         self.beamNumber = inputStream.read_unsigned_byte()
 
 
-class AggregateType(object):
+class AggregateType:
     """Identifies the type and organization of an aggregate. Section 6.2.5"""
 
     def __init__(self,
@@ -2131,7 +2131,7 @@ class AggregateType(object):
         self.extra = inputStream.read_unsigned_byte()
 
 
-class SimulationManagementPduHeader(object):
+class SimulationManagementPduHeader:
     """First part of a simulation management (SIMAN) PDU and SIMAN-Reliability (SIMAN-R) PDU. Section 6.2.81"""
 
     def __init__(self, pduHeader=None, originatingID=None, receivingID=None):
@@ -2157,7 +2157,7 @@ class SimulationManagementPduHeader(object):
         self.receivingID.parse(inputStream)
 
 
-class BeamData(object):
+class BeamData:
     """Describes the scan volue of an emitter beam. Section 6.2.11."""
 
     def __init__(self,
@@ -2196,7 +2196,7 @@ class BeamData(object):
         self.beamSweepSync = inputStream.read_float()
 
 
-class EngineFuel(object):
+class EngineFuel:
     """Information about an entity's engine fuel. Section 6.2.24."""
 
     def __init__(self,
@@ -2234,7 +2234,7 @@ class EngineFuel(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class IOEffect(object):
+class IOEffect:
     """Effect of IO on an entity. Section 6.2.49.3"""
 
     def __init__(self,
@@ -2281,7 +2281,7 @@ class IOEffect(object):
         self.padding = inputStream.read_unsigned_short()
 
 
-class SimulationIdentifier(object):
+class SimulationIdentifier:
     """The unique designation of a simulation when using the 48-bit identifier format shall be specified by the Simulation Identifier record. The reason that the 48-bit format is required in addition to the 32-bit simulation address format that actually identifies a specific simulation is because some 48-bit identifier fields in PDUs may contain either an Object Identifier, such as an Entity ID, or a Simulation Identifier. Section 6.2.80"""
 
     def __init__(self, simulationAddress=None, referenceNumber=0):
@@ -2303,7 +2303,7 @@ class SimulationIdentifier(object):
         self.referenceNumber = inputStream.read_unsigned_short()
 
 
-class GridAxisDescriptorVariable(object):
+class GridAxisDescriptorVariable:
     """Grid axis descriptor fo variable spacing axis data. NOT COMPLETE. Need padding to 64 bit boundary."""
 
     def __init__(self,
@@ -2371,7 +2371,7 @@ class GridAxisDescriptorVariable(object):
             self.xiValues.append(element)
 
 
-class SupplyQuantity(object):
+class SupplyQuantity:
     """A supply, and the amount of that supply. Section 6.2.86"""
 
     def __init__(self, supplyType=None, quantity=0.0):
@@ -2393,7 +2393,7 @@ class SupplyQuantity(object):
         self.quantity = inputStream.read_float()
 
 
-class SilentEntitySystem(object):
+class SilentEntitySystem:
     """information abou an enitity not producing espdus. Section 6.2.79"""
 
     def __init__(self,
@@ -2431,7 +2431,7 @@ class SilentEntitySystem(object):
             self.appearanceRecordList.append(element)
 
 
-class EventIdentifier(object):
+class EventIdentifier:
     """Identifies an event in the world. Use this format for every PDU EXCEPT the LiveEntityPdu. Section 6.2.34."""
 
     def __init__(self, simulationAddress=None, eventNumber=0):
@@ -2452,7 +2452,7 @@ class EventIdentifier(object):
         self.eventNumber = inputStream.read_unsigned_short()
 
 
-class BlankingSector(object):
+class BlankingSector:
     """The Blanking Sector attribute record may be used to convey persistent areas within a scan volume where emitter power for a specific active emitter beam is reduced to an insignificant value. Section 6.2.21.2"""
 
     def __init__(self,
@@ -2518,7 +2518,7 @@ class BlankingSector(object):
         self.padding4 = inputStream.read_int()
 
 
-class LaunchedMunitionRecord(object):
+class LaunchedMunitionRecord:
     """Identity of a communications node. Section 6.2.50"""
 
     def __init__(self,
@@ -2557,7 +2557,7 @@ class LaunchedMunitionRecord(object):
         self.targetLocation.parse(inputStream)
 
 
-class IFFFundamentalParameterData(object):
+class IFFFundamentalParameterData:
     """Fundamental IFF atc data. Section 6.2.45"""
 
     def __init__(self,
@@ -2611,7 +2611,7 @@ class IFFFundamentalParameterData(object):
             self.systemSpecificData[idx] = val
 
 
-class FundamentalOperationalData(object):
+class FundamentalOperationalData:
     """Basic operational data for IFF. Section 6.2.40."""
 
     def __init__(self,
@@ -2675,7 +2675,7 @@ class FundamentalOperationalData(object):
         self.parameter6 = inputStream.read_unsigned_short()
 
 
-class IntercomCommunicationsParameters(object):
+class IntercomCommunicationsParameters:
     """Intercom communcations parameters. Section 6.2.47.  This requires hand coding"""
 
     def __init__(self, recordType=0, recordLength=0, recordSpecificField=0):
@@ -2701,7 +2701,7 @@ class IntercomCommunicationsParameters(object):
         self.recordSpecificField = inputStream.read_unsigned_int()
 
 
-class EntityType(object):
+class EntityType:
     """Identifies the type of Entity"""
 
     def __init__(self,
@@ -2749,7 +2749,7 @@ class EntityType(object):
         self.extra = inputStream.read_unsigned_byte()
 
 
-class Munition(object):
+class Munition:
     """An entity's munition (e.g., bomb, missile) information shall be represented by one or more Munition records. For each type or location of munition, this record shall specify the type, location, quantity and status of munitions that an entity contains. Section 6.2.60"""
 
     def __init__(self,
@@ -2787,7 +2787,7 @@ class Munition(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class StandardVariableSpecification(object):
+class StandardVariableSpecification:
     """Does not work, and causes failure in anything it is embedded in. Section 6.2.83"""
 
     def __init__(self,
@@ -2816,7 +2816,7 @@ class StandardVariableSpecification(object):
             self.standardVariables.append(element)
 
 
-class Vector2Float(object):
+class Vector2Float:
     """Two floating point values, x, y"""
 
     def __init__(self, x=0.0, y=0.0):
@@ -2838,7 +2838,7 @@ class Vector2Float(object):
         self.y = inputStream.read_float()
 
 
-class Environment(object):
+class Environment:
     """Incomplete environment record; requires hand coding to fix. Section 6.2.31.1"""
 
     def __init__(self, environmentType=0, length=0, index=0):
@@ -2868,7 +2868,7 @@ class Environment(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class AcousticEmitter(object):
+class AcousticEmitter:
     """information about a specific UA emitter. Section 6.2.2."""
 
     def __init__(self,
@@ -2897,7 +2897,7 @@ class AcousticEmitter(object):
         self.acousticIDNumber = inputStream.read_unsigned_byte()
 
 
-class AngularVelocityVector(object):
+class AngularVelocityVector:
     """Angular velocity measured in radians per second out each of the entity's own coordinate axes. Order of measurement is angular velocity around the x, y, and z axis of the entity. The positive direction is determined by the right hand rule. Section 6.2.7"""
 
     def __init__(self, x=0.0, y=0.0, z=0.0):
@@ -2923,7 +2923,7 @@ class AngularVelocityVector(object):
         self.z = inputStream.read_float()
 
 
-class AggregateMarking(object):
+class AggregateMarking:
     """Specifies the character set used in the first byte, followed by up to 31 characters of text data. Section 6.2.4."""
 
     def __init__(self, characterSet=0, characters=None):
@@ -2950,7 +2950,7 @@ class AggregateMarking(object):
             self.characters[idx] = val
 
 
-class DataFilterRecord(object):
+class DataFilterRecord:
     """identify which of the optional data fields are contained in the Minefield Data PDU or requested in the Minefield Query PDU. This is a 32-bit record. For each field, true denotes that the data is requested or present and false denotes that the data is neither requested nor present. Section 6.2.16"""
 
     def __init__(self, bitFlags=0):
@@ -2968,7 +2968,7 @@ class DataFilterRecord(object):
         self.bitFlags = inputStream.read_unsigned_int()
 
 
-class IntercomIdentifier(object):
+class IntercomIdentifier:
     """Unique designation of an attached or unattached intercom in an event or exercise. Section 6.2.48"""
 
     def __init__(self,
@@ -2998,7 +2998,7 @@ class IntercomIdentifier(object):
         self.intercomNumber = inputStream.read_unsigned_short()
 
 
-class StorageFuel(object):
+class StorageFuel:
     """Information about an entity's engine fuel. Section 6.2.84."""
 
     def __init__(self,
@@ -3036,7 +3036,7 @@ class StorageFuel(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class Sensor(object):
+class Sensor:
     """An entity's sensor information.  Section 6.2.77."""
 
     def __init__(self,
@@ -3079,7 +3079,7 @@ class Sensor(object):
         self.padding = inputStream.read_unsigned_short()
 
 
-class MunitionReload(object):
+class MunitionReload:
     """indicate weapons (munitions) previously communicated via the Munition record. Section 6.2.61"""
 
     def __init__(self,
@@ -3123,7 +3123,7 @@ class MunitionReload(object):
         self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
 
 
-class StorageFuelReload(object):
+class StorageFuelReload:
     """For each type or location of Storage Fuel, this record shall specify the type, location, fuel measurement units, reload quantity and maximum quantity for storage fuel either for the whole entity or a specific storage fuel location (tank). Section 6.2.85."""
 
     def __init__(self,
@@ -3176,7 +3176,7 @@ class StorageFuelReload(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class ExpendableReload(object):
+class ExpendableReload:
     """An entity's expendable (chaff, flares, etc) information. Section 6.2.37"""
 
     def __init__(self,
@@ -3215,7 +3215,7 @@ class ExpendableReload(object):
         self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
 
 
-class EntityIdentifier(object):
+class EntityIdentifier:
     """Entity Identifier. Unique ID for entities in the world. Consists of an simulation address and a entity number. Section 6.2.28."""
 
     def __init__(self, simulationAddress=None, entityNumber=0):
@@ -3237,7 +3237,7 @@ class EntityIdentifier(object):
         self.entityNumber = inputStream.read_unsigned_short()
 
 
-class DirectedEnergyTargetEnergyDeposition(object):
+class DirectedEnergyTargetEnergyDeposition:
     """DE energy depostion properties for a target entity. Section 6.2.20.4"""
 
     def __init__(self, targetEntityID=None, peakIrradiance=0.0):
@@ -3263,7 +3263,7 @@ class DirectedEnergyTargetEnergyDeposition(object):
         self.peakIrradiance = inputStream.read_float()
 
 
-class EntityID(object):
+class EntityID:
     """more laconically named EntityIdentifier"""
 
     def __init__(self, siteID=0, applicationID=0, entityID=0):
@@ -3289,7 +3289,7 @@ class EntityID(object):
         self.entityID = inputStream.read_unsigned_short()
 
 
-class EngineFuelReload(object):
+class EngineFuelReload:
     """For each type or location of engine fuel, this record specifies the type, location, fuel measurement units, and reload quantity and maximum quantity. Section 6.2.25."""
 
     def __init__(self,
@@ -3337,7 +3337,7 @@ class EngineFuelReload(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class UnattachedIdentifier(object):
+class UnattachedIdentifier:
     """The unique designation of one or more unattached radios in an event or exercise Section 6.2.91"""
 
     def __init__(self, simulationAddress=None, referenceNumber=0):
@@ -3359,7 +3359,7 @@ class UnattachedIdentifier(object):
         self.referenceNumber = inputStream.read_unsigned_short()
 
 
-class EntityTypeVP(object):
+class EntityTypeVP:
     """Association or disassociation of two entities.  Section 6.2.94.5"""
 
     def __init__(self, recordType=3, changeIndicator=0, entityType=None):
@@ -3393,7 +3393,7 @@ class EntityTypeVP(object):
         self.padding1 = inputStream.read_unsigned_int()
 
 
-class BeamStatus(object):
+class BeamStatus:
     """Information related to the status of a beam. This is contained in the beam status field of the electromagnetic emission PDU. The first bit determines whether the beam is active (0) or deactivated (1). Section 6.2.12."""
 
     def __init__(self, beamState=0):
@@ -3411,7 +3411,7 @@ class BeamStatus(object):
         self.beamState = inputStream.read_unsigned_byte()
 
 
-class EnvironmentGeneral(object):
+class EnvironmentGeneral:
     """Information about a geometry, a state associated with a geometry, a bounding volume, or an associated entity ID. NOTE: this class requires hand coding. 6.2.31"""
 
     def __init__(self, environmentType=0, length=0, index=0, geometry=0):
@@ -3449,7 +3449,7 @@ class EnvironmentGeneral(object):
         self.padding2 = inputStream.read_unsigned_byte()
 
 
-class Vector3Double(object):
+class Vector3Double:
     """Three double precision floating point values, x, y, and z. Used for world coordinates Section 6.2.97."""
 
     def __init__(self, x=0.0, y=0.0, z=0.0):
@@ -3475,7 +3475,7 @@ class Vector3Double(object):
         self.z = inputStream.read_double()
 
 
-class GridAxis(object):
+class GridAxis:
     """Grid axis record for fixed data. Section 6.2.41"""
 
     def __init__(self,
@@ -3524,7 +3524,7 @@ class GridAxis(object):
         self.initialIndex = inputStream.read_unsigned_short()
 
 
-class RecordSpecification(object):
+class RecordSpecification:
     """This record shall specify the number of record sets contained in the Record Specification record and the record details. Section 6.2.73."""
 
     def __init__(self, numberOfRecordSets=0, recordSets=None):
@@ -3550,7 +3550,7 @@ class RecordSpecification(object):
             self.recordSets.append(element)
 
 
-class VariableDatum(object):
+class VariableDatum:
     """the variable datum type, the datum length, and the value for that variable datum type. NOT COMPLETE. Section 6.2.93"""
 
     def __init__(self,
@@ -3597,7 +3597,7 @@ class VariableDatum(object):
             inputStream.read_byte()
 
 
-class EventIdentifierLiveEntity(object):
+class EventIdentifierLiveEntity:
     """Identifies an event in the world. Use this format for ONLY the LiveEntityPdu. Section 6.2.34."""
 
     def __init__(self, siteNumber=0, applicationNumber=0, eventNumber=0):
@@ -3620,7 +3620,7 @@ class EventIdentifierLiveEntity(object):
         self.eventNumber = inputStream.read_unsigned_short()
 
 
-class PduHeader(object):
+class PduHeader:
     """Not used. The PDU Header Record is directly incorporated into the PDU class. Here for completeness only. Section 6.2.66"""
 
     def __init__(self,
@@ -3673,7 +3673,7 @@ class PduHeader(object):
         self.padding = inputStream.read_unsigned_byte()
 
 
-class PduSuperclass(object):
+class PduSuperclass:
     """The superclass for all PDUs, including classic and Live Entity (LE) PDUs. This incorporates the PduHeader record, section 7.2.2"""
 
     def __init__(self,
@@ -3718,7 +3718,7 @@ class PduSuperclass(object):
         self.length = inputStream.read_unsigned_short()
 
 
-class CommunicationsNodeID(object):
+class CommunicationsNodeID:
     """Identity of a communications node. Section 6.2.48.4"""
 
     def __init__(self, entityID=None, elementID=0):
@@ -3738,7 +3738,7 @@ class CommunicationsNodeID(object):
         self.elementID = inputStream.read_unsigned_short()
 
 
-class ExpendableDescriptor(object):
+class ExpendableDescriptor:
     """Burst of chaff or expendable device. Section 6.2.19.4"""
 
     def __init__(self, expendableType=None):
@@ -3760,7 +3760,7 @@ class ExpendableDescriptor(object):
         self.padding = inputStream.read_long()
 
 
-class PropulsionSystemData(object):
+class PropulsionSystemData:
     """contains information describing the propulsion systems of the entity. This information shall be provided for each active propulsion system defined. Section 6.2.68"""
 
     def __init__(self, powerSetting=0.0, engineRpm=0.0):
@@ -3782,7 +3782,7 @@ class PropulsionSystemData(object):
         self.engineRpm = inputStream.read_float()
 
 
-class LiveEntityIdentifier(object):
+class LiveEntityIdentifier:
     """The unique designation of each entity in an event or exercise that is contained in a Live Entity PDU. Section 6.2.54"""
 
     def __init__(self, liveSimulationAddress=None, entityNumber=0):
@@ -3805,7 +3805,7 @@ class LiveEntityIdentifier(object):
         self.entityNumber = inputStream.read_unsigned_short()
 
 
-class SeparationVP(object):
+class SeparationVP:
     """Physical separation of an entity from another entity.  Section 6.2.94.6"""
 
     def __init__(self,
@@ -3854,7 +3854,7 @@ class SeparationVP(object):
         self.stationLocation = inputStream.read_unsigned_int()
 
 
-class EmitterSystem(object):
+class EmitterSystem:
     """This field shall specify information about a particular emitter system. Section 6.2.23."""
 
     def __init__(self, emitterName=0, emitterFunction=0, emitterIDNumber=0):
@@ -3880,7 +3880,7 @@ class EmitterSystem(object):
         self.emitterIDNumber = inputStream.read_unsigned_byte()
 
 
-class PduStatus(object):
+class PduStatus:
     """PDU Status. These are a series of bit fields. Represented here as just a byte. Section 6.2.67"""
 
     def __init__(self, pduStatus=0):
