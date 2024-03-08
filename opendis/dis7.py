@@ -4,27 +4,29 @@
 
 
 class DataQueryDatumSpecification(object):
-    """List of fixed and variable datum records. Section 6.2.17"""
+    """Number and identification of fixed and variable datum records. Section 6.2.17"""
 
     def __init__(self,
-                 numberOfFixedDatums=0,
-                 numberOfVariableDatums=0,
                  fixedDatumIDs=None,
                  variableDatumIDs=None):
         """Initializer for DataQueryDatumSpecification"""
-        self.numberOfFixedDatums = numberOfFixedDatums
-        """Number of fixed datums"""
-        self.numberOfVariableDatums = numberOfVariableDatums
-        """Number of variable datums"""
         self.fixedDatumIDs = fixedDatumIDs or []
         """variable length list fixed datum IDs"""
         self.variableDatumIDs = variableDatumIDs or []
         """variable length list variable datum IDs"""
 
+    @property
+    def numberOfFixedDatumIDs(self) -> int:
+        return len(self.fixedDatumIDs)
+
+    @property
+    def numberOfVariableDatumIDs(self) -> int:
+        return len(self.variableDatumIDs)
+
     def serialize(self, outputStream):
         """serialize the class"""
-        outputStream.write_unsigned_int(len(self.fixedDatumIDs))
-        outputStream.write_unsigned_int(len(self.variableDatumIDs))
+        outputStream.write_unsigned_int(self.numberOfFixedDatumIDs)
+        outputStream.write_unsigned_int(self.numberOfVariableDatumIDs)
         for anObj in self.fixedDatumIDs:
             anObj.serialize(outputStream)
 
@@ -34,14 +36,14 @@ class DataQueryDatumSpecification(object):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
-        self.numberOfFixedDatums = inputStream.read_unsigned_int()
-        self.numberOfVariableDatums = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatums):
+        numberOfFixedDatumIDs = inputStream.read_unsigned_int()
+        numberOfVariableDatumIDs = inputStream.read_unsigned_int()
+        for idx in range(0, numberOfFixedDatumIDs):
             element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatumIDs.append(element)
 
-        for idx in range(0, self.numberOfVariableDatums):
+        for idx in range(0, numberOfVariableDatumIDs):
             element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumIDs.append(element)
@@ -1706,24 +1708,26 @@ class DatumSpecification(object):
     """List of fixed and variable datum records. Section 6.2.18"""
 
     def __init__(self,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for DatumSpecification"""
-        self.numberOfFixedDatumRecords = numberOfFixedDatumRecords
-        """Number of fixed datums"""
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
-        """Number of variable datums"""
         self.fixedDatumRecords = fixedDatumRecords or []
         """variable length list fixed datums"""
         self.variableDatumRecords = variableDatumRecords or []
         """variable length list variable datums"""
 
+    @property
+    def numberOfFixedDatumRecords(self) -> int:
+        return len(self.fixedDatumRecords)
+
+    @property
+    def numberOfVariableDatumRecords(self) -> int:
+        return len(self.variableDatumRecords)
+
     def serialize(self, outputStream):
         """serialize the class"""
-        outputStream.write_unsigned_int(len(self.fixedDatumRecords))
-        outputStream.write_unsigned_int(len(self.variableDatumRecords))
+        outputStream.write_unsigned_int(self.numberOfFixedDatumRecords)
+        outputStream.write_unsigned_int(self.numberOfVariableDatumRecords)
         for anObj in self.fixedDatumRecords:
             anObj.serialize(outputStream)
 
@@ -1732,15 +1736,14 @@ class DatumSpecification(object):
 
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
-
-        self.numberOfFixedDatumRecords = inputStream.read_unsigned_int()
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfFixedDatumRecords):
+        numberOfFixedDatumRecords = inputStream.read_unsigned_int()
+        numberOfVariableDatumRecords = inputStream.read_unsigned_int()
+        for idx in range(0, numberOfFixedDatumRecords):
             element = FixedDatum()
             element.parse(inputStream)
             self.fixedDatumRecords.append(element)
 
-        for idx in range(0, self.numberOfVariableDatumRecords):
+        for idx in range(0, numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
