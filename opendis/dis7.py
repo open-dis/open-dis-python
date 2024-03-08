@@ -14,11 +14,14 @@ struct8 = bytes
 
 
 class DataQueryDatumSpecification:
-    """Number and identification of fixed and variable datum records. Section 6.2.17"""
+    """Section 6.2.17
+    
+    Number and identification of fixed and variable datum records.
+    """
 
     def __init__(self,
-                 fixedDatumIDs=None,
-                 variableDatumIDs=None):
+                 fixedDatumIDs: list[enum32] | None = None,
+                 variableDatumIDs: list[enum32] | None = None):
         """Initializer for DataQueryDatumSpecification"""
         self.fixedDatumIDs = fixedDatumIDs or []
         """variable length list fixed datum IDs"""
@@ -26,11 +29,11 @@ class DataQueryDatumSpecification:
         """variable length list variable datum IDs"""
 
     @property
-    def numberOfFixedDatumIDs(self) -> int:
+    def numberOfFixedDatumIDs(self) -> uint32:
         return len(self.fixedDatumIDs)
 
     @property
-    def numberOfVariableDatumIDs(self) -> int:
+    def numberOfVariableDatumIDs(self) -> uint32:
         return len(self.variableDatumIDs)
 
     def serialize(self, outputStream):
@@ -4360,10 +4363,8 @@ class DataQueryPdu(SimulationManagementFamilyPdu):
     def __init__(self,
                  requestID=0,
                  timeInterval=0,
-                 numberOfFixedDatumIDs=0,
-                 numberOfVariableDatumIDs=0,
-                 fixedDatumIDs=None,
-                 variableDatumIDs=None):
+                 fixedDatumIDs: list[enum32] | None = None,
+                 variableDatumIDs: list[enum32] | None = None):
         """Initializer for DataQueryPdu"""
         super(DataQueryPdu, self).__init__()
         self.requestID = 0
@@ -4371,9 +4372,8 @@ class DataQueryPdu(SimulationManagementFamilyPdu):
         self.timeInterval = 0
         """time issues between issues of Data PDUs. Zero means send once only."""
         # Use DataQueryDatumSpecification
-        self._dataQuery = DataQueryDatumSpecification(
-            numberOfFixedDatumIDs, numberOfVariableDatumIDs, fixedDatumIDs
-            or [], variableDatumIDs or [])
+        self._dataQuery = DataQueryDatumSpecification(fixedDatumIDs or [],
+                                                      variableDatumIDs or [])
         self.pduType = 18
         """initialize value"""
 
@@ -4784,8 +4784,6 @@ class ActionRequestPdu(SimulationManagementFamilyPdu):
     def __init__(self,
                  requestID=0,
                  actionID=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for ActionRequestPdu"""
@@ -4795,9 +4793,7 @@ class ActionRequestPdu(SimulationManagementFamilyPdu):
         self.actionID = actionID
         """identifies the particular action being requested(see Section 7 of SISO-REF-010)."""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 16
         """initialize value"""
@@ -4920,8 +4916,6 @@ class ActionRequestReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
                  requiredReliabilityService=0,
                  requestID=0,
                  actionID=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for ActionRequestReliablePdu"""
@@ -4937,9 +4931,7 @@ class ActionRequestReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
         self.actionID = actionID
         """request ID"""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 56
         """initialize value"""
@@ -5680,8 +5672,6 @@ class SetDataReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
     def __init__(self,
                  requiredReliabilityService=0,
                  requestID=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for SetDataReliablePdu"""
@@ -5695,9 +5685,7 @@ class SetDataReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
         self.requestID = requestID
         """Request ID"""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 59
         """initialize value"""
@@ -5743,8 +5731,6 @@ class EventReportPdu(SimulationManagementFamilyPdu):
 
     def __init__(self,
                  eventType=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for EventReportPdu"""
@@ -5754,9 +5740,7 @@ class EventReportPdu(SimulationManagementFamilyPdu):
         self.padding1 = 0
         """padding"""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 21
         """initialize value"""
@@ -5860,8 +5844,6 @@ class DataPdu(SimulationManagementFamilyPdu):
 
     def __init__(self,
                  requestID=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for DataPdu"""
@@ -5871,9 +5853,7 @@ class DataPdu(SimulationManagementFamilyPdu):
         self.padding1 = 0
         """padding"""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 20
         """initialize value"""
@@ -6310,10 +6290,8 @@ class DataQueryReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
                  requiredReliabilityService=0,
                  requestID=0,
                  timeInterval=0,
-                 numberOfFixedDatumIDs=0,
-                 numberOfVariableDatumIDs=0,
-                 fixedDatumIDs=None,
-                 variableDatumIDs=None):
+                 fixedDatumIDs: list[enum32] | None = None,
+                 variableDatumIDs: list[enum32] | None = None):
         """Initializer for DataQueryReliablePdu"""
         super(DataQueryReliablePdu, self).__init__()
         self.requiredReliabilityService = requiredReliabilityService
@@ -6327,18 +6305,17 @@ class DataQueryReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
         self.timeInterval = timeInterval
         """time interval between issuing data query PDUs"""
         # Use DataQueryDatumSpecification
-        self._dataQuery = DataQueryDatumSpecification(
-            numberOfFixedDatumIDs, numberOfVariableDatumIDs, fixedDatumIDs
-            or [], variableDatumIDs or [])
+        self._dataQuery = DataQueryDatumSpecification(fixedDatumIDs or [],
+                                                      variableDatumIDs or [])
         self.pduType = 58
         """initialize value"""
 
     @property
-    def numberofFixedDatumIDs(self) -> int:
+    def numberOfFixedDatumIDs(self) -> int:
         return self._dataQuery.numberOfFixedDatumIDs
 
     @property
-    def numberofVariableDatumIDs(self) -> int:
+    def numberOfVariableDatumIDs(self) -> int:
         return self._dataQuery.numberOfVariableDatumIDs
 
     @property
@@ -6466,8 +6443,6 @@ class DataReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
     def __init__(self,
                  requestID=0,
                  requiredReliabilityService=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for DataReliablePdu"""
@@ -6481,9 +6456,7 @@ class DataReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
         self.pad2 = 0
         """padding"""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 60
         """initialize value"""
@@ -6528,16 +6501,12 @@ class CommentPdu(SimulationManagementFamilyPdu):
     """Arbitrary messages can be entered into the data stream via use of this PDU. Section 7.5.13 COMPLETE"""
 
     def __init__(self,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for CommentPdu"""
         super(CommentPdu, self).__init__()
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 22
         """initialize value"""
@@ -6574,16 +6543,12 @@ class CommentReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
     """Section 5.3.12.12: Arbitrary messages. Only reliable this time. Needs manual intervention to fix padding in variable datums. UNFINISHED"""
 
     def __init__(self,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for CommentReliablePdu"""
         super(CommentReliablePdu, self).__init__()
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 62
         """initialize value"""
@@ -6796,8 +6761,6 @@ class SetDataPdu(SimulationManagementFamilyPdu):
 
     def __init__(self,
                  requestID=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for SetDataPdu"""
@@ -6807,9 +6770,7 @@ class SetDataPdu(SimulationManagementFamilyPdu):
         self.padding1 = 0
         """padding"""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 19
         """initialize value"""
@@ -6913,8 +6874,6 @@ class ActionResponsePdu(SimulationManagementFamilyPdu):
     def __init__(self,
                  requestID=0,
                  requestStatus=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for ActionResponsePdu"""
@@ -6924,9 +6883,7 @@ class ActionResponsePdu(SimulationManagementFamilyPdu):
         self.requestStatus = requestStatus
         """Status of response"""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 17
         """initialize value"""
@@ -7545,8 +7502,6 @@ class EventReportReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
 
     def __init__(self,
                  eventType=0,
-                 numberOfFixedDatumRecords=0,
-                 numberOfVariableDatumRecords=0,
                  fixedDatumRecords=None,
                  variableDatumRecords=None):
         """Initializer for EventReportReliablePdu"""
@@ -7556,9 +7511,7 @@ class EventReportReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
         self.pad1 = 0
         """padding"""
         # Use DatumSpecification
-        self._datums = DatumSpecification(numberOfFixedDatumRecords,
-                                          numberOfVariableDatumRecords,
-                                          fixedDatumRecords or [],
+        self._datums = DatumSpecification(fixedDatumRecords or [],
                                           variableDatumRecords or [])
         self.pduType = 61
         """initialize value"""
