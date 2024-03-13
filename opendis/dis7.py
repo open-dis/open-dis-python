@@ -2,21 +2,23 @@
 #This code is licensed under the BSD software license
 #
 
-# Type aliases (for readability)
-enum8 = int
-enum16 = int
-enum32 = int
-int16 = int
-int32 = int
-uint8 = int
-uint16 = int
-uint32 = int
-uint64 = int
-float32 = float
-float64 = float
-struct8 = bytes
-struct16 = bytes
-struct32 = bytes
+from .types import (
+    enum8,
+    enum16,
+    enum32,
+    int8,
+    int16,
+    int32,
+    uint8,
+    uint16,
+    uint32,
+    uint64,
+    float32,
+    float64,
+    struct8,
+    struct16,
+    struct32,
+)
 
 
 class DataQueryDatumSpecification:

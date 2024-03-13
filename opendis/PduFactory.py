@@ -4,6 +4,7 @@ __date__ = "$Jun 25, 2015 11:31:42 AM$"
 from .DataInputStream import DataInputStream
 from .dis7 import *
 from io import BytesIO
+from os import PathLike
 import binascii
 import io
 
@@ -62,7 +63,7 @@ PduTypeDecoders = {
  }
 
 
-def getPdu(inputStream):
+def getPdu(inputStream: DataInputStream) -> PduSuperclass | None:
     inputStream.stream.seek(2, 0) # Skip ahead to PDU type enum field
     pduType = inputStream.read_byte()
     inputStream.stream.seek(0, 0) # Rewind to start
@@ -79,7 +80,7 @@ def getPdu(inputStream):
     return None
 
 
-def createPdu(data):
+def createPdu(data: bytes) -> PduSuperclass | None:
     """ Create a PDU of the correct type when passed an array of binary data
         input: a bytebuffer of DIS data
         output: a python DIS pdu instance of the correct class"""
@@ -90,7 +91,7 @@ def createPdu(data):
     return getPdu(inputStream)
 
 
-def createPduFromFilePath(filePath):
+def createPduFromFilePath(filePath: PathLike) -> PduSuperclass | None:
     """ Utility written for unit tests, but could have other uses too."""
     f = io.open(filePath, "rb")
     inputStream = DataInputStream(f)
