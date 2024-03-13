@@ -4,12 +4,12 @@ From https://github.com/arngarden/python_java_datastream/blob/master/data_output
 This uses big endian (network) format
 """
 
-from io import BytesIO
+from io import BufferedIOBase
 import struct
 
 
 class DataOutputStream:
-    def __init__(self, stream: BytesIO):
+    def __init__(self, stream: BufferedIOBase):
         self.stream = stream
 
     def write_boolean(self, boolean: bool) -> None:
