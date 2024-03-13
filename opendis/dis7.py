@@ -7430,7 +7430,7 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.sampleRate = sampleRate
         """sample rate"""
         self.dataLength = dataLength
-        """length od data"""
+        """length of data"""
         self.samples = samples
         """number of samples"""
         self.data = data or []
