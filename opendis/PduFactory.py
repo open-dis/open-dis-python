@@ -93,8 +93,7 @@ def createPdu(data: bytes) -> PduSuperclass | None:
 
 def createPduFromFilePath(filePath: PathLike) -> PduSuperclass | None:
     """ Utility written for unit tests, but could have other uses too."""
-    f = io.open(filePath, "rb")
-    inputStream = DataInputStream(f)
-    pdu = getPdu(inputStream)
-    f.close()
+    with io.open(filePath, "rb") as f:
+        inputStream = DataInputStream(f)
+        pdu = getPdu(inputStream)
     return pdu
