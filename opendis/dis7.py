@@ -5404,7 +5404,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  frequency: uint64 = 0,  # in Hz
                  transmitFrequencyBandwidth: float32 = 0.0,  # in Hz
                  power: float32 = 0.0,  # in decibel-milliwatts
-                 modulationType: "ModulationType" or None = None,
+                 modulationType: "ModulationType | None" = None,
                  cryptoSystem: enum16 = 0,  # [UID 166]
                  cryptoKeyId: struct16 = 0,  # See Table 175
                  modulationParameterCount: uint8 = 0,  # in bytes
