@@ -1458,8 +1458,8 @@ class DirectedEnergyDamage:
     def __init__(
             self,
             damageLocation: "Vector3Float | None" = None,
-            damageDiameter: float32 = 0.0,
-            temperature: float32 = -273.15,
+            damageDiameter: float32 = 0.0,  # in metres
+            temperature: float32 = -273.15,  # in degrees Celsius
             componentIdentification: enum8 = 0,  # [UID 314]
             componentDamageStatus: enum8 = 0,  # [UID 315]
             componentVisualDamageStatus: struct8 = b'0',  # [UID 317]
@@ -3433,7 +3433,7 @@ class DirectedEnergyTargetEnergyDeposition:
 
     def __init__(self,
                  targetEntityID: "EntityIdentifier | None" = None,
-                 peakIrradiance: float32 = 0.0):
+                 peakIrradiance: float32 = 0.0):  # in W/m^2
         self.targetEntityID = targetEntityID or EntityID()
         """Unique ID of the target entity."""
         self.padding: uint16 = 0
@@ -3988,8 +3988,8 @@ class PropulsionSystemData:
     """
 
     def __init__(self,
-                 powerSetting: float32 = 0.0,
-                 engineRpm: float32 = 0.0):
+                 powerSetting: float32 = 0.0,  # normalized value for throttle (Table 25)
+                 engineRpm: float32 = 0.0):  # in RPM
         self.powerSetting = powerSetting
         """powerSetting"""
         self.engineRpm = engineRpm
