@@ -104,7 +104,7 @@ class RequestID:
     PDUs. This should be a hand-coded thingie, maybe a singleton.
     """
 
-    def __init__(self, requestID=0):
+    def __init__(self, requestID: uint32 = 0):
         self.requestID = requestID
         """monotonically increasing number"""
 
@@ -5406,7 +5406,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  power: float32 = 0.0,  # in decibel-milliwatts
                  modulationType: "ModulationType | None" = None,
                  cryptoSystem: enum16 = 0,  # [UID 166]
-                 cryptoKeyId: struct16 = 0,  # See Table 175
+                 cryptoKeyId: struct16 = b'00',  # See Table 175
                  modulationParameterCount: uint8 = 0,  # in bytes
                  modulationParametersList=None,
                  antennaPatternList=None):
