@@ -48,6 +48,15 @@ class DataQueryDatumSpecification( object ):
             element.parse(inputStream)
             self.variableDatumIDs.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                                # self.numberOfFixedDatums
+        marshalSize += 4                                                # self.numberOfVariableDatums
+        for anObj in self.fixedDatumIDs:                                # self.fixedDatumIDs
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumIDs:                             # self.variableDatumIDs
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -85,6 +94,13 @@ class RadioIdentifier( object ):
         self.referenceNumber = inputStream.read_unsigned_short()
         self.radioNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.siteNumber
+        marshalSize += 2    # self.applicationNumber
+        marshalSize += 2    # self.referenceNumber
+        marshalSize += 2    # self.radioNumber
+        return marshalSize
 
 
 class RequestID( object ):
@@ -105,6 +121,10 @@ class RequestID( object ):
 
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.requestID
+        return marshalSize
 
 
 class IFFData( object ):
@@ -141,6 +161,12 @@ class IFFData( object ):
             val = inputStream.read_unsigned_byte()
             self.iffData.append(val)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        # As stated above:
+        """ The record length includes the length of record type field (32 bits) and record length field (16 bits) so we subtract 6 bytes total for those. """
+        marshalSize += self.recordLength()
+        return marshalSize
 
 
 
@@ -183,6 +209,14 @@ class MunitionDescriptor( object ):
         self.quantity = inputStream.read_unsigned_short()
         self.rate = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.munitionType.marshalledSize()   # self.munitionType
+        marshalSize += 2                                    # self.warhead
+        marshalSize += 2                                    # self.fuse
+        marshalSize += 2                                    # self.quantity
+        marshalSize += 2                                    # self.rate
+        return marshalSize
 
 
 class MinefieldSensorType( object ):
@@ -203,6 +237,10 @@ class MinefieldSensorType( object ):
 
         self.sensorType = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.sensorType
+        return marshalSize
 
 
 class GroupID( object ):
@@ -227,6 +265,11 @@ class GroupID( object ):
         self.simulationAddress.parse(inputStream)
         self.groupNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()  # self.simulationAddress
+        marshalSize += 2                                        # self.groupNumber
+        return marshalSize
 
 
 class LayerHeader( object ):
@@ -254,6 +297,12 @@ class LayerHeader( object ):
         self.layerSpecificInformation = inputStream.read_unsigned_byte()
         self.length = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1  # self.layerNumber
+        marshalSize += 1  # self.layerSpecificInformation
+        marshalSize += 2  # self.length
+        return marshalSize
 
 
 class UnsignedDISInteger( object ):
@@ -274,6 +323,10 @@ class UnsignedDISInteger( object ):
 
         self.val = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4  # self.val
+        return marshalSize
 
 
 class DeadReckoningParameters( object ):
@@ -317,6 +370,13 @@ class DeadReckoningParameters( object ):
         self.entityLinearAcceleration.parse(inputStream)
         self.entityAngularVelocity.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1                                                # self.deadReckoningAlgorithm
+        marshalSize += 15                                               # self.parameters
+        marshalSize += self.entityLinearAcceleration.marshalledSize()   # self.entityLinearAcceleration
+        marshalSize += self.entityAngularVelocity.marshalledSize()      # self.entityAngularVelocity
+        return marshalSize
 
 
 class ProtocolMode( object ):
@@ -337,6 +397,10 @@ class ProtocolMode( object ):
 
         self.protocolMode = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2  # self.protocolMode
+        return marshalSize
 
 
 class AngleDeception( object ):
@@ -414,6 +478,25 @@ class AngleDeception( object ):
         self.elevationPullAcceleration = inputStream.read_float()
         self.padding3 = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4  # self.recordType
+        marshalSize += 2  # self.recordLength
+        marshalSize += 2  # self.padding
+        marshalSize += 1  # self.emitterNumber
+        marshalSize += 1  # self.beamNumber
+        marshalSize += 1  # self.stateIndicator
+        marshalSize += 1  # self.padding2
+        marshalSize += 4  # self.azimuthOffset
+        marshalSize += 4  # self.azimuthWidth
+        marshalSize += 4  # self.azimuthPullRate
+        marshalSize += 4  # self.azimuthPullAcceleration
+        marshalSize += 4  # self.elevationOffset
+        marshalSize += 4  # self.elevationWidth
+        marshalSize += 4  # self.elevationPullRate
+        marshalSize += 4  # self.elevationPullAcceleration
+        marshalSize += 4  # self.padding3
+        return marshalSize
 
 
 class EntityAssociation( object ):
@@ -474,6 +557,18 @@ class EntityAssociation( object ):
         self.groupMemberType = inputStream.read_unsigned_byte()
         self.groupNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1                                # self.recordType
+        marshalSize += 1                                # self.changeIndicator
+        marshalSize += 1                                # self.associationStatus
+        marshalSize += 1                                # self.associationType
+        marshalSize += self.entityID.marshalledSize()   # self.entityID
+        marshalSize += 2                                # self.ownStationLocation
+        marshalSize += 1                                # self.physicalConnectionType
+        marshalSize += 1                                # self.groupMemberType
+        marshalSize += 2                                # self.groupNumber
+        return marshalSize
 
 
 class VectoringNozzleSystem( object ):
@@ -500,6 +595,11 @@ class VectoringNozzleSystem( object ):
         self.horizontalDeflectionAngle = inputStream.read_float()
         self.verticalDeflectionAngle = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                # self.horizontalDeflectionAngle
+        marshalSize += 4                                # self.verticalDeflectionAngle
+        return marshalSize
 
 
 class FalseTargetsAttribute( object ):
@@ -564,6 +664,22 @@ class FalseTargetsAttribute( object ):
         self.keepTime = inputStream.read_float()
         self.echoSpacing = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.recordType
+        marshalSize += 2    # self.recordLength
+        marshalSize += 2    # self.padding
+        marshalSize += 1    # self.emitterNumber
+        marshalSize += 1    # self.beamNumber
+        marshalSize += 1    # self.stateIndicator
+        marshalSize += 1    # self.padding2
+        marshalSize += 2    # self.falseTargetCount
+        marshalSize += 4    # self.walkSpeed
+        marshalSize += 4    # self.walkAcceleration
+        marshalSize += 4    # self.maximumWalkDistance
+        marshalSize += 4    # self.keepTime
+        marshalSize += 4    # self.echoSpacing
+        return marshalSize
 
 
 class MinefieldIdentifier( object ):
@@ -588,6 +704,11 @@ class MinefieldIdentifier( object ):
         self.simulationAddress.parse(inputStream)
         self.minefieldNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()  # self.simulationAddress
+        marshalSize += 2                                        # self.minefieldNumber
+        return marshalSize
 
 
 class RadioType( object ):
@@ -637,6 +758,16 @@ class RadioType( object ):
         self.specific = inputStream.read_unsigned_byte()
         self.extra = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.entityKind
+        marshalSize += 1    # self.domain
+        marshalSize += 2    # self.country
+        marshalSize += 1    # self.category
+        marshalSize += 1    # self.subcategory
+        marshalSize += 1    # self.specific
+        marshalSize += 1    # self.extra
+        return marshalSize
 
 
 class NamedLocationIdentification( object ):
@@ -661,6 +792,11 @@ class NamedLocationIdentification( object ):
         self.stationName = inputStream.read_unsigned_short()
         self.stationNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.stationName
+        marshalSize += 2    # self.stationNumber
+        return marshalSize
 
 
 class ModulationParameters( object ):
@@ -676,6 +812,9 @@ class ModulationParameters( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
+    def marshalledSize(self):
+        marshalSize = 0
+        return marshalSize
 
 
 class EulerAngles( object ):
@@ -701,6 +840,12 @@ class EulerAngles( object ):
         self.theta = inputStream.read_float()
         self.phi = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.psi
+        marshalSize += 4    # self.theta
+        marshalSize += 4    # self.phi
+        return marshalSize
 
 
 class DirectedEnergyPrecisionAimpoint( object ):
@@ -788,6 +933,24 @@ class DirectedEnergyPrecisionAimpoint( object ):
         self.peakIrradiance = inputStream.read_float()
         self.padding2 = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                                # self.recordType
+        marshalSize += 2                                                # self.recordLength
+        marshalSize += 2                                                # self.padding
+        marshalSize += self.targetSpotLocation.marshalledSize()         # self.targetSpotLocation
+        marshalSize += self.targetSpotEntityLocation.marshalledSize()   # self.targetSpotEntityLocation
+        marshalSize += self.targetSpotVelocity.marshalledSize()         # self.targetSpotVelocity
+        marshalSize += self.targetSpotAcceleration.marshalledSize()     # self.targetSpotAcceleration
+        marshalSize += self.targetEntityID.marshalledSize()             # self.targetEntityID
+        marshalSize += 1                                                # self.targetComponentID
+        marshalSize += 1                                                # self.beamSpotType
+        marshalSize += 4                                                # self.beamSpotCrossSectionSemiMajorAxis
+        marshalSize += 4                                                # self.beamSpotCrossSectionOrientationAngle
+        marshalSize += 4                                                # self.beamSpotCrossSectionOrientationAngle
+        marshalSize += 4                                                # self.peakIrradiance
+        marshalSize += 4                                                # self.padding2
+        return marshalSize
 
 
 class IffDataSpecification( object ):
@@ -815,6 +978,12 @@ class IffDataSpecification( object ):
             element.parse(inputStream)
             self.iffDataRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2                        # self.numberOfIffDataRecords
+        for anObj in self.iffDataRecords:       # self.iffDataRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -844,6 +1013,12 @@ class OwnershipStatus( object ):
         self.ownershipStatus = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.entityId.marshalledSize()   # self.entityId
+        marshalSize += 1                                # self.ownershipStatus
+        marshalSize += 1                                # self.padding
+        return marshalSize
 
 
 class BeamAntennaPattern( object ):
@@ -902,6 +1077,19 @@ class BeamAntennaPattern( object ):
         self.phase = inputStream.read_float()
         self.padding3 = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.beamDirection.marshalledSize()  # self.beamDirection
+        marshalSize += 4                                    # self.azimuthBeamwidth
+        marshalSize += 4                                    # self.elevationBeamwidth
+        marshalSize += 1                                    # self.referenceSystem
+        marshalSize += 1                                    # self.padding1
+        marshalSize += 2                                    # self.padding2
+        marshalSize += 4                                    # self.ez
+        marshalSize += 4                                    # self.ex
+        marshalSize += 4                                    # self.phase
+        marshalSize += 4                                    # self.padding3
+        return marshalSize
 
 
 class AttachedParts( object ):
@@ -942,6 +1130,14 @@ class AttachedParts( object ):
         self.parameterType = inputStream.read_unsigned_int()
         self.parameterValue = inputStream.read_long()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.recordType
+        marshalSize += 1    # self.detachedIndicator
+        marshalSize += 2    # self.partAttachedTo
+        marshalSize += 4    # self.parameterType
+        marshalSize += 8    # self.parameterValue
+        return marshalSize
 
 
 class VariableTransmitterParameters( object ):
@@ -966,6 +1162,11 @@ class VariableTransmitterParameters( object ):
         self.recordType = inputStream.read_unsigned_int()
         self.recordLength = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.recordType
+        marshalSize += 4    # self.recordLength
+        return marshalSize
 
 
 class Attribute( object ):
@@ -991,6 +1192,12 @@ class Attribute( object ):
         self.recordLength = inputStream.read_unsigned_short()
         self.recordSpecificFields = inputStream.read_long()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.recordType
+        marshalSize += 2    # self.recordLength
+        marshalSize += 8    # self.recordSpecificFields
+        return marshalSize
 
 
 class RecordQuerySpecification( object ):
@@ -1016,6 +1223,11 @@ class RecordQuerySpecification( object ):
             val = inputstream.read_unsigned_int()
             self.records.append(val)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                            # self.numberOfRecords
+        marshalSize += self.numberOfRecords * 4     # self.records
+        return marshalSize
 
 
 class ArticulatedParts( object ):
@@ -1057,6 +1269,14 @@ class ArticulatedParts( object ):
         self.parameterType = inputStream.read_unsigned_int()
         self.parameterValue = inputStream.read_long()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.recordType
+        marshalSize += 1    # self.changeIndicator
+        marshalSize += 2    # self.partAttachedTo
+        marshalSize += 4    # self.parameterType
+        marshalSize += 8    # self.parameterValue
+        return marshalSize
 
 
 class ObjectType( object ):
@@ -1093,6 +1313,13 @@ class ObjectType( object ):
         self.category = inputStream.read_unsigned_byte()
         self.subcategory = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.domain
+        marshalSize += 1    # self.objectKind
+        marshalSize += 1    # self.category
+        marshalSize += 1    # self.subcategory
+        return marshalSize
 
 
 class Association( object ):
@@ -1126,6 +1353,13 @@ class Association( object ):
         self.associatedEntityID.parse(inputStream)
         self.associatedLocation.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1                                            # self.associationType
+        marshalSize += 1                                            # self.padding4
+        marshalSize += self.associatedEntityID.marshalledSize()     # self.associatedEntityID
+        marshalSize += self.associatedLocation.marshalledSize()     # self.associatedLocation
+        return marshalSize
 
 
 class RecordSpecificationElement( object ):
@@ -1171,6 +1405,15 @@ class RecordSpecificationElement( object ):
         self.recordValues = inputStream.read_unsigned_short()
         self.pad4 = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.recordID
+        marshalSize += 4    # self.recordSetSerialNumber
+        marshalSize += 2    # self.recordLength
+        marshalSize += 2    # self.recordCount
+        marshalSize += 2    # self.recordValues
+        marshalSize += 1    # self.pad4
+        return marshalSize
 
 
 class AntennaLocation( object ):
@@ -1197,6 +1440,11 @@ class AntennaLocation( object ):
         self.antennaLocation.parse(inputStream)
         self.relativeAntennaLocation.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.antennaLocation.marshalledSize()            # self.antennaLocation
+        marshalSize += self.relativeAntennaLocation.marshalledSize()    # self.relativeAntennaLocation
+        return marshalSize
 
 
 class ObjectIdentifier( object ):
@@ -1221,6 +1469,11 @@ class ObjectIdentifier( object ):
         self.simulationAddress.parse(inputStream)
         self.objectNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()      # self.simulationAddress
+        marshalSize += 2                                            # self.objectNumber
+        return marshalSize
 
 
 class AggregateIdentifier( object ):
@@ -1245,6 +1498,11 @@ class AggregateIdentifier( object ):
         self.simulationAddress.parse(inputStream)
         self.aggregateID = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()      # self.simulationAddress
+        marshalSize += 2                                            # self.aggregateID
+        return marshalSize
 
 
 class FixedDatum( object ):
@@ -1271,6 +1529,11 @@ class FixedDatum( object ):
         self.fixedDatumID = inputStream.read_unsigned_int()
         self.fixedDatumValue = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.fixedDatumID
+        marshalSize += 4    # self.fixedDatumValue
+        return marshalSize
 
 
 class VariableParameter( object ):
@@ -1312,6 +1575,14 @@ class VariableParameter( object ):
         self.variableParameterFields3 = inputStream.read_unsigned_short()
         self.variableParameterFields4 = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.recordType
+        marshalSize += 8    # self.variableParameterFields1
+        marshalSize += 4    # self.variableParameterFields2
+        marshalSize += 2    # self.variableParameterFields3
+        marshalSize += 1    # self.variableParameterFields4
+        return marshalSize
 
 
 class ChangeOptions( object ):
@@ -1327,6 +1598,9 @@ class ChangeOptions( object ):
     def parse(self, inputStream):
         """"Parse a message. This may recursively call embedded objects."""
 
+    def marshalledSize(self):
+        marshalSize = 0
+        return marshalSize
 
 
 
@@ -1352,6 +1626,11 @@ class LiveSimulationAddress( object ):
         self.liveSiteNumber = inputStream.read_unsigned_byte()
         self.liveApplicationNumber = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.liveSiteNumber
+        marshalSize += 1    # self.liveApplicationNumber
+        return marshalSize
 
 
 class EntityMarking( object ):
@@ -1393,6 +1672,11 @@ class EntityMarking( object ):
 
             self.characters[  idx  ] = val
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.characterSet
+        marshalSize += 11   # self.characters
+        return marshalSize
 
 
 
@@ -1440,6 +1724,15 @@ class UAFundamentalParameter( object ):
         self.beamCenterDepressionElevation = inputStream.read_float()
         self.beamwidthDownElevation = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.activeEmissionParameterIndex
+        marshalSize += 2    # self.scanPattern
+        marshalSize += 4    # self.beamCenterAzimuthHorizontal
+        marshalSize += 4    # self.azimuthalBeamwidthHorizontal
+        marshalSize += 4    # self.beamCenterDepressionElevation
+        marshalSize += 4    # self.beamwidthDownElevation
+        return marshalSize
 
 
 class DirectedEnergyDamage( object ):
@@ -1512,6 +1805,21 @@ class DirectedEnergyDamage( object ):
         self.fireEventID.parse(inputStream)
         self.padding2 = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                        # self.recordType
+        marshalSize += 2                                        # self.recordLength
+        marshalSize += 2                                        # self.padding
+        marshalSize += self.damageLocation.marshalledSize()     # self.damageLocation
+        marshalSize += 4                                        # self.damageDiameter
+        marshalSize += 4                                        # self.temperature
+        marshalSize += 1                                        # self.componentIdentification
+        marshalSize += 1                                        # self.componentDamageStatus
+        marshalSize += 1                                        # self.componentVisualDamageStatus
+        marshalSize += 1                                        # self.componentVisualSmokeColor
+        marshalSize += self.fireEventID.marshalledSize()        # self.fireEventID
+        marshalSize += 2                                        # self.padding2
+        return marshalSize
 
 
 class ExplosionDescriptor( object ):
@@ -1547,6 +1855,13 @@ class ExplosionDescriptor( object ):
         self.padding = inputStream.read_unsigned_short()
         self.explosiveForce = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.explodingObject.marshalledSize()    # self.explodingObject
+        marshalSize += 2                                        # self.explosiveMaterial
+        marshalSize += 2                                        # self.padding
+        marshalSize += 4                                        # self.explosiveForce
+        return marshalSize
 
 
 class ClockTime( object ):
@@ -1571,6 +1886,11 @@ class ClockTime( object ):
         self.hour = inputStream.read_unsigned_int()
         self.timePastHour = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.hour
+        marshalSize += 4    # self.timePastHour
+        return marshalSize
 
 
 class SecondaryOperationalData( object ):
@@ -1602,6 +1922,12 @@ class SecondaryOperationalData( object ):
         self.operationalData2 = inputStream.read_unsigned_byte()
         self.numberOfIFFFundamentalParameterRecords = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.operationalData1
+        marshalSize += 1    # self.operationalData2
+        marshalSize += 2    # self.numberOfIFFFundamentalParameterRecords
+        return marshalSize
 
 
 class EnvironmentType( object ):
@@ -1652,6 +1978,16 @@ class EnvironmentType( object ):
         self.specific = inputStream.read_unsigned_byte()
         self.extra = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.entityKind
+        marshalSize += 1    # self.domain
+        marshalSize += 2    # self.entityClass
+        marshalSize += 1    # self.category
+        marshalSize += 1    # self.subcategory
+        marshalSize += 1    # self.specific
+        marshalSize += 1    # self.extra
+        return marshalSize
 
 
 class TotalRecordSets( object ):
@@ -1676,6 +2012,11 @@ class TotalRecordSets( object ):
         self.totalRecordSets = inputStream.read_unsigned_short()
         self.padding = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.totalRecordSets
+        marshalSize += 2    # self.padding
+        return marshalSize
 
 
 class MineEntityIdentifier( object ):
@@ -1700,6 +2041,11 @@ class MineEntityIdentifier( object ):
         self.simulationAddress.parse(inputStream)
         self.mineEntityNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()      # self.simulationAddress
+        marshalSize += 2                                            # self.mineEntityNumber
+        return marshalSize
 
 
 class Relationship( object ):
@@ -1724,6 +2070,11 @@ class Relationship( object ):
         self.nature = inputStream.read_unsigned_short()
         self.position = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.nature
+        marshalSize += 2    # self.position
+        return marshalSize
 
 
 class EEFundamentalParameterData( object ):
@@ -1785,6 +2136,19 @@ class EEFundamentalParameterData( object ):
         self.beamElevationSweep = inputStream.read_float()
         self.beamSweepSync = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.frequency
+        marshalSize += 4    # self.frequencyRange
+        marshalSize += 4    # self.effectiveRadiatedPower
+        marshalSize += 4    # self.pulseRepetitionFrequency
+        marshalSize += 4    # self.pulseWidth
+        marshalSize += 4    # self.beamAzimuthCenter
+        marshalSize += 4    # self.beamAzimuthSweep
+        marshalSize += 4    # self.beamElevationCenter
+        marshalSize += 4    # self.beamElevationSweep
+        marshalSize += 4    # self.beamSweepSync
+        return marshalSize
 
 class JammingTechnique( object ):
     """Jamming technique. Section 6.2.49"""
@@ -1812,6 +2176,13 @@ class JammingTechnique( object ):
         self.subcategory = inputStream.read_unsigned_byte()
         self.specific = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.kind
+        marshalSize += 1    # self.category
+        marshalSize += 1    # self.subcategory
+        marshalSize += 1    # self.specific
+        return marshalSize
 
 
 class DatumSpecification( object ):
@@ -1859,7 +2230,16 @@ class DatumSpecification( object ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
 
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 class DirectedEnergyAreaAimpoint( object ):
@@ -1920,6 +2300,18 @@ class DirectedEnergyAreaAimpoint( object ):
             element.parse(inputStream)
             self.directedEnergyTargetEnergyDepositionRecordList.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                                    # self.recordType
+        marshalSize += 2                                                    # self.recordLength
+        marshalSize += 2                                                    # self.padding
+        marshalSize += 2                                                    # self.beamAntennaPatternRecordCount
+        marshalSize += 2                                                    # self.directedEnergyTargetEnergyDepositionRecordCount
+        for anObj in self.beamAntennaParameterList:                         # self.beamAntennaParameterList
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.directedEnergyTargetEnergyDepositionRecordList:   # self.directedEnergyTargetEnergyDepositionRecordList
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -1949,6 +2341,12 @@ class Vector3Float( object ):
         self.y = inputStream.read_float()
         self.z = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.x
+        marshalSize += 4    # self.y
+        marshalSize += 4    # self.z
+        return marshalSize
 
 
 class Expendable( object ):
@@ -1985,6 +2383,14 @@ class Expendable( object ):
         self.expendableStatus = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.expendable.marshalledSize()     # self.expendable
+        marshalSize += 4                                    # self.station
+        marshalSize += 2                                    # self.quantity
+        marshalSize += 1                                    # self.expendableStatus
+        marshalSize += 1                                    # self.padding
+        return marshalSize
 
 
 class IOCommunicationsNode( object ):
@@ -2018,6 +2424,14 @@ class IOCommunicationsNode( object ):
         self.padding = inputStream.read_unsigned_byte()
         self.communicationsNodeID.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                            # self.recordType
+        marshalSize += 2                                            # self.recordLength
+        marshalSize += 1                                            # self.communcationsNodeType
+        marshalSize += 1                                            # self.padding
+        marshalSize += self.communicationsNodeID.marshalledSize()   # self.communicationsNodeID
+        return marshalSize
 
 
 class ModulationType( object ):
@@ -2054,6 +2468,13 @@ class ModulationType( object ):
         self.detail = inputStream.read_unsigned_short()
         self.radioSystem = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.spreadSpectrum
+        marshalSize += 2    # self.majorModulation
+        marshalSize += 2    # self.detail
+        marshalSize += 2    # self.radioSystem
+        return marshalSize
 
 
 class LinearSegmentParameter( object ):
@@ -2124,6 +2545,20 @@ class LinearSegmentParameter( object ):
         self.segmentDepth = inputStream.read_float()
         self.padding = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1                                            # self.segmentNumber
+        marshalSize += 1                                            # self.segmentModification
+        marshalSize += 2                                            # self.generalSegmentAppearance
+        marshalSize += 4                                            # self.specificSegmentAppearance
+        marshalSize += self.segmentLocation.marshalledSize()        # self.segmentLocation
+        marshalSize += self.segmentOrientation.marshalledSize()     # self.segmentOrientation
+        marshalSize += 4                                            # self.segmentLength
+        marshalSize += 4                                            # self.segmentWidth
+        marshalSize += 4                                            # self.segmentHeight
+        marshalSize += 4                                            # self.segmentDepth
+        marshalSize += 4                                            # self.padding
+        return marshalSize
 
 
 class SimulationAddress( object ):
@@ -2148,6 +2583,11 @@ class SimulationAddress( object ):
         self.site = inputStream.read_unsigned_short()
         self.application = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.site
+        marshalSize += 2    # self.application
+        return marshalSize
 
 
 class SystemIdentifier( object ):
@@ -2184,6 +2624,13 @@ class SystemIdentifier( object ):
         self.systemMode = inputStream.read_unsigned_short()
         self.changeOptions.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2                                        # self.systemType
+        marshalSize += 2                                        # self.systemName
+        marshalSize += 2                                        # self.systemMode
+        marshalSize += self.changeOptions.marshalledSize()      # self.changeOptions
+        return marshalSize
 
 
 class TrackJamData( object ):
@@ -2212,6 +2659,11 @@ class TrackJamData( object ):
         self.emitterNumber = inputStream.read_unsigned_byte()
         self.beamNumber = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.emitterNumber
+        marshalSize += 1    # self.beamNumber
+        return marshalSize
 
 
 class AggregateType( object ):
@@ -2262,6 +2714,16 @@ class AggregateType( object ):
         self.specificInfo = inputStream.read_unsigned_byte()
         self.extra = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.aggregateKind
+        marshalSize += 1    # self.domain
+        marshalSize += 2    # self.country
+        marshalSize += 1    # self.category
+        marshalSize += 1    # self.subcategory
+        marshalSize += 1    # self.specificInfo
+        marshalSize += 1    # self.extra
+        return marshalSize
 
 
 class SimulationManagementPduHeader( object ):
@@ -2293,6 +2755,12 @@ class SimulationManagementPduHeader( object ):
         self.originatingID.parse(inputStream)
         self.receivingID.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.pduHeader.marshalledSize()      # self.pduHeader
+        marshalSize += self.originatingID.marshalledSize()  # self.originatingID
+        marshalSize += self.receivingID.marshalledSize()    # self.receivingID
+        return marshalSize
 
 
 class BeamData( object ):
@@ -2334,6 +2802,14 @@ class BeamData( object ):
         self.beamElevationSweep = inputStream.read_float()
         self.beamSweepSync = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.beamAzimuthCenter
+        marshalSize += 4    # self.beamAzimuthSweep
+        marshalSize += 4    # self.beamElevationCenter
+        marshalSize += 4    # self.beamElevationSweep
+        marshalSize += 4    # self.beamSweepSync
+        return marshalSize
 
 
 class EngineFuel( object ):
@@ -2374,6 +2850,14 @@ class EngineFuel( object ):
         self.fuelLocation = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.fuelQuantity
+        marshalSize += 1    # self.fuelMeasurementUnits
+        marshalSize += 1    # self.fuelType
+        marshalSize += 1    # self.fuelLocation
+        marshalSize += 1    # self.padding
+        return marshalSize
 
 
 class IOEffect( object ):
@@ -2423,6 +2907,18 @@ class IOEffect( object ):
         self.ioProcess = inputStream.read_unsigned_short()
         self.padding = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                # self.recordType
+        marshalSize += 2                                # self.recordLength
+        marshalSize += 1                                # self.ioStatus
+        marshalSize += 1                                # self.ioLinkType
+        marshalSize += self.ioEffect.marshalledSize()   # self.ioEffect
+        marshalSize += 1                                # self.ioEffectDutyCycle
+        marshalSize += 2                                # self.ioEffectDuration
+        marshalSize += 2                                # self.ioProcess
+        marshalSize += 2                                # self.padding
+        return marshalSize
 
 
 class SimulationIdentifier( object ):
@@ -2447,6 +2943,11 @@ class SimulationIdentifier( object ):
         self.simulationAddress.parse(inputStream)
         self.referenceNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()  # self.simulationAddress
+        marshalSize += 2                                        # self.referenceNumber
+        return marshalSize
 
 
 class GridAxisDescriptorVariable( object ):
@@ -2518,6 +3019,20 @@ class GridAxisDescriptorVariable( object ):
             element.parse(inputStream)
             self.xiValues.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 8                                # self.domainInitialXi
+        marshalSize += 8                                # self.domainFinalXi
+        marshalSize += 2                                # self.domainPointsXi
+        marshalSize += 1                                # self.interleafFactor
+        marshalSize += 1                                # self.axisType
+        marshalSize += 2                                # self.numberOfPointsOnXiAxis
+        marshalSize += 2                                # self.initialIndex
+        marshalSize += 8                                # self.coordinateScaleXi
+        marshalSize += 8                                # self.coordinateOffsetXi
+        for anObj in self.xiValues:                     # self.xiValues
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -2543,6 +3058,11 @@ class SupplyQuantity( object ):
         self.supplyType.parse(inputStream)
         self.quantity = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.supplyType.marshalledSize()     # self.supplyType
+        marshalSize += 4                                    # self.quantity
+        return marshalSize
 
 
 class SilentEntitySystem( object ):
@@ -2584,6 +3104,14 @@ class SilentEntitySystem( object ):
             element.parse(inputStream)
             self.appearanceRecordList.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2                                # self.numberOfEntities
+        marshalSize += 2                                # self.numberOfAppearanceRecords
+        marshalSize += self.entityType.marshalledSize() # self.entityType
+        for anObj in self.xiValues:                     # self.appearanceRecordList
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -2608,6 +3136,11 @@ class EventIdentifier( object ):
         self.simulationAddress.parse(inputStream)
         self.eventNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()  # self.simulationAddress
+        marshalSize += 2                                        # self.eventNumber
+        return marshalSize
 
 
 class BlankingSector( object ):
@@ -2676,6 +3209,23 @@ class BlankingSector( object ):
         self.padding3 = inputStream.read_int()
         self.padding4 = inputStream.read_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.recordType
+        marshalSize += 2    # self.recordLength
+        marshalSize += 2    # self.padding
+        marshalSize += 1    # self.emitterNumber
+        marshalSize += 1    # self.beamNumber
+        marshalSize += 1    # self.stateIndicator
+        marshalSize += 1    # self.padding2
+        marshalSize += 4    # self.leftAzimuth
+        marshalSize += 4    # self.rightAzimuth
+        marshalSize += 4    # self.lowerElevation
+        marshalSize += 4    # self.upperElevation
+        marshalSize += 4    # self.residualPower
+        marshalSize += 4    # self.padding3
+        marshalSize += 4    # self.padding4
+        return marshalSize
 
 
 class LaunchedMunitionRecord( object ):
@@ -2717,6 +3267,16 @@ class LaunchedMunitionRecord( object ):
         self.padding3 = inputStream.read_unsigned_short()
         self.targetLocation.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.fireEventID.marshalledSize()        # self.fireEventID
+        marshalSize += 2                                        # self.padding
+        marshalSize += self.firingEntityID.marshalledSize()     # self.firingEntityID
+        marshalSize += 2                                        # self.padding2
+        marshalSize += self.targetEntityID.marshalledSize()     # self.targetEntityID
+        marshalSize += 2                                        # self.padding3
+        marshalSize += self.targetLocation.marshalledSize()     # self.targetLocation
+        return marshalSize
 
 
 class IFFFundamentalParameterData( object ):
@@ -2774,6 +3334,16 @@ class IFFFundamentalParameterData( object ):
 
             self.systemSpecificData[  idx  ] = val
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.erp
+        marshalSize += 4    # self.frequency
+        marshalSize += 4    # self.pgrf
+        marshalSize += 4    # self.pulseWidth
+        marshalSize += 4    # self.burstLength
+        marshalSize += 1    # self.applicableModes
+        marshalSize += 3    # self.systemSpecificData
+        return marshalSize
 
 
 
@@ -2841,6 +3411,19 @@ class FundamentalOperationalData( object ):
         self.parameter5 = inputStream.read_unsigned_short()
         self.parameter6 = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.systemStatus
+        marshalSize += 1    # self.dataField1
+        marshalSize += 1    # self.informationLayers
+        marshalSize += 1    # self.dataField2
+        marshalSize += 2    # self.parameter1
+        marshalSize += 2    # self.parameter2
+        marshalSize += 2    # self.parameter3
+        marshalSize += 2    # self.parameter4
+        marshalSize += 2    # self.parameter5
+        marshalSize += 2    # self.parameter6
+        return marshalSize
 
 
 class IntercomCommunicationsParameters( object ):
@@ -2869,6 +3452,12 @@ class IntercomCommunicationsParameters( object ):
         self.recordLength = inputStream.read_unsigned_short()
         self.recordSpecificField = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.recordType
+        marshalSize += 2    # self.recordLength
+        marshalSize += 4    # self.recordSpecificField
+        return marshalSize
 
 
 class EntityType( object ):
@@ -2919,6 +3508,16 @@ class EntityType( object ):
         self.specific = inputStream.read_unsigned_byte()
         self.extra = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.entityKind
+        marshalSize += 1    # self.domain
+        marshalSize += 2    # self.country
+        marshalSize += 1    # self.category
+        marshalSize += 1    # self.subcategory
+        marshalSize += 1    # self.specific
+        marshalSize += 1    # self.extra
+        return marshalSize
 
 
 class Munition( object ):
@@ -2959,6 +3558,14 @@ class Munition( object ):
         self.munitionStatus = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.munitionType.marshalledSize()   # self.munitionType
+        marshalSize += 4                                    # self.station
+        marshalSize += 2                                    # self.quantity
+        marshalSize += 1                                    # self.munitionStatus
+        marshalSize += 1                                    # self.padding
+        return marshalSize
 
 
 class StandardVariableSpecification( object ):
@@ -2990,6 +3597,12 @@ class StandardVariableSpecification( object ):
             element.parse(inputStream)
             self.standardVariables.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2                                # self.numberOfStandardVariableRecords
+        for anObj in self.standardVariables:            # self.standardVariables
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -3015,6 +3628,11 @@ class Vector2Float( object ):
         self.x = inputStream.read_float()
         self.y = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.x
+        marshalSize += 4    # self.y
+        return marshalSize
 
 
 class Environment( object ):
@@ -3047,6 +3665,13 @@ class Environment( object ):
         self.index = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.environmentType
+        marshalSize += 2    # self.length
+        marshalSize += 1    # self.index
+        marshalSize += 1    # self.padding
+        return marshalSize
 
 
 class AcousticEmitter( object ):
@@ -3078,6 +3703,12 @@ class AcousticEmitter( object ):
         self.acousticFunction = inputStream.read_unsigned_byte()
         self.acousticIDNumber = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.acousticSystemName
+        marshalSize += 1    # self.acousticFunction
+        marshalSize += 1    # self.acousticIDNumber
+        return marshalSize
 
 
 class AngularVelocityVector( object ):
@@ -3106,6 +3737,12 @@ class AngularVelocityVector( object ):
         self.y = inputStream.read_float()
         self.z = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.x
+        marshalSize += 4    # self.y
+        marshalSize += 4    # self.z
+        return marshalSize
 
 
 class AggregateMarking( object ):
@@ -3136,6 +3773,11 @@ class AggregateMarking( object ):
 
             self.characters[  idx  ] = val
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.characterSet
+        marshalSize += 31   # self.characters
+        return marshalSize
 
 
 
@@ -3157,6 +3799,10 @@ class DataFilterRecord( object ):
 
         self.bitFlags = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.bitFlags
+        return marshalSize
 
 
 class IntercomIdentifier( object ):
@@ -3189,6 +3835,13 @@ class IntercomIdentifier( object ):
         self.referenceNumber = inputStream.read_unsigned_short()
         self.intercomNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.siteNumber
+        marshalSize += 2    # self.applicationNumber
+        marshalSize += 2    # self.referenceNumber
+        marshalSize += 2    # self.intercomNumber
+        return marshalSize
 
 
 class StorageFuel( object ):
@@ -3229,6 +3882,14 @@ class StorageFuel( object ):
         self.fuelLocation = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.fuelQuantity
+        marshalSize += 1    # self.fuelMeasurementUnits
+        marshalSize += 1    # self.fuelType
+        marshalSize += 1    # self.fuelLocation
+        marshalSize += 1    # self.padding
+        return marshalSize
 
 
 class Sensor( object ):
@@ -3274,6 +3935,15 @@ class Sensor( object ):
         self.quantity = inputStream.read_unsigned_short()
         self.padding = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.sensorTypeSource
+        marshalSize += 1    # self.sensorOnOffStatus
+        marshalSize += 2    # self.sensorType
+        marshalSize += 4    # self.station
+        marshalSize += 2    # self.quantity
+        marshalSize += 2    # self.padding
+        return marshalSize
 
 
 class MunitionReload( object ):
@@ -3320,6 +3990,15 @@ class MunitionReload( object ):
         self.standardQuantityReloadTime = inputStream.read_unsigned_int()
         self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.munitionType.marshalledSize()   # self.munitionType
+        marshalSize += 4                                    # self.station
+        marshalSize += 2                                    # self.standardQuantity
+        marshalSize += 2                                    # self.maximumQuantity
+        marshalSize += 4                                    # self.standardQuantityReloadTime
+        marshalSize += 4                                    # self.maximumQuantityReloadTime
+        return marshalSize
 
 
 class StorageFuelReload( object ):
@@ -3375,6 +4054,17 @@ class StorageFuelReload( object ):
         self.fuelLocation = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.standardQuantity
+        marshalSize += 4    # self.maximumQuantity
+        marshalSize += 1    # self.standardQuantityReloadTime
+        marshalSize += 1    # self.maximumQuantityReloadTime
+        marshalSize += 1    # self.fuelMeasurementUnits
+        marshalSize += 1    # self.fuelType
+        marshalSize += 1    # self.fuelLocation
+        marshalSize += 1    # self.padding
+        return marshalSize
 
 
 class ExpendableReload( object ):
@@ -3416,6 +4106,15 @@ class ExpendableReload( object ):
         self.standardQuantityReloadTime = inputStream.read_unsigned_int()
         self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.expendable.marshalledSize()     # self.expendable
+        marshalSize += 4                                    # self.station
+        marshalSize += 2                                    # self.standardQuantity
+        marshalSize += 2                                    # self.maximumQuantity
+        marshalSize += 4                                    # self.standardQuantityReloadTime
+        marshalSize += 4                                    # self.maximumQuantityReloadTime
+        return marshalSize
 
 
 class EntityIdentifier( object ):
@@ -3442,6 +4141,11 @@ class EntityIdentifier( object ):
         self.simulationAddress.parse(inputStream)
         self.entityNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()  # self.simulationAddress
+        marshalSize += 2                                        # self.entityNumber
+        return marshalSize
 
 
 class DirectedEnergyTargetEnergyDeposition( object ):
@@ -3472,6 +4176,12 @@ class DirectedEnergyTargetEnergyDeposition( object ):
         self.padding = inputStream.read_unsigned_short()
         self.peakIrradiance = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.targetEntityID.marshalledSize()     # self.targetEntityID
+        marshalSize += 2                                        # self.padding
+        marshalSize += 4                                        # self.peakIrradiance
+        return marshalSize
 
 
 class EntityID( object ):
@@ -3503,6 +4213,12 @@ class EntityID( object ):
         self.applicationID = inputStream.read_unsigned_short()
         self.entityID = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.siteID
+        marshalSize += 2    # self.applicationID
+        marshalSize += 2    # self.entityID
+        return marshalSize
 
 
 class EngineFuelReload( object ):
@@ -3553,6 +4269,16 @@ class EngineFuelReload( object ):
         self.fuelLocation = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.standardQuantity
+        marshalSize += 4    # self.maximumQuantity
+        marshalSize += 4    # self.standardQuantityReloadTime
+        marshalSize += 4    # self.maximumQuantityReloadTime
+        marshalSize += 1    # self.fuelMeasurmentUnits
+        marshalSize += 1    # self.fuelLocation
+        marshalSize += 1    # self.padding
+        return marshalSize
 
 
 class UnattachedIdentifier( object ):
@@ -3579,6 +4305,11 @@ class UnattachedIdentifier( object ):
         self.simulationAddress.parse(inputStream)
         self.referenceNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.simulationAddress.marshalledSize()  # self.simulationAddress
+        marshalSize += 2                                        # self.referenceNumber
+        return marshalSize
 
 
 class EntityTypeVP( object ):
@@ -3618,6 +4349,14 @@ class EntityTypeVP( object ):
         self.padding = inputStream.read_unsigned_short()
         self.padding1 = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1                                    # self.recordType
+        marshalSize += 1                                    # self.changeIndicator
+        marshalSize += self.entityType.marshalledSize()     # self.entityType
+        marshalSize += 2                                    # self.padding
+        marshalSize += 4                                    # self.padding1
+        return marshalSize
 
 
 class BeamStatus( object ):
@@ -3638,6 +4377,10 @@ class BeamStatus( object ):
 
         self.beamState = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.beamState
+        return marshalSize
 
 
 class EnvironmentGeneral( object ):
@@ -3682,6 +4425,15 @@ class EnvironmentGeneral( object ):
         self.geometry = inputStream.read_unsigned_byte()
         self.padding2 = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.environmentType
+        marshalSize += 1    # self.length
+        marshalSize += 1    # self.index
+        marshalSize += 1    # self.padding1
+        marshalSize += 1    # self.geometry
+        marshalSize += 1    # self.padding2
+        return marshalSize
 
 
 class Vector3Double( object ):
@@ -3710,6 +4462,12 @@ class Vector3Double( object ):
         self.y = inputStream.read_double()
         self.z = inputStream.read_double()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 8    # self.x
+        marshalSize += 8    # self.y
+        marshalSize += 8    # self.z
+        return marshalSize
 
 
 class GridAxis( object ):
@@ -3761,6 +4519,16 @@ class GridAxis( object ):
         self.numberOfPointsOnXiAxis = inputStream.read_unsigned_short()
         self.initialIndex = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 8    # self.domainInitialXi
+        marshalSize += 8    # self.domainFinalXi
+        marshalSize += 2    # self.domainFinalXi
+        marshalSize += 1    # self.interleafFactor
+        marshalSize += 1    # self.axisType
+        marshalSize += 2    # self.numberOfPointsOnXiAxis
+        marshalSize += 2    # self.initialIndex
+        return marshalSize
 
 
 class RecordSpecification( object ):
@@ -3792,6 +4560,12 @@ class RecordSpecification( object ):
             element.parse(inputStream)
             self.recordSets.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                                # self.numberOfRecordSets
+        for anObj in self.recordSets:                   # self.recordSets
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -3842,6 +4616,12 @@ class VariableDatum( object ):
         for x in range(self.datumPaddingSizeInBits() // 8):
             inputStream.read_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4                            # self.variableDatumID
+        marshalSize += 4                            # self.variableDatumLength
+        marshalSize += self.variableDatumLength     # self.variableData
+        return marshalSize
 
 
 class EventIdentifierLiveEntity( object ):
@@ -3870,6 +4650,12 @@ class EventIdentifierLiveEntity( object ):
         self.applicationNumber = inputStream.read_unsigned_byte()
         self.eventNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.siteNumber
+        marshalSize += 1    # self.applicationNumber
+        marshalSize += 2    # self.eventNumber
+        return marshalSize
 
 
 class PduHeader( object ):
@@ -3925,6 +4711,17 @@ class PduHeader( object ):
         self.pduStatus = inputStream.read_unsigned_short()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.protocolVersion
+        marshalSize += 1    # self.exerciseID
+        marshalSize += 1    # self.pduType
+        marshalSize += 1    # self.protocolFamily
+        marshalSize += 4    # self.timestamp
+        marshalSize += 1    # self.pduLength
+        marshalSize += 2    # self.pduStatus
+        marshalSize += 1    # self.padding
+        return marshalSize
 
 
 class PduSuperclass( object ):
@@ -3971,6 +4768,16 @@ class PduSuperclass( object ):
         self.protocolFamily = inputStream.read_unsigned_byte()
         self.timestamp = inputStream.read_unsigned_int()
         self.length = inputStream.read_unsigned_short()
+        
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.protocolVersion
+        marshalSize += 1    # self.exerciseID
+        marshalSize += 1    # self.pduType
+        marshalSize += 1    # self.protocolFamily
+        marshalSize += 4    # self.timestamp
+        marshalSize += 2    # self.length
+        return marshalSize
 
 
 
@@ -3994,6 +4801,11 @@ class CommunicationsNodeID( object ):
         self.entityID.parse(inputStream)
         self.elementID = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.entityID.marshalledSize()   # self.entityID
+        marshalSize += 2                                # self.elementID
+        return marshalSize
 
 
 class ExpendableDescriptor( object ):
@@ -4018,6 +4830,11 @@ class ExpendableDescriptor( object ):
         self.expendableType.parse(inputStream)
         self.padding = inputStream.read_long()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.expendableType.marshalledSize()     # self.expendableType
+        marshalSize += 8                                        # self.padding
+        return marshalSize
 
 
 class PropulsionSystemData( object ):
@@ -4042,6 +4859,11 @@ class PropulsionSystemData( object ):
         self.powerSetting = inputStream.read_float()
         self.engineRpm = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 4    # self.powerSetting
+        marshalSize += 4    # self.engineRpm
+        return marshalSize
 
 
 class LiveEntityIdentifier( object ):
@@ -4066,6 +4888,11 @@ class LiveEntityIdentifier( object ):
         self.liveSimulationAddress.parse(inputStream)
         self.entityNumber = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += self.liveSimulationAddress.marshalledSize()  # self.liveSimulationAddress
+        marshalSize += 2                                            # self.entityNumber
+        return marshalSize
 
 
 class SeparationVP( object ):
@@ -4117,6 +4944,16 @@ class SeparationVP( object ):
         self.padding2 = inputStream.read_unsigned_short()
         self.stationLocation = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1                                        # self.recordType
+        marshalSize += 1                                        # self.reasonForSeparation
+        marshalSize += 1                                        # self.preEntityIndicator
+        marshalSize += 1                                        # self.padding1
+        marshalSize += self.parentEntityID.marshalledSize()     # self.parentEntityID
+        marshalSize += 2                                        # self.padding2
+        marshalSize += 4                                        # self.stationLocation
+        return marshalSize
 
 
 class EmitterSystem( object ):
@@ -4145,6 +4982,12 @@ class EmitterSystem( object ):
         self.emitterFunction = inputStream.read_unsigned_byte()
         self.emitterIDNumber = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 2    # self.emitterName
+        marshalSize += 1    # self.emitterFunction
+        marshalSize += 1    # self.emitterIDNumber
+        return marshalSize
 
 
 class PduStatus( object ):
@@ -4165,6 +5008,10 @@ class PduStatus( object ):
 
         self.pduStatus = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1    # self.pduStatus
+        return marshalSize
 
 
 
@@ -4193,6 +5040,11 @@ class LiveEntityPdu( PduSuperclass ):
         self.subprotocolNumber = inputStream.read_unsigned_short()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = super( LiveEntityPdu, self).marshalledSize()
+        marshalSize += 2    # self.subprotocolNumber
+        marshalSize += 1    # self.padding
+        return marshalSize
 
 
 class Pdu( PduSuperclass ):
@@ -4220,6 +5072,11 @@ class Pdu( PduSuperclass ):
         self.pduStatus = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
+    def marshalledSize(self):
+        marshalSize = super( Pdu, self).marshalledSize()
+        marshalSize += 1    # self.pduStatus
+        marshalSize += 1    # self.padding
+        return marshalSize
 
 
 class EntityInformationFamilyPdu( Pdu ):
@@ -4241,6 +5098,9 @@ class EntityInformationFamilyPdu( Pdu ):
 
         super( EntityInformationFamilyPdu, self).parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( EntityInformationFamilyPdu, self).marshalledSize()
+        return marshalSize
 
 
 class LogisticsFamilyPdu( Pdu ):
@@ -4262,6 +5122,9 @@ class LogisticsFamilyPdu( Pdu ):
 
         super( LogisticsFamilyPdu, self).parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( LogisticsFamilyPdu, self).marshalledSize()
+        return marshalSize
 
 
 class EntityStateUpdatePdu( EntityInformationFamilyPdu ):
@@ -4329,6 +5192,18 @@ class EntityStateUpdatePdu( EntityInformationFamilyPdu ):
             element.parse(inputStream)
             self.variableParameters.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( EntityStateUpdatePdu, self).marshalledSize()
+        marshalSize += self.entityID.marshalledSize()               # self.entityID
+        marshalSize += 1                                            # self.padding1
+        marshalSize += 1                                            # self.numberOfVariableParameters
+        marshalSize += self.entityLinearVelocity.marshalledSize()   # self.entityLinearVelocity
+        marshalSize += self.entityLocation.marshalledSize()         # self.entityLocation
+        marshalSize += self.entityOrientation.marshalledSize()      # self.entityOrientation
+        marshalSize += 4                                            # self.entityAppearance
+        for anObj in self.variableParameters:                       # self.variableParameters
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -4384,6 +5259,16 @@ class ServiceRequestPdu( LogisticsFamilyPdu ):
             element.parse(inputStream)
             self.supplies.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( ServiceRequestPdu, self).marshalledSize()
+        marshalSize += self.requestingEntityID.marshalledSize()             # self.requestingEntityID
+        marshalSize += self.servicingEntityID.marshalledSize()              # self.servicingEntityID
+        marshalSize += 1                                                    # self.serviceTypeRequested
+        marshalSize += 1                                                    # self.numberOfSupplyTypes
+        marshalSize += 2                                                    # self.serviceRequestPadding
+        for anObj in self.supplies:
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -4425,6 +5310,13 @@ class RepairCompletePdu( LogisticsFamilyPdu ):
         self.repair = inputStream.read_unsigned_short()
         self.padding4 = inputStream.read_short()
 
+    def marshalledSize(self):
+        marshalSize = super( RepairCompletePdu, self).marshalledSize()
+        marshalSize += self.receivingEntityID.marshalledSize()              # self.receivingEntityID
+        marshalSize += self.repairingEntityID.marshalledSize()              # self.repairingEntityID
+        marshalSize += 2                                                    # self.repair
+        marshalSize += 2                                                    # self.padding4
+        return marshalSize
 
 
 class SyntheticEnvironmentFamilyPdu( Pdu ):
@@ -4446,6 +5338,9 @@ class SyntheticEnvironmentFamilyPdu( Pdu ):
 
         super( SyntheticEnvironmentFamilyPdu, self).parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( SyntheticEnvironmentFamilyPdu, self).marshalledSize()
+        return marshalSize
 
 
 class CollisionPdu( EntityInformationFamilyPdu ):
@@ -4508,6 +5403,17 @@ class CollisionPdu( EntityInformationFamilyPdu ):
         self.mass = inputStream.read_float()
         self.location.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( CollisionPdu, self).marshalledSize()
+        marshalSize += self.issuingEntityID.marshalledSize()        # self.issuingEntityID
+        marshalSize += self.collidingEntityID.marshalledSize()      # self.collidingEntityID
+        marshalSize += self.eventID.marshalledSize()                # self.eventID
+        marshalSize += 1                                            # self.collisionType
+        marshalSize += 1                                            # self.pad
+        marshalSize += self.velocity.marshalledSize()               # self.velocity
+        marshalSize += 4                                            # self.mass
+        marshalSize += self.location.marshalledSize()               # self.location
+        return marshalSize
 
 
 class RepairResponsePdu( LogisticsFamilyPdu ):
@@ -4552,6 +5458,14 @@ class RepairResponsePdu( LogisticsFamilyPdu ):
         self.padding1 = inputStream.read_short()
         self.padding2 = inputStream.read_byte()
 
+    def marshalledSize(self):
+        marshalSize = super( RepairResponsePdu, self).marshalledSize()
+        marshalSize += self.receivingEntityID.marshalledSize()      # self.receivingEntityID
+        marshalSize += self.repairingEntityID.marshalledSize()      # self.repairingEntityID
+        marshalSize += 1                                            # self.repairResult
+        marshalSize += 2                                            # self.padding1
+        marshalSize += 1                                            # self.padding2
+        return marshalSize
 
 
 class SimulationManagementFamilyPdu( Pdu ):
@@ -4581,6 +5495,11 @@ class SimulationManagementFamilyPdu( Pdu ):
         self.originatingEntityID.parse(inputStream)
         self.receivingEntityID.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( SimulationManagementFamilyPdu, self).marshalledSize()
+        marshalSize += self.originatingEntityID.marshalledSize()    # self.originatingEntityID
+        marshalSize += self.receivingEntityID.marshalledSize()      # self.receivingEntityID
+        return marshalSize
 
 
 class DataQueryPdu( SimulationManagementFamilyPdu ):
@@ -4643,6 +5562,17 @@ class DataQueryPdu( SimulationManagementFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumIDs.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( DataQueryPdu, self).marshalledSize()
+        marshalSize += 4                                # self.requestID
+        marshalSize += 4                                # self.timeInterval
+        marshalSize += 4                                # self.numberOfFixedDatumIDs
+        marshalSize += 4                                # self.numberOfVariableDatumIDs
+        for anObj in self.fixedDatumIDs:                # self.originatingEntityID
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumIDs:             # self.originatingEntityID
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -4715,6 +5645,19 @@ class LinearObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
             element.parse(inputStream)
             self.linearSegmentParameters.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( LinearObjectStatePdu, self).marshalledSize()
+        marshalSize += self.objectID.marshalledSize()               # self.objectID
+        marshalSize += self.referencedObjectID.marshalledSize()     # self.referencedObjectID
+        marshalSize += 2                                            # self.updateNumber
+        marshalSize += 1                                            # self.forceID
+        marshalSize += 1                                            # self.numberOfSegments
+        marshalSize += self.requesterID.marshalledSize()            # self.requesterID
+        marshalSize += self.receivingID.marshalledSize()            # self.receivingID
+        marshalSize += self.objectType.marshalledSize()             # self.objectType
+        for anObj in self.linearSegmentParameters:                  # self.linearSegmentParameters
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -4741,6 +5684,10 @@ class CreateEntityPdu( SimulationManagementFamilyPdu ):
         super( CreateEntityPdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( CreateEntityPdu, self).marshalledSize()
+        marshalSize += 4    # self.requestID
+        return marshalSize
 
 
 class RadioCommunicationsFamilyPdu( Pdu ):
@@ -4762,6 +5709,9 @@ class RadioCommunicationsFamilyPdu( Pdu ):
 
         super( RadioCommunicationsFamilyPdu, self).parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( RadioCommunicationsFamilyPdu, self).marshalledSize()
+        return marshalSize
 
 
 class IntercomSignalPdu( RadioCommunicationsFamilyPdu ):
@@ -4828,6 +5778,18 @@ class IntercomSignalPdu( RadioCommunicationsFamilyPdu ):
             element.parse(inputStream)
             self.data.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( IntercomSignalPdu, self).marshalledSize()
+        marshalSize += self.entityID.marshalledSize()   # self.entityID
+        marshalSize += 2                                # self.communicationsDeviceID
+        marshalSize += 2                                # self.encodingScheme
+        marshalSize += 2                                # self.tdlType
+        marshalSize += 4                                # self.sampleRate
+        marshalSize += 2                                # self.dataLength
+        marshalSize += 2                                # self.samples
+        for anObj in self.data:                         # self.data
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -4854,6 +5816,10 @@ class RemoveEntityPdu( SimulationManagementFamilyPdu ):
         super( RemoveEntityPdu, self).parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( RemoveEntityPdu, self).marshalledSize()
+        marshalSize += 4    # self.requestID
+        return marshalSize
 
 
 class ResupplyReceivedPdu( LogisticsFamilyPdu ):
@@ -4908,6 +5874,16 @@ class ResupplyReceivedPdu( LogisticsFamilyPdu ):
             element.parse(inputStream)
             self.supplies.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( ResupplyReceivedPdu, self).marshalledSize()
+        marshalSize += self.receivingEntityID.marshalledSize()  # self.receivingEntityID
+        marshalSize += self.supplyingEntityID.marshalledSize()  # self.supplyingEntityID
+        marshalSize += 1                                        # self.numberOfSupplyTypes
+        marshalSize += 2                                        # self.padding1
+        marshalSize += 1                                        # self.padding2
+        for anObj in self.supplies:                             # self.supplies
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -4940,6 +5916,11 @@ class WarfareFamilyPdu( Pdu ):
         self.firingEntityID.parse(inputStream)
         self.targetEntityID.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( WarfareFamilyPdu, self).marshalledSize()
+        marshalSize += self.firingEntityID.marshalledSize()     # self.firingEntityID
+        marshalSize += self.targetEntityID.marshalledSize()     # self.targetEntityID
+        return marshalSize
 
 
 class CollisionElasticPdu( EntityInformationFamilyPdu ):
@@ -5037,6 +6018,24 @@ class CollisionElasticPdu( EntityInformationFamilyPdu ):
         self.unitSurfaceNormal.parse(inputStream)
         self.coefficientOfRestitution = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = super( CollisionElasticPdu, self).marshalledSize()
+        marshalSize += self.issuingEntityID.marshalledSize()    # self.issuingEntityID
+        marshalSize += self.collidingEntityID.marshalledSize()  # self.collidingEntityID
+        marshalSize += self.collisionEventID.marshalledSize()   # self.collisionEventID
+        marshalSize += 2                                        # self.pad
+        marshalSize += self.contactVelocity.marshalledSize()    # self.contactVelocity
+        marshalSize += 4                                        # self.mass
+        marshalSize += self.locationOfImpact.marshalledSize()   # self.locationOfImpact
+        marshalSize += 4                                        # self.collisionIntermediateResultXX
+        marshalSize += 4                                        # self.collisionIntermediateResultXY
+        marshalSize += 4                                        # self.collisionIntermediateResultXZ
+        marshalSize += 4                                        # self.collisionIntermediateResultYY
+        marshalSize += 4                                        # self.collisionIntermediateResultYZ
+        marshalSize += 4                                        # self.collisionIntermediateResultZZ
+        marshalSize += self.unitSurfaceNormal.marshalledSize()  # self.unitSurfaceNormal
+        marshalSize += 4                                        # self.coefficientOfRestitution
+        return marshalSize
 
 
 class ActionRequestPdu( SimulationManagementFamilyPdu ):
@@ -5099,6 +6098,17 @@ class ActionRequestPdu( SimulationManagementFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( ActionRequestPdu, self).marshalledSize()
+        marshalSize += 2                                # self.requestID
+        marshalSize += 4                                # self.actionID
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -5133,6 +6143,12 @@ class AcknowledgePdu( SimulationManagementFamilyPdu ):
         self.responseFlag = inputStream.read_unsigned_short()
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( AcknowledgePdu, self).marshalledSize()
+        marshalSize += 2    # self.acknowledgeFlag
+        marshalSize += 2    # self.responseFlag
+        marshalSize += 4    # self.requestID
+        return marshalSize
 
 
 class DistributedEmissionsFamilyPdu( Pdu ):
@@ -5154,6 +6170,9 @@ class DistributedEmissionsFamilyPdu( Pdu ):
 
         super( DistributedEmissionsFamilyPdu, self).parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( DistributedEmissionsFamilyPdu, self).marshalledSize()
+        return marshalSize
 
 
 class SimulationManagementWithReliabilityFamilyPdu( Pdu ):
@@ -5183,6 +6202,11 @@ class SimulationManagementWithReliabilityFamilyPdu( Pdu ):
         self.originatingEntityID.parse(inputStream)
         self.receivingEntityID.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( SimulationManagementWithReliabilityFamilyPdu, self).marshalledSize()
+        marshalSize += self.originatingEntityID.marshalledSize()    # self.originatingEntityID
+        marshalSize += self.receivingEntityID.marshalledSize()      # self.receivingEntityID
+        return marshalSize
 
 
 class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
@@ -5258,6 +6282,20 @@ class ActionRequestReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( ActionRequestReliablePdu, self).marshalledSize()
+        marshalSize += 1                            # self.requiredReliabilityService
+        marshalSize += 2                            # self.pad1
+        marshalSize += 1                            # self.pad2
+        marshalSize += 4                            # self.requestID
+        marshalSize += 4                            # self.actionID
+        marshalSize += 4                            # self.numberOfFixedDatumRecords
+        marshalSize += 4                            # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:        # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:     # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -5338,6 +6376,21 @@ class DesignatorPdu( DistributedEmissionsFamilyPdu ):
         self.padding2 = inputStream.read_byte()
         self.entityLinearAcceleration.parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( DesignatorPdu, self).marshalledSize()
+        marshalSize += self.designatingEntityID.marshalledSize()            # self.designatingEntityID
+        marshalSize += 2                                                    # self.codeName
+        marshalSize += self.designatedEntityID.marshalledSize()             # self.designatedEntityID
+        marshalSize += 2                                                    # self.designatorCode
+        marshalSize += 4                                                    # self.designatorPower
+        marshalSize += 4                                                    # self.designatorWavelength
+        marshalSize += self.designatorSpotWrtDesignated.marshalledSize()    # self.designatorSpotWrtDesignated
+        marshalSize += self.designatorSpotLocation.marshalledSize()         # self.designatorSpotLocation
+        marshalSize += 1                                                    # self.deadReckoningAlgorithm
+        marshalSize += 2                                                    # self.padding1
+        marshalSize += 1                                                    # self.padding2
+        marshalSize += self.entityLinearAcceleration.marshalledSize()       # self.entityLinearAcceleration
+        return marshalSize
 
 
 class StopFreezePdu( SimulationManagementFamilyPdu ):
@@ -5383,6 +6436,14 @@ class StopFreezePdu( SimulationManagementFamilyPdu ):
         self.padding1 = inputStream.read_short()
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( StopFreezePdu, self).marshalledSize()
+        marshalSize += self.realWorldTime.marshalledSize()      # self.realWorldTime
+        marshalSize += 1                                        # self.reason
+        marshalSize += 1                                        # self.frozenBehavior
+        marshalSize += 2                                        # self.padding1
+        marshalSize += 4                                        # self.requestID
+        return marshalSize
 
 
 class EntityStatePdu( EntityInformationFamilyPdu ):
@@ -5473,6 +6534,23 @@ class EntityStatePdu( EntityInformationFamilyPdu ):
             element.parse(inputStream)
             self.variableParameters.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( EntityStatePdu, self).marshalledSize()
+        marshalSize += self.entityID.marshalledSize()                   # self.entityID
+        marshalSize += 1                                                # self.forceId
+        marshalSize += 1                                                # self.numberOfVariableParameters
+        marshalSize += self.entityType.marshalledSize()                 # self.entityType
+        marshalSize += self.alternativeEntityType.marshalledSize()      # self.alternativeEntityType
+        marshalSize += self.entityLinearVelocity.marshalledSize()       # self.entityLinearVelocity
+        marshalSize += self.entityLocation.marshalledSize()             # self.entityLocation
+        marshalSize += self.entityOrientation.marshalledSize()          # self.entityOrientation
+        marshalSize += 4                                                # self.entityAppearance
+        marshalSize += self.deadReckoningParameters.marshalledSize()    # self.deadReckoningParameters
+        marshalSize += self.marking.marshalledSize()                    # self.marking
+        marshalSize += 4                                                # self.capabilities
+        for anObj in self.variableParameters:                           # self.variableParameters
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -5495,6 +6573,9 @@ class EntityManagementFamilyPdu( Pdu ):
 
         super( EntityManagementFamilyPdu, self).parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( EntityManagementFamilyPdu, self).marshalledSize()
+        return marshalSize
 
 
 class StartResumePdu( SimulationManagementFamilyPdu ):
@@ -5531,6 +6612,12 @@ class StartResumePdu( SimulationManagementFamilyPdu ):
         self.simulationTime.parse(inputStream)
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( StartResumePdu, self).marshalledSize()
+        marshalSize += self.realWorldTime.marshalledSize()      # self.realWorldTime
+        marshalSize += self.simulationTime.marshalledSize()     # self.simulationTime
+        marshalSize += 1                                        # self.requestID
+        return marshalSize
 
 
 class TransmitterPdu( RadioCommunicationsFamilyPdu ):
@@ -5684,6 +6771,32 @@ class TransmitterPdu( RadioCommunicationsFamilyPdu ):
                 element.parse(inputStream)
                 self.antennaPatternList.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( TransmitterPdu, self).marshalledSize()
+        marshalSize += self.radioReferenceID.marshalledSize()           # self.radioReferenceID
+        marshalSize += 2                                                # self.radioNumber
+        marshalSize += self.radioEntityType.marshalledSize()            # self.radioEntityType
+        marshalSize += 1                                                # self.transmitState
+        marshalSize += 1                                                # self.inputSource
+        marshalSize += 2                                                # self.variableTransmitterParameterCount
+        marshalSize += self.antennaLocation.marshalledSize()            # self.antennaLocation
+        marshalSize += self.relativeAntennaLocation.marshalledSize()    # self.relativeAntennaLocation
+        marshalSize += 2                                                # self.antennaPatternType
+        marshalSize += 2                                                # self.antennaPatternCount
+        marshalSize += 8                                                # self.frequency
+        marshalSize += 4                                                # self.transmitFrequencyBandwidth
+        marshalSize += 4                                                # self.power
+        marshalSize += self.modulationType.marshalledSize()             # self.modulationType
+        marshalSize += 2                                                # self.cryptoSystem
+        marshalSize += 2                                                # self.cryptoKeyId
+        marshalSize += 1                                                # self.modulationParameterCount
+        marshalSize += 2                                                # self.padding2
+        marshalSize += 1                                                # self.padding3
+        for anObj in self.modulationParametersList:                     # self.modulationParametersList
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.antennaPatternList:                           # self.antennaPatternList
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
@@ -5740,6 +6853,18 @@ class ElectronicEmissionsPdu( DistributedEmissionsFamilyPdu ):
             element.parse(inputStream)
             self.systems.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( ElectronicEmissionsPdu, self).marshalledSize()
+        marshalSize += self.emittingEntityID.marshalledSize()   # self.emittingEntityID
+        marshalSize += self.eventID.marshalledSize()            # self.eventID
+        marshalSize += 1                                        # self.stateUpdateIndicator
+        marshalSize += 1                                        # self.numberOfSystems
+        marshalSize += 2                                        # self.paddingForEmissionsPdu
+        for anObj in self.systems:                              # self.systems
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
+
+
 class EmissionSystemBeamRecord():
     def __init__(self,
                  beamDataLength=0,
@@ -5791,6 +6916,22 @@ class EmissionSystemBeamRecord():
             element.parse(inputStream)
             self.trackJamRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1                                                # self.beamDataLength
+        marshalSize += 1                                                # self.beamIDNumber
+        marshalSize += 2                                                # self.beamParameterIndex
+        marshalSize += self.fundamentalParameterData.marshalledSize()   # self.fundamentalParameterData
+        marshalSize += 1                                                # self.beamFunction
+        marshalSize += 1                                                # self.numberOfTargetsInTrackJam
+        marshalSize += 1                                                # self.highDensityTrackJam
+        marshalSize += 1                                                # 8 bit padding
+        marshalSize += 4                                                # self.jammingModeSequence
+        for anObj in self.trackJamRecords:                              # self.trackJamRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
+
+
 class EmissionSystemRecord():
     def __init__(self,
                  systemDataLength=0,
@@ -5829,6 +6970,18 @@ class EmissionSystemRecord():
             element = EmissionSystemBeamRecord()
             element.parse(inputStream)
             self.beamRecords.append(element)
+
+    def marshalledSize(self):
+        marshalSize = 0
+        marshalSize += 1                                    # self.systemDataLength
+        marshalSize += 1                                    # self.numberOfBeams
+        marshalSize += 2                                    # 16 bit padding
+        marshalSize += self.emitterSystem.marshalledSize()  # self.emitterSystem
+        marshalSize += self.location.marshalledSize()       # self.location
+        for anObj in self.beamRecords:                      # self.beamRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
+
 
 class ResupplyOfferPdu( LogisticsFamilyPdu ):
     """Information used to communicate the offer of supplies by a supplying entity to a receiving entity. Section 7.4.3 COMPLETE"""
@@ -5882,6 +7035,16 @@ class ResupplyOfferPdu( LogisticsFamilyPdu ):
             element.parse(inputStream)
             self.supplies.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( ResupplyOfferPdu, self).marshalledSize()
+        marshalSize += self.receivingEntityID.marshalledSize()  # self.receivingEntityID
+        marshalSize += self.supplyingEntityID.marshalledSize()  # self.supplyingEntityID
+        marshalSize += 1                                        # self.numberOfSupplyTypes
+        marshalSize += 1                                        # self.padding1
+        marshalSize += 2                                        # self.padding2
+        for anObj in self.systems:                              # self.supplies
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -5944,6 +7107,18 @@ class AttributePdu( EntityInformationFamilyPdu ):
         self.padding3 = inputStream.read_byte()
         self.numberAttributeRecordSet = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = super( AttributePdu, self).marshalledSize()
+        marshalSize += self.originatingSimulationAddress.marshalledSize()   # self.originatingSimulationAddress
+        marshalSize += 4                                                    # self.padding1
+        marshalSize += 2                                                    # self.padding2
+        marshalSize += 1                                                    # self.attributeRecordPduType
+        marshalSize += 1                                                    # self.attributeRecordProtocolVersion
+        marshalSize += 4                                                    # self.masterAttributeRecordType
+        marshalSize += 1                                                    # self.actionCode
+        marshalSize += 1                                                    # self.padding3
+        marshalSize += 2                                                    # self.numberAttributeRecordSet
+        return marshalSize
 
 
 class MinefieldFamilyPdu( Pdu ):
@@ -5965,6 +7140,9 @@ class MinefieldFamilyPdu( Pdu ):
 
         super( MinefieldFamilyPdu, self).parse(inputStream)
 
+    def marshalledSize(self):
+        marshalSize = super( MinefieldFamilyPdu, self).marshalledSize()
+        return marshalSize
 
 
 class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
@@ -6035,6 +7213,19 @@ class SetDataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( SetDataReliablePdu, self).marshalledSize()
+        marshalSize += 1                                # self.requiredReliabilityService
+        marshalSize += 2                                # self.pad1
+        marshalSize += 1                                # self.pad2
+        marshalSize += 4                                # self.requestID
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6097,6 +7288,17 @@ class EventReportPdu( SimulationManagementFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( EventReportPdu, self).marshalledSize()
+        marshalSize += 4                                # self.eventType
+        marshalSize += 4                                # self.padding1
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6178,6 +7380,21 @@ class PointObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
         self.receivingID.parse(inputStream)
         self.pad2 = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( PointObjectStatePdu, self).marshalledSize()
+        marshalSize += self.objectID.marshalledSize()               # self.objectID
+        marshalSize += self.referencedObjectID.marshalledSize()     # self.referencedObjectID
+        marshalSize += 2                                            # self.updateNumber
+        marshalSize += 1                                            # self.forceID
+        marshalSize += 1                                            # self.modifications
+        marshalSize += self.objectType.marshalledSize()             # self.objectType
+        marshalSize += self.objectLocation.marshalledSize()         # self.objectLocation
+        marshalSize += self.objectOrientation.marshalledSize()      # self.objectOrientation
+        marshalSize += 8                                            # self.objectAppearance
+        marshalSize += self.requesterID.marshalledSize()            # self.requesterID
+        marshalSize += self.receivingID.marshalledSize()            # self.receivingID
+        marshalSize += 4                                            # self.pad2
+        return marshalSize
 
 
 class DataPdu( SimulationManagementFamilyPdu ):
@@ -6239,6 +7456,17 @@ class DataPdu( SimulationManagementFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( DataPdu, self).marshalledSize()
+        marshalSize += 4                                # self.requestID
+        marshalSize += 4                                # self.padding1
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6475,6 +7703,50 @@ class FastEntityStatePdu( EntityInformationFamilyPdu ):
             element.parse(inputStream)
             self.variableParameters.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( FastEntityStatePdu, self).marshalledSize()
+        marshalSize += 2                                                # self.site
+        marshalSize += 2                                                # self.application
+        marshalSize += 2                                                # self.entity
+        marshalSize += 1                                                # self.forceId
+        marshalSize += 1                                                # self.numberOfVariableParameters
+        marshalSize += 1                                                # self.entityKind
+        marshalSize += 1                                                # self.domain
+        marshalSize += 2                                                # self.country
+        marshalSize += 1                                                # self.category
+        marshalSize += 1                                                # self.subcategory
+        marshalSize += 1                                                # self.specific
+        marshalSize += 1                                                # self.extra
+        marshalSize += 1                                                # self.altEntityKind
+        marshalSize += 1                                                # self.altDomain
+        marshalSize += 2                                                # self.altCountry
+        marshalSize += 1                                                # self.altCategory
+        marshalSize += 1                                                # self.altSubcategory
+        marshalSize += 1                                                # self.altSpecific
+        marshalSize += 1                                                # self.altExtra
+        marshalSize += 4                                                # self.xVelocity
+        marshalSize += 4                                                # self.yVelocity
+        marshalSize += 4                                                # self.zVelocity
+        marshalSize += 8                                                # self.xLocation
+        marshalSize += 8                                                # self.yLocation
+        marshalSize += 8                                                # self.zLocation
+        marshalSize += 4                                                # self.psi
+        marshalSize += 4                                                # self.theta
+        marshalSize += 4                                                # self.phi
+        marshalSize += 4                                                # self.entityAppearance
+        marshalSize += 1                                                # self.deadReckoningAlgorithm
+        marshalSize += 15                                               # self.otherParameters
+        marshalSize += 4                                                # self.xAcceleration
+        marshalSize += 4                                                # self.yAcceleration
+        marshalSize += 4                                                # self.zAcceleration
+        marshalSize += 4                                                # self.xAngularVelocity
+        marshalSize += 4                                                # self.yAngularVelocity
+        marshalSize += 4                                                # self.zAngularVelocity
+        marshalSize += 12                                               # self.marking
+        marshalSize += 4                                                # self.capabilities
+        for anObj in self.variableParameters:                           # self.variableParameters
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6512,6 +7784,12 @@ class AcknowledgeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.responseFlag = inputStream.read_unsigned_short()
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( AcknowledgeReliablePdu, self).marshalledSize()
+        marshalSize += 2    # self.acknowledgeFlag
+        marshalSize += 2    # self.responseFlag
+        marshalSize += 4    # self.requestID
+        return marshalSize
 
 
 class StartResumeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
@@ -6561,6 +7839,15 @@ class StartResumeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.pad2 = inputStream.read_unsigned_byte()
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( StartResumeReliablePdu, self).marshalledSize()
+        marshalSize += self.realWorldTime.marshalledSize()      # self.realWorldTime
+        marshalSize += self.simulationTime.marshalledSize()     # self.simulationTime
+        marshalSize += 1                                        # self.requiredReliabilityService
+        marshalSize += 2                                        # self.pad1
+        marshalSize += 1                                        # self.pad2
+        marshalSize += 4                                        # self.requestID
+        return marshalSize
 
 
 class ArealObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
@@ -6647,6 +7934,22 @@ class ArealObjectStatePdu( SyntheticEnvironmentFamilyPdu ):
             element.parse(inputStream)
             self.objectLocation.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( ArealObjectStatePdu, self).marshalledSize()
+        marshalSize += self.objectID.marshalledSize()               # self.objectID
+        marshalSize += self.referencedObjectID.marshalledSize()     # self.referencedObjectID
+        marshalSize += 2                                            # self.updateNumber
+        marshalSize += 1                                            # self.forceID
+        marshalSize += 1                                            # self.modifications
+        marshalSize += self.objectType.marshalledSize()             # self.objectType
+        marshalSize += 4                                            # self.specificObjectAppearance
+        marshalSize += 2                                            # self.generalObjectAppearance
+        marshalSize += 2                                            # self.numberOfPoints
+        marshalSize += self.requesterID.marshalledSize()            # self.requesterID
+        marshalSize += self.receivingID.marshalledSize()            # self.receivingID
+        for anObj in self.objectLocation:                           # self.objectLocation
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6723,6 +8026,20 @@ class DataQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumIDs.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( DataQueryReliablePdu, self).marshalledSize()
+        marshalSize += 1                                # self.requiredReliabilityService
+        marshalSize += 2                                # self.pad1
+        marshalSize += 1                                # self.pad2
+        marshalSize += 4                                # self.requestID
+        marshalSize += 4                                # self.timeInterval
+        marshalSize += 4                                # self.numberOfFixedDatumIDs
+        marshalSize += 4                                # self.numberOfVariableDatumIDs
+        for anObj in self.fixedDatumIDs:                # self.fixedDatumIDs
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumIDs:             # self.variableDatumIDs
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6816,6 +8133,23 @@ class MinefieldStatePdu( MinefieldFamilyPdu ):
             element.parse(inputStream)
             self.mineType.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( MinefieldStatePdu, self).marshalledSize()
+        marshalSize += self.minefieldID.marshalledSize()            # self.minefieldID
+        marshalSize += 2                                            # self.minefieldSequence
+        marshalSize += 1                                            # self.forceID
+        marshalSize += 1                                            # self.numberOfPerimeterPoints
+        marshalSize += self.minefieldType.marshalledSize()          # self.minefieldType
+        marshalSize += 2                                            # self.numberOfMineTypes
+        marshalSize += self.minefieldLocation.marshalledSize()      # self.minefieldLocation
+        marshalSize += self.minefieldOrientation.marshalledSize()   # self.minefieldOrientation
+        marshalSize += 2                                            # self.appearance
+        marshalSize += 2                                            # self.protocolMode
+        for anObj in self.perimeterPoints:                          # self.perimeterPoints
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.mineType:                                 # self.mineType
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6887,6 +8221,19 @@ class DataReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( DataReliablePdu, self).marshalledSize()
+        marshalSize += 4                                # self.requestID
+        marshalSize += 1                                # self.requiredReliabilityService
+        marshalSize += 2                                # self.pad1
+        marshalSize += 1                                # self.pad2
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6940,6 +8287,15 @@ class CommentPdu( SimulationManagementFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( CommentPdu, self).marshalledSize()
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -6993,6 +8349,15 @@ class CommentReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( CommentReliablePdu, self).marshalledSize()
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7056,7 +8421,7 @@ class DirectedEnergyFirePdu( WarfareFamilyPdu ):
         self.munitionType.serialize(outputStream)
         self.shotStartTime.serialize(outputStream)
         outputStream.write_float(self.commulativeShotTime)
-        self.ApertureEmitterLocation.serialize(outputStream)
+        self.apertureEmitterLocation.serialize(outputStream)
         outputStream.write_float(self.apertureDiameter)
         outputStream.write_float(self.wavelength)
         outputStream.write_float(self.peakIrradiance)
@@ -7080,7 +8445,7 @@ class DirectedEnergyFirePdu( WarfareFamilyPdu ):
         self.munitionType.parse(inputStream)
         self.shotStartTime.parse(inputStream)
         self.commulativeShotTime = inputStream.read_float()
-        self.ApertureEmitterLocation.parse(inputStream)
+        self.apertureEmitterLocation.parse(inputStream)
         self.apertureDiameter = inputStream.read_float()
         self.wavelength = inputStream.read_float()
         self.peakIrradiance = inputStream.read_float()
@@ -7097,6 +8462,26 @@ class DirectedEnergyFirePdu( WarfareFamilyPdu ):
             element.parse(inputStream)
             self.dERecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( DirectedEnergyFirePdu, self).marshalledSize()
+        marshalSize += self.munitionType.marshalledSize()               # self.munitionType
+        marshalSize += self.shotStartTime.marshalledSize()              # self.shotStartTime
+        marshalSize += 4                                                # self.commulativeShotTime
+        marshalSize += self.apertureEmitterLocation.marshalledSize()    # self.apertureEmitterLocation
+        marshalSize += 4                                                # self.apertureDiameter
+        marshalSize += 4                                                # self.wavelength
+        marshalSize += 4                                                # self.peakIrradiance
+        marshalSize += 4                                                # self.pulseRepetitionFrequency
+        marshalSize += 4                                                # self.pulseWidth
+        marshalSize += 4                                                # self.flags
+        marshalSize += 1                                                # self.pulseShape
+        marshalSize += 1                                                # self.padding1
+        marshalSize += 4                                                # self.padding2
+        marshalSize += 2                                                # self.padding3
+        marshalSize += 2                                                # self.numberOfDERecords
+        for anObj in self.dERecords:                                    # self.dERecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7173,6 +8558,20 @@ class DetonationPdu( WarfareFamilyPdu ):
             element.parse(inputStream)
             self.variableParameters.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( DetonationPdu, self).marshalledSize()
+        marshalSize += self.explodingEntityID.marshalledSize()              # self.explodingEntityID
+        marshalSize += self.eventID.marshalledSize()                        # self.eventID
+        marshalSize += self.velocity.marshalledSize()                       # self.velocity
+        marshalSize += self.locationInWorldCoordinates.marshalledSize()     # self.locationInWorldCoordinates
+        marshalSize += self.descriptor.marshalledSize()                     # self.descriptor
+        marshalSize += self.locationOfEntityCoordinates.marshalledSize()    # self.locationOfEntityCoordinates
+        marshalSize += 1                                                    # self.detonationResult
+        marshalSize += 1                                                    # self.numberOfVariableParameters
+        marshalSize += 2                                                    # self.pad
+        for anObj in self.variableParameters:                               # self.variableParameters
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7235,6 +8634,17 @@ class SetDataPdu( SimulationManagementFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( SetDataPdu, self).marshalledSize()
+        marshalSize += 4                                # self.requestID
+        marshalSize += 4                                # self.padding1
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7300,6 +8710,18 @@ class RecordQueryReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
             element.parse(inputStream)
             self.recordIDs.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( RecordQueryReliablePdu, self).marshalledSize()
+        marshalSize += 4                                # self.requestID
+        marshalSize += 1                                # self.requiredReliabilityService
+        marshalSize += 2                                # self.pad1
+        marshalSize += 1                                # self.pad2
+        marshalSize += 2                                # self.eventType
+        marshalSize += 4                                # self.time
+        marshalSize += 4                                # self.numberOfRecords
+        for anObj in self.recordIDs:                    # self.recordIDs
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7363,6 +8785,17 @@ class ActionResponsePdu( SimulationManagementFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( ActionResponsePdu, self).marshalledSize()
+        marshalSize += 4                                # self.requestID
+        marshalSize += 4                                # self.requestStatus
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7413,6 +8846,15 @@ class EntityDamageStatusPdu( WarfareFamilyPdu ):
             element.parse(inputStream)
             self.damageDescriptionRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( EntityDamageStatusPdu, self).marshalledSize()
+        marshalSize += self.damagedEntityID.marshalledSize()    # self.damagedEntityID
+        marshalSize += 2                                        # self.padding1
+        marshalSize += 2                                        # self.padding2
+        marshalSize += 2                                        # self.numberOfDamageDescription
+        for anObj in self.fixedDatumRecords:                    # self.damageDescriptionRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7449,7 +8891,7 @@ class FirePdu( WarfareFamilyPdu ):
     def serialize(self, outputStream):
         """serialize the class """
         super( FirePdu, self ).serialize(outputStream)
-        self.munitionExpendibleID.serialize(outputStream)
+        self.munitionExpendableID.serialize(outputStream)
         self.eventID.serialize(outputStream)
         outputStream.write_unsigned_int(self.fireMissionIndex)
         self.locationInWorldCoordinates.serialize(outputStream)
@@ -7462,7 +8904,7 @@ class FirePdu( WarfareFamilyPdu ):
         """"Parse a message. This may recursively call embedded objects."""
 
         super( FirePdu, self).parse(inputStream)
-        self.munitionExpendibleID.parse(inputStream)
+        self.munitionExpendableID.parse(inputStream)
         self.eventID.parse(inputStream)
         self.fireMissionIndex = inputStream.read_unsigned_int()
         self.locationInWorldCoordinates.parse(inputStream)
@@ -7470,6 +8912,16 @@ class FirePdu( WarfareFamilyPdu ):
         self.velocity.parse(inputStream)
         self.range = inputStream.read_float()
 
+    def marshalledSize(self):
+        marshalSize = super( FirePdu, self).marshalledSize()
+        marshalSize += self.munitionExpendableID.marshalledSize()           # self.munitionExpendableID
+        marshalSize += self.eventID.marshalledSize()                        # self.eventID
+        marshalSize += 4                                                    # self.fireMissionIndex
+        marshalSize += self.locationInWorldCoordinates.marshalledSize()     # self.locationInWorldCoordinates
+        marshalSize += self.descriptor.marshalledSize()                     # self.descriptor
+        marshalSize += self.velocity.marshalledSize()                       # self.velocity
+        marshalSize += 4                                                    # self.range
+        return marshalSize
 
 
 class ReceiverPdu( RadioCommunicationsFamilyPdu ):
@@ -7501,7 +8953,7 @@ class ReceiverPdu( RadioCommunicationsFamilyPdu ):
         outputStream.write_unsigned_short(self.receiverState)
         outputStream.write_unsigned_short(self.padding1)
         outputStream.write_float(self.receivedPower)
-        self.transmitterEntityId.serialize(outputStream)
+        self.transmitterEntityID.serialize(outputStream)
         outputStream.write_unsigned_short(self.transmitterRadioId)
 
 
@@ -7512,9 +8964,17 @@ class ReceiverPdu( RadioCommunicationsFamilyPdu ):
         self.receiverState = inputStream.read_unsigned_short()
         self.padding1 = inputStream.read_unsigned_short()
         self.receivedPower = inputStream.read_float()
-        self.transmitterEntityId.parse(inputStream)
+        self.transmitterEntityID.parse(inputStream)
         self.transmitterRadioId = inputStream.read_unsigned_short()
 
+    def marshalledSize(self):
+        marshalSize = super( ReceiverPdu, self).marshalledSize()
+        marshalSize += 2                                                    # self.receiverState
+        marshalSize += 2                                                    # self.padding1
+        marshalSize += 4                                                    # self.receivedPower
+        marshalSize += self.transmitterEntityID.marshalledSize()            # self.transmitterEntityID
+        marshalSize += 2                                                    # self.transmitterRadioId
+        return marshalSize
 
 
 class UaPdu( DistributedEmissionsFamilyPdu ):
@@ -7612,6 +9072,24 @@ class UaPdu( DistributedEmissionsFamilyPdu ):
             element.parse(inputStream)
             self.emitterSystems.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( UaPdu, self).marshalledSize()
+        marshalSize += self.emittingEntityID.marshalledSize()   # self.emittingEntityID
+        marshalSize += self.eventID.marshalledSize()            # self.eventID
+        marshalSize += 1                                        # self.stateChangeIndicator
+        marshalSize += 1                                        # self.pad
+        marshalSize += 2                                        # self.passiveParameterIndex
+        marshalSize += 1                                        # self.propulsionPlantConfiguration
+        marshalSize += 1                                        # self.numberOfShafts
+        marshalSize += 1                                        # self.numberOfAPAs
+        marshalSize += 1                                        # self.numberOfUAEmitterSystems
+        for anObj in self.shaftRPMs:                            # self.shaftRPMs
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.apaData:                              # self.apaData
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.emitterSystems:                       # self.emitterSystems
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7699,6 +9177,22 @@ class IntercomControlPdu( RadioCommunicationsFamilyPdu ):
             element.parse(inputStream)
             self.intercomParameters.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( IntercomControlPdu, self).marshalledSize()
+        marshalSize += 1                                        # self.controlType
+        marshalSize += 1                                        # self.communicationsChannelType
+        marshalSize += self.sourceEntityID.marshalledSize()     # self.sourceEntityID
+        marshalSize += 1                                        # self.sourceCommunicationsDeviceID
+        marshalSize += 1                                        # self.sourceLineID
+        marshalSize += 1                                        # self.transmitPriority
+        marshalSize += 1                                        # self.transmitLineState
+        marshalSize += 1                                        # self.command
+        marshalSize += self.masterEntityID.marshalledSize()     # self.masterEntityID
+        marshalSize += 2                                        # self.masterCommunicationsDeviceID
+        marshalSize += 4                                        # self.intercomParametersLength
+        for anObj in self.intercomParameters:                   # self.intercomParameters
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7766,6 +9260,17 @@ class SignalPdu( RadioCommunicationsFamilyPdu ):
             element = inputStream.read_byte()
             self.data.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( SignalPdu, self).marshalledSize()
+        marshalSize += self.entityID.marshalledSize()           # self.entityID
+        marshalSize += 2                                        # self.radioID
+        marshalSize += 2                                        # self.encodingScheme
+        marshalSize += 2                                        # self.tdlType
+        marshalSize += 4                                        # self.sampleRate
+        marshalSize += 2                                        # self.dataLength
+        marshalSize += 2                                        # self.samples
+        marshalSize += self.dataLength // 8                     # self.data [not sure, seems wrong]
+        return marshalSize
 
 
 
@@ -7804,6 +9309,13 @@ class RemoveEntityReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.pad2 = inputStream.read_unsigned_byte()
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( RemoveEntityReliablePdu, self).marshalledSize()
+        marshalSize += 1    # self.requiredReliabilityService
+        marshalSize += 2    # self.pad1
+        marshalSize += 1    # self.pad2
+        marshalSize += 4    # self.requestID
+        return marshalSize
 
 
 class SeesPdu( DistributedEmissionsFamilyPdu ):
@@ -7876,6 +9388,19 @@ class SeesPdu( DistributedEmissionsFamilyPdu ):
             element.parse(inputStream)
             self.vectoringSystemData.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( RemoveEntityReliablePdu, self).marshalledSize()
+        marshalSize += self.orginatingEntityID.marshalledSize()     # self.orginatingEntityID
+        marshalSize += 2                                            # self.infraredSignatureRepresentationIndex
+        marshalSize += 2                                            # self.acousticSignatureRepresentationIndex
+        marshalSize += 2                                            # self.radarCrossSectionSignatureRepresentationIndex
+        marshalSize += 2                                            # self.numberOfPropulsionSystems
+        marshalSize += 2                                            # self.numberOfVectoringNozzleSystems
+        for anObj in self.propulsionSystemData:                     # self.propulsionSystemData
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.vectoringSystemData:                      # self.vectoringSystemData
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -7914,6 +9439,13 @@ class CreateEntityReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.pad2 = inputStream.read_unsigned_byte()
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( CreateEntityReliablePdu, self).marshalledSize()
+        marshalSize += 1    # self.requiredReliabilityService
+        marshalSize += 2    # self.pad1
+        marshalSize += 1    # self.pad2
+        marshalSize += 4    # self.requestID
+        return marshalSize
 
 
 class StopFreezeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
@@ -7964,6 +9496,15 @@ class StopFreezeReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
         self.pad1 = inputStream.read_unsigned_byte()
         self.requestID = inputStream.read_unsigned_int()
 
+    def marshalledSize(self):
+        marshalSize = super( StopFreezeReliablePdu, self).marshalledSize()
+        marshalSize += self.realWorldTime.marshalledSize()      # self.realWorldTime
+        marshalSize += 1                                        # self.reason
+        marshalSize += 1                                        # self.frozenBehavior
+        marshalSize += 1                                        # self.requiredReliablityService
+        marshalSize += 1                                        # self.pad1
+        marshalSize += 4                                        # self.requestID
+        return marshalSize
 
 
 class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
@@ -8025,6 +9566,17 @@ class EventReportReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( EventReportReliablePdu, self).marshalledSize()
+        marshalSize += 2                                # self.eventType
+        marshalSize += 4                                # self.pad1
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -8077,6 +9629,15 @@ class MinefieldResponseNackPdu( MinefieldFamilyPdu ):
             element.parse(inputStream)
             self.missingPduSequenceNumbers.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( MinefieldResponseNackPdu, self).marshalledSize()
+        marshalSize += self.minefieldID.marshalledSize()            # self.minefieldID
+        marshalSize += self.requestingEntityID.marshalledSize()     # self.requestingEntityID
+        marshalSize += 1                                            # self.requestID
+        marshalSize += 1                                            # self.numberOfMissingPdus
+        for anObj in self.missingPduSequenceNumbers:                # self.missingPduSequenceNumbers
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -8140,6 +9701,17 @@ class ActionResponseReliablePdu( SimulationManagementWithReliabilityFamilyPdu ):
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
 
+    def marshalledSize(self):
+        marshalSize = super( MinefieldResponseNackPdu, self).marshalledSize()
+        marshalSize += 4                                # self.requestID
+        marshalSize += 4                                # self.responseStatus
+        marshalSize += 4                                # self.numberOfFixedDatumRecords
+        marshalSize += 4                                # self.numberOfVariableDatumRecords
+        for anObj in self.fixedDatumRecords:            # self.fixedDatumRecords
+            marshalSize += anObj.marshalledSize()
+        for anObj in self.variableDatumRecords:         # self.variableDatumRecords
+            marshalSize += anObj.marshalledSize()
+        return marshalSize
 
 
 
@@ -8191,3 +9763,13 @@ class IsPartOfPdu( EntityManagementFamilyPdu ):
         self.partLocation.parse(inputStream)
         self.namedLocationID.parse(inputStream)
         self.partEntityType.parse(inputStream)
+
+    def marshalledSize(self):
+        marshalSize = super( IsPartOfPdu, self).marshalledSize()
+        marshalSize += self.orginatingEntityID.marshalledSize()     # self.orginatingEntityID
+        marshalSize += self.receivingEntityID.marshalledSize()      # self.receivingEntityID
+        marshalSize += self.relationship.marshalledSize()           # self.relationship
+        marshalSize += self.partLocation.marshalledSize()           # self.partLocation
+        marshalSize += self.namedLocationID.marshalledSize()        # self.namedLocationID
+        marshalSize += self.partEntityType.marshalledSize()         # self.partEntityType
+        return marshalSize
