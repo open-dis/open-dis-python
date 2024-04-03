@@ -46,6 +46,7 @@ def send():
 
     memoryStream = BytesIO()
     outputStream = DataOutputStream(memoryStream)
+    pdu.length = pdu.marshalledSize()
     pdu.serialize(outputStream)
     data = memoryStream.getvalue()
 
