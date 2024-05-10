@@ -46,12 +46,12 @@ from math import sqrt, pi, sin, cos, tan, atan, atan2, asin
 from numpy import array, dot, identity
 
 
-def deg2rad(deg):
+def deg2rad(deg: float):
     """Converts degrees to radians"""
     return deg * pi / 180
 
 
-def rad2deg(rad):
+def rad2deg(rad: float):
     """Converts radians to degrees"""
     return rad * 180 / pi
 
