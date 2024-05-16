@@ -7450,7 +7450,7 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         outputStream.write_short(len(self.data) * 8)
         outputStream.write_short(self.samples)
         for b in self.data:
-            outputStream.write_byte(b)
+            outputStream.write_unsigned_byte(b)
 
     def parse(self, inputStream):
         """Parse a message. This may recursively call embedded objects."""
@@ -7463,7 +7463,7 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.dataLength = inputStream.read_short()
         self.samples = inputStream.read_short()
         for idx in range(0, self.dataLength // 8):
-            element = inputStream.read_byte()
+            element = inputStream.read_unsigned_byte()
             self.data.append(element)
 
 
