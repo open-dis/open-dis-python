@@ -2519,7 +2519,7 @@ class GridAxisDescriptorVariable:
         self.axisType = inputStream.read_unsigned_byte()
         # FIXME: use axis type to determine whether to deserialize regular or
         #        irregular axis data
-self.numberOfPointsOnXiAxis = inputStream.read_unsigned_short()
+        self.numberOfPointsOnXiAxis = inputStream.read_unsigned_short()
         self.initialIndex = inputStream.read_unsigned_short()
         self.coordinateScaleXi = inputStream.read_double()
         self.coordinateOffsetXi = inputStream.read_double()
@@ -4701,7 +4701,7 @@ class IntercomSignalPdu(RadioCommunicationsFamilyPdu):
                  tdlType: uint16 = 0,  # [UID 178]
                  sampleRate: uint32 = 0,
                  samples: uint16 = 0,
-                 data: bytes = b""):
+                 data: list[bytes] | None = None):
         super(IntercomSignalPdu, self).__init__()
         self.entityID = entityID or EntityID()
         self.communicationsDeviceID = communicationsDeviceID
@@ -4710,14 +4710,14 @@ class IntercomSignalPdu(RadioCommunicationsFamilyPdu):
         """tactical data link type"""
         self.sampleRate = sampleRate
         self.samples = samples
-        self.data = data
+        self.data = data or []
         """data bytes"""
         # Pad to 32-bit boundary
 
     @property
     def dataLength(self) -> uint16:
         """Length of data in bits"""
-        return len(self.data) // 8
+        return len(self.data) * 8
 
     def serialize(self, outputStream):
         """serialize the class"""
@@ -4743,7 +4743,7 @@ class IntercomSignalPdu(RadioCommunicationsFamilyPdu):
         dataLength = inputStream.read_unsigned_short()
         self.samples = inputStream.read_unsigned_short()
         # FIXME: Read dataLength number of bits from inputStream for data
-        for idx in range(0, self.dataLength):
+        for idx in range(0, dataLength // 8):
             element = null()
             element.parse(inputStream)
             self.data.append(element)
@@ -5446,7 +5446,6 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.radioEntityType = radioEntityType or EntityType()  # TODO: validation
         self.transmitState = transmitState
         self.inputSource = inputSource
-        self.variableTransmitterParameterCount = variableTransmitterParameterCount
         self.antennaLocation = antennaLocation or Vector3Double()
         self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float(
         )
@@ -5513,7 +5512,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.radioEntityType.parse(inputStream)
         self.transmitState = inputStream.read_unsigned_byte()
         self.inputSource = inputStream.read_unsigned_byte()
-        self.variableTransmitterParameterCount = inputStream.read_unsigned_short(
+        variableTransmitterParameterCount = inputStream.read_unsigned_short(
         )
         self.antennaLocation.parse(inputStream)
         self.relativeAntennaLocation.parse(inputStream)
@@ -7346,7 +7345,7 @@ class IntercomControlPdu(RadioCommunicationsFamilyPdu):
                  command: enum8 = 0,  # [UID 182]
                  masterEntityID: "EntityID | UnattachedIdentifier | None" = None,
                  masterCommunicationsDeviceID: uint16 = 0,
-                 intercomParameters: "IntercomCommunicationsParameters" | None = None):
+                 intercomParameters: "IntercomCommunicationsParameters | None" = None):
         super(IntercomControlPdu, self).__init__()
         self.controlType = controlType
         self.communicationsChannelType = communicationsChannelType
@@ -7425,13 +7424,10 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
                  tdlType: enum16 = 0,  # [UID 178]
                  sampleRate: uint32 = 0,
                  samples: uint16 = 0,
-                 data: bytes = b""):
+                 data: list[bytes] | None = None):
         super(SignalPdu, self).__init__()
-
         self.entityID = entityID or EntityID()
-
         self.radioID = radioID
-
         self.encodingScheme = encodingScheme
         """encoding scheme used, and enumeration"""
         self.tdlType = tdlType
@@ -7440,14 +7436,14 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         """sample rate"""
         self.samples = samples
         """number of samples"""
-        self.data = data
+        self.data = data or []
         """list of eight bit values"""
         # TODO: pad to 32-bit boundary
 
     @property
     def dataLength(self) -> uint16:
         """Length of data in bits"""
-        return len(self.data)
+        return len(self.data) * 8
 
     def serialize(self, outputStream):
         """serialize the class"""
@@ -7459,7 +7455,6 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         outputStream.write_unsigned_int(self.sampleRate)
         outputStream.write_short(self.dataLength)
         outputStream.write_short(self.samples)
-        # FIXME: serialize data to outputStream directly
         for b in self.data:
             outputStream.write_byte(b)
 
@@ -7473,7 +7468,6 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.sampleRate = inputStream.read_unsigned_int()
         dataLength = inputStream.read_short()
         self.samples = inputStream.read_short()
-        # FIXME: deserialize dataLength bits from inputStream directly
         for idx in range(0, dataLength // 8):
             element = inputStream.read_byte()
             self.data.append(element)
