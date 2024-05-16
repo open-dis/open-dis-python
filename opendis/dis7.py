@@ -4742,7 +4742,8 @@ class IntercomSignalPdu(RadioCommunicationsFamilyPdu):
         self.sampleRate = inputStream.read_unsigned_int()
         dataLength = inputStream.read_unsigned_short()
         self.samples = inputStream.read_unsigned_short()
-        # FIXME: Read dataLength number of bits from inputStream for data
+        # sampleSize = dataLength / samples
+        # FIXME: Read sampleSize number of bits from inputStream for data
         for idx in range(0, dataLength // 8):
             element = null()
             element.parse(inputStream)
@@ -7429,13 +7430,9 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.entityID = entityID or EntityID()
         self.radioID = radioID
         self.encodingScheme = encodingScheme
-        """encoding scheme used, and enumeration"""
         self.tdlType = tdlType
-        """tdl type"""
         self.sampleRate = sampleRate
-        """sample rate"""
         self.samples = samples
-        """number of samples"""
         self.data = data or []
         """list of eight bit values"""
         # TODO: pad to 32-bit boundary
@@ -7468,6 +7465,8 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.sampleRate = inputStream.read_unsigned_int()
         dataLength = inputStream.read_short()
         self.samples = inputStream.read_short()
+        # sampleSize = dataLength / samples
+        # FIXME: Read sampleSize number of bits from inputStream for data
         for idx in range(0, dataLength // 8):
             element = inputStream.read_byte()
             self.data.append(element)
