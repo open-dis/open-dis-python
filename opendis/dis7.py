@@ -3787,23 +3787,23 @@ class VariableDatum:
         outputStream.write_unsigned_int(self.variableDatumID)
         outputStream.write_unsigned_int(self.variableDatumLength)
         for x in range(self.variableDatumLength // 8):  # length is in bits
-            outputStream.write_byte(self.variableData[x])
+            outputStream.write_unsigned_byte(self.variableData[x])
 
         #send padding
         for x in range(self.datumPaddingSizeInBits() // 8):
-            outputStream.write_byte(0)
+            outputStream.write_unsigned_byte(0)
 
     def parse(self, inputStream):
         """Parse a message. This may recursively call embedded objects."""
         self.variableDatumID = inputStream.read_unsigned_int()
         self.variableDatumLength = inputStream.read_unsigned_int()
         for x in range(self.variableDatumLength // 8):  # length is in bits
-            self.variableData.append(inputStream.read_byte())
+            self.variableData.append(inputStream.read_unsigned_byte())
 
         # Skip over padding
         # "This field shall be padded at the end to make the length a multiple of 64-bits."
         for x in range(self.datumPaddingSizeInBits() // 8):
-            inputStream.read_byte()
+            inputStream.read_unsigned_byte()
 
 
 class EventIdentifierLiveEntity:
