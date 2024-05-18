@@ -7447,8 +7447,8 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         outputStream.write_unsigned_short(self.encodingScheme)
         outputStream.write_unsigned_short(self.tdlType)
         outputStream.write_unsigned_int(self.sampleRate)
-        outputStream.write_short(len(self.data) * 8)
-        outputStream.write_short(self.samples)
+        outputStream.write_unsigned_short(len(self.data) * 8)
+        outputStream.write_unsigned_short(self.samples)
         for b in self.data:
             outputStream.write_unsigned_byte(b)
 
@@ -7460,8 +7460,8 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.encodingScheme = inputStream.read_unsigned_short()
         self.tdlType = inputStream.read_unsigned_short()
         self.sampleRate = inputStream.read_unsigned_int()
-        self.dataLength = inputStream.read_short()
-        self.samples = inputStream.read_short()
+        self.dataLength = inputStream.read_unsigned_short()
+        self.samples = inputStream.read_unsigned_short()
         for idx in range(0, self.dataLength // 8):
             element = inputStream.read_unsigned_byte()
             self.data.append(element)
