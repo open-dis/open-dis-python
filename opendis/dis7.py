@@ -2039,14 +2039,14 @@ class ModulationType:
 
     def serialize(self, outputStream):
         """serialize the class"""
-        outputStream.write_unsigned_short(self.spreadSpectrum)
+        self.spreadSpectrum.serialize(outputStream)
         outputStream.write_unsigned_short(self.majorModulation)
         outputStream.write_unsigned_short(self.detail)
         outputStream.write_unsigned_short(self.radioSystem)
 
     def parse(self, inputStream):
         """Parse a message. This may recursively call embedded objects."""
-        self.spreadSpectrum = inputStream.read_unsigned_short()
+        self.spreadSpectrum.parse(inputStream)
         self.majorModulation = inputStream.read_unsigned_short()
         self.detail = inputStream.read_unsigned_short()
         self.radioSystem = inputStream.read_unsigned_short()
