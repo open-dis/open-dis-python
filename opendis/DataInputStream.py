@@ -61,3 +61,6 @@ class DataInputStream:
 
     def read_unsigned_int(self) -> uint32:
         return struct.unpack('>I', self.stream.read(4))[0]
+
+    def read_bytes(self, n: int) -> bytes:
+        return self.stream.read(n)
