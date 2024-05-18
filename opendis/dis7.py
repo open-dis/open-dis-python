@@ -5482,6 +5482,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.radioEntityType = radioEntityType or EntityType()  # TODO: validation
         self.transmitState = transmitState
         self.inputSource = inputSource
+        self.variableTransmitterParameterCount = variableTransmitterParameterCount
         self.antennaLocation = antennaLocation or Vector3Double()
         self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float(
         )
