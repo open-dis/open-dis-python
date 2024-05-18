@@ -1,11 +1,10 @@
 from collections.abc import Sequence
 from ctypes import c_uint, BigEndianStructure
+
 from .types import (
     bf_enum,
-    bf_int,
     bf_uint,
 )
-
 from .DataInputStream import DataInputStream
 from .DataOutputStream import DataOutputStream
 
@@ -32,14 +31,14 @@ def bitfield(
 
     class Bitfield(BigEndianStructure):
         _fields_ = fields
-    
+
         @staticmethod
         def marshalledSize() -> int:
             return bytesize
-    
+
         def serialize(self, outputStream: DataOutputStream) -> None:
             outputStream.write_bytes(bytes(self))
-    
+
         @classmethod
         def parse(cls, inputStream: DataInputStream) -> "Bitfield":
             return cls.from_buffer_copy(inputStream.read_bytes(bytesize))
@@ -61,7 +60,7 @@ class NetId:
         ("mode", c_uint, 2),
         ("padding", c_uint, 2)
     ])
-    
+
     def __init__(self,
                  netNumber: bf_uint = 0,
                  frequencyTable: bf_enum = 0,  # [UID 299]
@@ -112,7 +111,7 @@ class SpreadSpectrum:
         ("timeHopping", c_uint, 1),
         ("padding", c_uint, 13)
     ])
-    
+
     def __init__(self,
                  frequencyHopping: bool = False,
                  pseudoNoise: bool = False,
