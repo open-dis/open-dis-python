@@ -30,7 +30,7 @@ PduTypeDecoders = {
     , 20 : DataPdu
     , 21 : EventReportPdu
     , 22 : CommentPdu
-    , 23 : ElectronicEmissionsPdu
+    , 23 : ElectromagneticEmissionsPdu
     , 24 : DesignatorPdu
     , 25 : TransmitterPdu
     , 26 : SignalPdu
