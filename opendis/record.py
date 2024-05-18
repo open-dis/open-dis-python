@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from ctypes import c_uint, BigEndianStructure
+from ctypes import c_uint8, c_uint16, BigEndianStructure
 
 from .types import (
     bf_enum,
@@ -55,10 +55,10 @@ class NetId:
     YY = Frequency Table
     """
     _struct = bitfield("NetId", 2, [
-        ("netNumber", c_uint, 10),
-        ("frequencyTable", c_uint, 2),
-        ("mode", c_uint, 2),
-        ("padding", c_uint, 2)
+        ("netNumber", c_uint16, 10),
+        ("frequencyTable", c_uint8, 2),
+        ("mode", c_uint8, 2),
+        ("padding", c_uint8, 2)
     ])
 
     def __init__(self,
@@ -106,10 +106,10 @@ class SpreadSpectrum:
     In Python, the presence or absence of each technique is indicated by a bool.
     """
     _struct = bitfield("SpreadSpectrum", 2, [
-        ("frequencyHopping", c_uint, 1),
-        ("pseudoNoise", c_uint, 1),
-        ("timeHopping", c_uint, 1),
-        ("padding", c_uint, 13)
+        ("frequencyHopping", c_uint8, 1),
+        ("pseudoNoise", c_uint8, 1),
+        ("timeHopping", c_uint8, 1),
+        ("padding", c_uint16, 13)
     ])
 
     def __init__(self,
