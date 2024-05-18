@@ -27,3 +27,8 @@ struct16 = bytes
 struct32 = bytes
 char8 = str
 char16 = str
+
+# Non-octet-size types for bitfields
+bf_enum = int
+bf_int = int
+bf_uint = int
