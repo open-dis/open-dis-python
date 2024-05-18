@@ -5412,48 +5412,29 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  antennaPatternList=None):
         super(TransmitterPdu, self).__init__()
         self.radioReferenceID = radioReferenceID or EntityID()
-        """ID of the entitythat is the source of the communication"""
+        """ID of the entity that is the source of the communication"""
         self.radioNumber = radioNumber
         """particular radio within an entity"""
         self.radioEntityType = radioEntityType or EntityType()  # TODO: validation
-        """Type of radio"""
         self.transmitState = transmitState
-        """transmit state"""
         self.inputSource = inputSource
-        """input source"""
         self.variableTransmitterParameterCount = variableTransmitterParameterCount
-        """count field"""
         self.antennaLocation = antennaLocation or Vector3Double()
-        """Location of antenna"""
         self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float(
         )
-        """relative location of antenna"""
         self.antennaPatternType = antennaPatternType
-        """antenna pattern type"""
         self.antennaPatternCount = antennaPatternCount
-        """antenna pattern length"""
         self.frequency = frequency
-        """frequency"""
         self.transmitFrequencyBandwidth = transmitFrequencyBandwidth
-        """transmit frequency Bandwidth"""
         self.power = power
-        """transmission power"""
         self.modulationType = modulationType or ModulationType()
-        """modulation"""
         self.cryptoSystem = cryptoSystem
-        """crypto system enumeration"""
         self.cryptoKeyId = cryptoKeyId
-        """crypto system key identifer"""
         self.modulationParameterCount = modulationParameterCount
-        """how many modulation parameters we have"""
         self.padding2 = 0
-        """padding2"""
         self.padding3 = 0
-        """padding3"""
         self.modulationParametersList = modulationParametersList or []
-        """variable length list of modulation parameters"""
         self.antennaPatternList = antennaPatternList or []
-        """variable length list of antenna pattern records"""
         # TODO: zero or more Variable Transmitter Parameters records (see 6.2.95)
 
     def serialize(self, outputStream):
