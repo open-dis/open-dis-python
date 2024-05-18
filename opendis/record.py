@@ -1,25 +1,32 @@
 from collections.abc import Sequence
-from ctypes import _CData, BigEndianStructure, c_uint
+from ctypes import c_uint, BigEndianStructure
 from .types import (
     bf_enum,
     bf_int,
     bf_uint,
 )
 
-from DataInputStream import DataInputStream
-from DataOutputStream import DataOutputStream
+from .DataInputStream import DataInputStream
+from .DataOutputStream import DataOutputStream
 
 
 def bitfield(
         name: str,
         bytesize: int,
-        fields: Sequence[
-            tuple[str, type[_CData]] | tuple[str, type[_CData], int]
-        ],
+        fields: Sequence[tuple],
     ):
     """Factory function for bitfield structs, which are subclasses of
     ctypes.Structure.
     These are used in records that require them to unpack non-octet-sized fields.
+
+    Arguments
+    ---------
+    name: str
+        The name of the bitfield struct.
+    bytesize: int
+        The number of bytes required by the bitfield, including padding.
+    fields: Sequence[tuple[str, ctypes._CData] | tuple[str, ctypes._CData, int]]
+        A sequence of field descriptions. See ctypes.Structure documentation for details.
     """
     assert bytesize > 0, "Cannot create bitfield with zero bytes"
 
