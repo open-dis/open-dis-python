@@ -6,8 +6,6 @@ from .types import (
     enum8,
     enum16,
     enum32,
-    int8,
-    int16,
     int32,
     uint8,
     uint16,
@@ -19,6 +17,7 @@ from .types import (
     struct16,
     struct32,
 )
+from .record import SpreadSpectrum
 
 
 class DataQueryDatumSpecification:
@@ -2025,11 +2024,11 @@ class ModulationType:
     """
 
     def __init__(self,
-                 spreadSpectrum: struct16 = 0,  # See RPR Enumerations
+                 spreadSpectrum: SpreadSpectrum | None = None,  # See RPR Enumerations
                  majorModulation: enum16 = 0,  # [UID 155]
-                 detail: enum16  =0,  # [UID 156-162]
-                 radioSystem: enum16  =0):  # [UID 163]
-        self.spreadSpectrum = spreadSpectrum
+                 detail: enum16 = 0,  # [UID 156-162]
+                 radioSystem: enum16 = 0):  # [UID 163]
+        self.spreadSpectrum = spreadSpectrum or SpreadSpectrum()
         """This field shall indicate the spread spectrum technique or combination of spread spectrum techniques in use. Bit field. 0=freq hopping, 1=psuedo noise, time hopping=2, reamining bits unused"""
         self.majorModulation = majorModulation
         """the major classification of the modulation type."""
@@ -2040,14 +2039,14 @@ class ModulationType:
 
     def serialize(self, outputStream):
         """serialize the class"""
-        outputStream.write_unsigned_short(self.spreadSpectrum)
+        self.spreadSpectrum.serialize(outputStream)
         outputStream.write_unsigned_short(self.majorModulation)
         outputStream.write_unsigned_short(self.detail)
         outputStream.write_unsigned_short(self.radioSystem)
 
     def parse(self, inputStream):
         """Parse a message. This may recursively call embedded objects."""
-        self.spreadSpectrum = inputStream.read_unsigned_short()
+        self.spreadSpectrum.parse(inputStream)
         self.majorModulation = inputStream.read_unsigned_short()
         self.detail = inputStream.read_unsigned_short()
         self.radioSystem = inputStream.read_unsigned_short()
@@ -5441,7 +5440,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  antennaPatternList=None):
         super(TransmitterPdu, self).__init__()
         self.radioReferenceID = radioReferenceID or EntityID()
-        """ID of the entitythat is the source of the communication"""
+        """ID of the entity that is the source of the communication"""
         self.radioNumber = radioNumber
         """particular radio within an entity"""
         self.radioEntityType = radioEntityType or EntityType()  # TODO: validation
@@ -5455,7 +5454,6 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.frequency = frequency
         self.transmitFrequencyBandwidth = transmitFrequencyBandwidth
         self.power = power
-        """transmission power"""
         self.modulationType = modulationType or ModulationType()
         self.cryptoSystem = cryptoSystem
         self.cryptoKeyId = cryptoKeyId
@@ -5464,9 +5462,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.padding2 = 0
         self.padding3 = 0
         self.modulationParametersList = modulationParametersList or []
-        """variable length list of modulation parameters"""
         self.antennaPatternList = antennaPatternList or []
-        """variable length list of antenna pattern records"""
         # TODO: zero or more Variable Transmitter Parameters records (see 6.2.95)
 
     @property
@@ -7463,9 +7459,11 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.encodingScheme = inputStream.read_unsigned_short()
         self.tdlType = inputStream.read_unsigned_short()
         self.sampleRate = inputStream.read_unsigned_int()
-        self.dataLength = inputStream.read_unsigned_short()
+        dataLength = inputStream.read_unsigned_short()
+        # TODO: Make validation optional
+        assert dataLength % 8 == 0
         self.samples = inputStream.read_unsigned_short()
-        for idx in range(0, self.dataLength // 8):
+        for idx in range(0, dataLength // 8):
             element = inputStream.read_unsigned_byte()
             self.data.append(element)
 

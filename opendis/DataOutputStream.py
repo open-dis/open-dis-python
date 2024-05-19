@@ -49,3 +49,6 @@ class DataOutputStream:
     def write_unsigned_int(self, val: int) -> None:
         self.stream.write(struct.pack('>I', val))
 
+    def write_bytes(self, val: bytes) -> None:
+        self.stream.write(val)
+
