@@ -7463,9 +7463,9 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.encodingScheme = inputStream.read_unsigned_short()
         self.tdlType = inputStream.read_unsigned_short()
         self.sampleRate = inputStream.read_unsigned_int()
-        self.dataLength = inputStream.read_unsigned_short()
+        dataLength = inputStream.read_unsigned_short()
         self.samples = inputStream.read_unsigned_short()
-        for idx in range(0, self.dataLength // 8):
+        for idx in range(0, dataLength // 8):
             element = inputStream.read_unsigned_byte()
             self.data.append(element)
 
