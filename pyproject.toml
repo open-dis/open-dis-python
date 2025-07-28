@@ -1,6 +1,6 @@
 [project]
 name = "opendis"
-version = "1.1.0a0"
+version = "1.1.0a1"
 description='implementation of DIS, IEEE-1278.1'
 authors = [
     {name="Don McGregor", email="mcgredo@nps.edu"},
@@ -33,7 +33,7 @@ docformatter = {extras = ["tomli"], version = "^1.7.5"}
 
 
 [tool.commitizen]
-version = "1.1.0a0"
+version = "1.1.0a1"
 update_changelog_on_bump = false
 changelog_merge_prerelease = false
 bump_message = "bump: $current_version → $new_version"
