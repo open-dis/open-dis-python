@@ -2,5 +2,5 @@
 
 ### Feat
 
-- alpha releases now indicate accel opendis releases
-- allow a newer version of numpy
+- alpha releases indicate accel-opendis releases
+- allow a newer version of numpy and support python >3.9
