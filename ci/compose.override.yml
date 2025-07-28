@@ -1,0 +1,3 @@
+services:
+  opendis:
+    image: devops.cuic.mitre.org/accel-lab/opendis:ci_${CI_PIPELINE_ID}

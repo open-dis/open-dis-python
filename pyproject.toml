@@ -40,6 +40,7 @@ major_version_zero = true
 bump_message = "bump: $current_version → $new_version"
 version_files = [
     "pyproject.toml:^version",
+    ".env:^version"
 ]
 
 [build-system]
