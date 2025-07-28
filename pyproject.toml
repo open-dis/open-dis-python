@@ -36,7 +36,6 @@ docformatter = {extras = ["tomli"], version = "^1.7.5"}
 version = "1.1.0a"
 update_changelog_on_bump = false
 changelog_merge_prerelease = false
-major_version_zero = true
 bump_message = "bump: $current_version → $new_version"
 version_files = [
     "pyproject.toml:^version",
