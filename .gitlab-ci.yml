@@ -1,9 +1,40 @@
+variables:
+  PROJECT_REGISTRY: ${PROJECT_REGISTRY}
+  NAMESPACE: ${NAMESPACE}
+  APP_NAME: "accel-api"
+  GIT_USER: "Accel Gitlab Runner"
+  GIT_EMAIL: "runner@accel.mitre.org"
+  CURRENT_USER: "None"
+  GIT_STRATEGY: clone
+
 stages:
+  - version
   - publish
 
 default:
   tags:
     - accel_docker_builder_runner
+
+#
+# Version
+#
+auto-bump-dev:
+  stage: version
+  image: devops.cuic.mitre.org/cuic-lab/mitre-cuic-debian-bookworm:py3.11
+  script:
+    - ./ci/auto-bump.sh
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_ONLY_CHORES == "true"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_MESSAGE =~ /^bump:/
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+
+
+
 #
 # Publish
 #
@@ -19,6 +50,6 @@ include:
 publish:poetry_build_and_publish:
   # Override the build rules for the include
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: $CI_COMMIT_TAG  # publish on tag
       when: on_success
     - when: never
