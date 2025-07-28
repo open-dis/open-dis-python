@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "opendis"
-version = "1.0"
+version = "1.0.1"
 description='implementation of DIS, IEEE-1278.1'
 authors = ["Don McGregor <mcgredo@nps.edu>"]
 readme = "README.md"
@@ -14,10 +14,9 @@ classifiers=[
  ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-numpy = "^1.26.4"
-
+python = ">=3.9,<4.0"
+numpy = ">=1.26.4,<3.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
