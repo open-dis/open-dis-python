@@ -1,0 +1,26 @@
+stages:
+  - publish
+
+default:
+  tags:
+    - accel_docker_builder_runner
+#
+# Publish
+#
+include:
+  # Test Publish Poetry Component
+  - component:  $CI_SERVER_FQDN/cuic-lab/cuic-devops/cicd-templates/poetry-project-ci/publish-poetry@main
+    inputs:
+      stage: publish
+      runner_tag: accel_docker_builder_runner
+      image: devops.cuic.mitre.org/cuic-lab/mitre-cuic-debian-bookworm:py3.11
+
+
+publish:poetry_build_and_publish:
+  # Override the build rules for the include
+  rules:
+    - if: $CI_COMMIT_TAG  # publish on tag
+      when: on_success
+      variables:
+        SDK_VERSION: $CI_COMMIT_TAG
+    - when: never
