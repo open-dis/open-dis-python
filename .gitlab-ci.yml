@@ -26,6 +26,7 @@ build:build_poetry_containers:
     - echo "$DEV_SERVER_PASSWORD" | docker login $PROJECT_REGISTRY -u $DEV_SERVER_USERNAME --password-stdin
     - docker info
   script:
+    # Pull latest changes to debian base image
     - docker pull devops.cuic.mitre.org/cuic-lab/mitre-cuic-debian-bookworm:py3.11
     - docker compose build opendis
   rules:
