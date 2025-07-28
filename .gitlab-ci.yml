@@ -20,7 +20,9 @@ default:
 #
 auto-bump-dev:
   stage: version
-  image: devops.cuic.mitre.org/cuic-lab/mitre-cuic-debian-bookworm:py3.11
+  image: 
+    name: devops.cuic.mitre.org/cuic-lab/mitre-cuic-debian-bookworm:py3.11
+    entrypoint: [""]
   script:
     - ./ci/auto-bump.sh
   rules:
