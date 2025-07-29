@@ -7,7 +7,6 @@ This uses big endian (network) format
 from io import BufferedIOBase
 import struct
 
-
 class DataOutputStream:
     def __init__(self, stream: BufferedIOBase):
         self.stream = stream
@@ -15,10 +14,10 @@ class DataOutputStream:
     def write_boolean(self, boolean: bool) -> None:
         self.stream.write(struct.pack('?', boolean))
 
-    def write_byte(self, val: bytes) -> None:
+    def write_byte(self, val: int) -> None:
         self.stream.write(struct.pack('b', val))
 
-    def write_unsigned_byte(self, val: bytes) -> None:
+    def write_unsigned_byte(self, val: int) -> None:
         self.stream.write(struct.pack('B', val))
     
     def write_char(self, val: str) -> None:
