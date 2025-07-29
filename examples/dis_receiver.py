@@ -23,8 +23,11 @@ print("Listening for DIS on UDP socket {}".format(UDP_PORT))
 gps = GPS();
 
 def recv():
+    print('Reading from socket...')
+
     data = udpSocket.recv(1024) # buffer size in bytes
-    pdu = createPdu(data);
+    pdu = createPdu(data)
+
     pduTypeName = pdu.__class__.__name__
 
     if pdu.pduType == 1: # PduTypeDecoders.EntityStatePdu:
@@ -50,6 +53,7 @@ def recv():
     else:
         print("Received {}, {} bytes".format(pduTypeName, len(data)), flush=True)
 
-
-while True:
-    recv()
+if __name__ == "__main__":
+    while True:
+        recv()
+        time.sleep(.5)
