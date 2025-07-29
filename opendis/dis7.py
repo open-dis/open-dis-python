@@ -1465,7 +1465,7 @@ class DirectedEnergyDamage:
             temperature: float32 = -273.15,  # in degrees Celsius
             componentIdentification: enum8 = 0,  # [UID 314]
             componentDamageStatus: enum8 = 0,  # [UID 315]
-            componentVisualDamageStatus: struct8 = b'0',  # [UID 317]
+            componentVisualDamageStatus: struct8 = 0,  # [UID 317]
             componentVisualSmokeColor: enum8 = 0,  # [UID 316]
             fireEventID: "EventIdentifier | None" = None):
         self.padding: uint16 = 0
@@ -1588,8 +1588,8 @@ class SecondaryOperationalData:
     """
 
     def __init__(self,
-                 operationalData1: struct8 = b'0',
-                 operationalData2: struct8 = b'0',
+                 operationalData1: struct8 = 0,
+                 operationalData2: struct8 = 0,
                  numberOfIFFFundamentalParameterRecords: uint16 = 0):
         self.operationalData1 = operationalData1
         """additional operational characteristics of the IFF emitting system. Each 8-bit field will vary depending on the system type."""
@@ -3862,7 +3862,7 @@ class PduHeader:
                  protocolFamily: enum8 = 0,  # [UID 5]
                  timestamp: uint32 = 0,  # (See 6.2.88)
                  pduLength: uint16 = 0,  # in bytes
-                 pduStatus: struct8 = b'0'):  # (See 6.2.67)
+                 pduStatus: struct8 = 0):  # (See 6.2.67)
         self.protocolVersion = protocolVersion
         """The version of the protocol. 5=DIS-1995, 6=DIS-1998, 7=DIS-2009."""
         self.exerciseID = exerciseID
@@ -3912,20 +3912,31 @@ class PduSuperclass:
     def __init__(self,
                  protocolVersion: enum8 = 7,  # [UID 3]
                  exerciseID=0,  # Exercise ID (6.2.34)
-                 pduType: enum8 = 0,  # [UID 4]
-                 protocolFamily: enum8 = 0,  # [UID 5]
+                 pduType: enum8 = None,  # [UID 4], set on subclasses
+                 protocolFamily: enum8 = None,  # [UID 5], set on subclasses
                  timestamp: uint32 = 0,  # (See 6.2.88)
                  pduLength: uint16 = 0):  # in bytes
         self.protocolVersion = protocolVersion
         """The version of the protocol. 5=DIS-1995, 6=DIS-1998, 7=DIS-2009."""
+        
         self.exerciseID = exerciseID
         """Exercise ID"""
-        self.pduType = pduType
+        
+        if pduType is None and not hasattr(self, 'pduType'):
+            raise ValueError("pduType must be set on subclasses of PduSuperclass or passed in via init")
+        elif pduType is not None:
+            self.pduType = pduType
         """Type of pdu, unique for each PDU class"""
-        self.protocolFamily = protocolFamily
+        
+        if protocolFamily is None and not hasattr(self, 'pduType'):
+            raise ValueError("protocolFamily must be set on subclasses of PduSuperclass or passed in via init")
+        elif pduType is not None:
+            self.protocolFamily = protocolFamily
         """value that refers to the protocol family, eg SimulationManagement, et"""
+        
         self.timestamp = timestamp
         """Timestamp value"""
+        
         self.length = pduLength
         """Length, in bytes, of the PDU"""
 
@@ -4125,7 +4136,7 @@ class PduStatus:
     a byte.
     """
 
-    def __init__(self, pduStatus: struct8 = b'0'):
+    def __init__(self, pduStatus: struct8 = 0):
         self.pduStatus = pduStatus
         """Bit fields. The semantics of the bit fields depend on the PDU type"""
 
@@ -4170,7 +4181,7 @@ class Pdu(PduSuperclass):
 
     def __init__(self, pduStatus: "PduStatus | None" = None):  # (See 6.2.67)
         super(Pdu, self).__init__()
-        self.pduStatus = pduStatus or PduStatus()
+        self.pduStatus = pduStatus or PduStatus().pduStatus
         """PDU Status Record. Described in 6.2.67. This field is not present in earlier DIS versions"""
         self.padding: uint8 = 0
         """zero-filled array of padding"""
@@ -4240,7 +4251,7 @@ class EntityStateUpdatePdu(EntityInformationFamilyPdu):
                  entityLinearVelocity: "Vector3Float | None" = None,
                  entityLocation: "Vector3Double | None" = None,
                  entityOrientation: "EulerAngles | None" = None,
-                 entityAppearance: struct32 = b'0000',  # [UID 31-43]
+                 entityAppearance: struct32 = 0,  # [UID 31-43]
                  variableParameters: list["VariableParameter"] | None = None):
         super(EntityStateUpdatePdu, self).__init__()
         self.entityID = entityID or EntityID()
@@ -4697,7 +4708,7 @@ class IntercomSignalPdu(RadioCommunicationsFamilyPdu):
     def __init__(self,
                  entityID: "EntityID | ObjectID | UnattachedIdentifier | None" = None,
                  communicationsDeviceID: uint16 = 0,
-                 encodingScheme: struct16 = b'00',
+                 encodingScheme: struct16 = 00,
                  tdlType: uint16 = 0,  # [UID 178]
                  sampleRate: uint32 = 0,
                  samples: uint16 = 0,
@@ -5280,10 +5291,10 @@ class EntityStatePdu(EntityInformationFamilyPdu):
                  entityLinearVelocity: "Vector3Float | None" = None,
                  entityLocation: "Vector3Double | None" = None,
                  entityOrientation: "EulerAngles | None" = None,
-                 entityAppearance: struct32 = b'0000',  # [UID 31-43]
+                 entityAppearance: struct32 = 0,  # [UID 31-43]
                  deadReckoningParameters: "DeadReckoningParameters | None" = None,
                  marking: "EntityMarking | None" = None,
-                 capabilities: struct32 = b'0000',  # [UID 55]
+                 capabilities: struct32 = 0,  # [UID 55]
                  variableParameters: list["VariableParameter"] | None = None):
         super(EntityStatePdu, self).__init__()
         self.entityID = entityID or EntityID()
@@ -5435,7 +5446,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  power: float32 = 0.0,  # in decibel-milliwatts
                  modulationType: "ModulationType | None" = None,
                  cryptoSystem: enum16 = 0,  # [UID 166]
-                 cryptoKeyId: struct16 = b'00',  # See Table 175
+                 cryptoKeyId: struct16 = 0,  # See Table 175
                  modulationParameterCount: uint8 = 0,  # in bytes
                  modulationParametersList=None,
                  antennaPatternList=None):
@@ -5959,7 +5970,7 @@ class PointObjectStatePdu(SyntheticEnvironmentFamilyPdu):
                  objectType: "ObjectType | None" = None,
                  objectLocation: "Vector3Double | None" = None,
                  objectOrientation: "EulerAngles | None" = None,
-                 objectAppearance: struct32 | struct16 = b'0000',  # [UID 229]
+                 objectAppearance: struct32 | struct16 = 0,  # [UID 229]
                  requesterID: "SimulationAddress | None" = None,
                  receivingID: "SimulationAddress | None" = None):
         super(PointObjectStatePdu, self).__init__()
@@ -6402,8 +6413,8 @@ class ArealObjectStatePdu(SyntheticEnvironmentFamilyPdu):
                  forceId: enum8 = 0,  # [UID 6]
                  modifications: enum8 = 0,  # [UID 242]
                  objectType: "ObjectType | None" = None,
-                 specificObjectAppearance: struct32 = b'0000',
-                 generalObjectAppearance: struct16 = b'00',  # [UID 229]
+                 specificObjectAppearance: struct32 = 0,
+                 generalObjectAppearance: struct16 = 0,  # [UID 229]
                  requesterID: "SimulationAddress | None" = None,
                  receivingID: "SimulationAddress | None" = None,
                  objectLocation: list["Vector3Double"] | None = None):
@@ -6773,7 +6784,7 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
                  peakIrradiance=0.0,
                  pulseRepetitionFrequency: float32 = 0.0,  # in Hz
                  pulseWidth: float32 = 0,  # in seconds
-                 flags: struct16 = b'00',  # [UID 313]
+                 flags: struct16 = 0,  # [UID 313]
                  pulseShape: enum8 = 0,  # [UID 312]
                  dERecords: list | None = None):
         super(DirectedEnergyFirePdu, self).__init__()
@@ -7244,7 +7255,7 @@ class UaPdu(DistributedEmissionsFamilyPdu):
                  eventID: "EventIdentifier | None" = None,
                  stateChangeIndicator: enum8 = 0,  # [UID 143]
                  passiveParameterIndex: enum16 = 0,  # [UID 148]
-                 propulsionPlantConfiguration: struct8 = b'0',  # [UID 149]
+                 propulsionPlantConfiguration: struct8 = 0,  # [UID 149]
                  shaftRPMs: list | None = None,  # positive = clockwise
                  apaData: list | None = None,
                  emitterSystems: list | None = None):
@@ -7337,7 +7348,7 @@ class IntercomControlPdu(RadioCommunicationsFamilyPdu):
 
     def __init__(self,
                  controlType: enum8 = 0,  # [UID 180]
-                 communicationsChannelType: struct8 = b'0',  # [UID 416], [UID 181]
+                 communicationsChannelType: struct8 = 0,  # [UID 416], [UID 181]
                  sourceEntityID: "EntityID | UnattachedIdentifier | None" = None,
                  sourceCommunicationsDeviceID: uint16 = 0,
                  sourceLineID: uint8 = 0,
@@ -7421,7 +7432,7 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
     def __init__(self,
                  entityID: "EntityID | ObjectIdentifier | UnattachedIdentifier | None" = None,
                  radioID: uint16 = 0,
-                 encodingScheme: struct16 = b'00',  # (Table 177), [UID 271], [UID 270]
+                 encodingScheme: struct16 = 0,  # (Table 177), [UID 271], [UID 270]
                  tdlType: enum16 = 0,  # [UID 178]
                  sampleRate: uint32 = 0,
                  samples: uint16 = 0,
@@ -7618,7 +7629,7 @@ class StopFreezeReliablePdu(SimulationManagementWithReliabilityFamilyPdu):
     def __init__(self,
                  realWorldTime: "ClockTime | None" = None,
                  reason: enum8 = 0,  # [UID 67]
-                 frozenBehavior: struct8 = b'0',  # [UID 68]
+                 frozenBehavior: struct8 = 0,  # [UID 68]
                  requiredReliabilityService: enum8 = 0,  # [UID 74]
                  requestID: uint32 = 0):
         super(StopFreezeReliablePdu, self).__init__()
