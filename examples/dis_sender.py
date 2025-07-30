@@ -22,6 +22,7 @@ gps = GPS() # conversion helper
 
 def send():
     pdu = EntityStatePdu()
+
     pdu.entityID.entityID = 42
     pdu.entityID.siteID = 17
     pdu.entityID.applicationID = 23
@@ -43,6 +44,7 @@ def send():
     pdu.entityOrientation.theta = montereyLocation[4]
     pdu.entityOrientation.phi = montereyLocation[5]
 
+    print("Entity state pdu type is ", pdu.pduType)
 
     memoryStream = BytesIO()
     outputStream = DataOutputStream(memoryStream)
@@ -52,6 +54,7 @@ def send():
     while True:
         udpSocket.sendto(data, (DESTINATION_ADDRESS, UDP_PORT))
         print("Sent {}. {} bytes".format(pdu.__class__.__name__, len(data)))
-        time.sleep(60)
+        time.sleep(1)
 
-send()
+if __name__ == "__main__":
+    send()
