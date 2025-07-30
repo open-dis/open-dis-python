@@ -1,8 +1,0 @@
-name: opendis-ci
-
-include:
-  - path:
-      - ../docker-compose.yml
-      - compose.override.yml
-    env_file:
-      - ../.env

@@ -6,7 +6,7 @@ authors = [
     {name="Don McGregor", email="mcgredo@nps.edu"},
 ]
 readme = "README.md"
-requires-python = ">=3.9,<4.0"
+requires-python = ">=3.10,<4.0"
 repository = 'https://github.com/open-dis/open-dis-python'
 documentation = "https://open-dis.org/"
 classifiers=[
