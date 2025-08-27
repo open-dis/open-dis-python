@@ -3606,16 +3606,17 @@ class BeamStatus:
     """
 
     def __init__(self, beamState: struct8 = 0):
-        self.beamState = beamState
+        self.beamState: uint8 = beamState & 0x01
         """First bit zero means beam is active, first bit = 1 means deactivated. The rest is padding."""
 
     def serialize(self, outputStream):
         """serialize the class"""
-        outputStream.write_unsigned_byte(self.beamState)
+        outputStream.write_unsigned_byte(self.beamState & 0x01)
 
     def parse(self, inputStream):
         """Parse a message. This may recursively call embedded objects."""
-        self.beamState = inputStream.read_unsigned_byte()
+        value = inputStream.read_unsigned_byte() & 0x01
+        self.beamState = value
 
 
 class EnvironmentGeneral:
@@ -5623,7 +5624,7 @@ class EmissionSystemBeamRecord:
                  fundamentalParameterData: "EEFundamentalParameterData | None" = None,
                  beamFunction: enum8 = 0,  # [UID 78]
                  highDensityTrackJam: enum8 = 0,  # [UID 79]
-                 # MISSING: beam status (See EEPDU 7.6.2)
+                 beamStatus: "BeamStatus | None" = None,
                  jammingModeSequence: "JammingTechnique | None" = None,
                  trackJamRecords: list["TrackJamData"] | None = None):
         self.beamDataLength = beamDataLength
@@ -5633,6 +5634,7 @@ class EmissionSystemBeamRecord:
                                          or EEFundamentalParameterData())
         self.beamFunction = beamFunction
         self.highDensityTrackJam = highDensityTrackJam
+        self.beamStatus = beamStatus or BeamStatus()
         self.jammingModeSequence = jammingModeSequence or JammingTechnique()
         self.trackJamRecords = trackJamRecords or []
 
@@ -5648,7 +5650,7 @@ class EmissionSystemBeamRecord:
         outputStream.write_unsigned_byte(self.beamFunction)
         outputStream.write_unsigned_byte(self.numberOfTargetsInTrackJam)
         outputStream.write_unsigned_byte(self.highDensityTrackJam)
-        outputStream.write_unsigned_byte(0)  # 8 bit padding
+        self.beamStatus.serialize(outputStream)
         outputStream.write_unsigned_int(self.jammingModeSequence)
 
         for anObj in self.trackJamRecords:
@@ -5662,7 +5664,7 @@ class EmissionSystemBeamRecord:
         self.beamFunction = inputStream.read_unsigned_byte()
         numberOfTargetsInTrackJam = inputStream.read_unsigned_byte()
         self.highDensityTrackJam = inputStream.read_unsigned_byte()
-        inputStream.read_unsigned_byte()  # 8 bit padding
+        self.beamStatus.parse(inputStream)
         self.jammingModeSequence = inputStream.read_unsigned_int()
 
         for idx in range(0, numberOfTargetsInTrackJam):
