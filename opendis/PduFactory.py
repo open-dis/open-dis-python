@@ -38,6 +38,7 @@ PduTypeDecoders = {
     , 29 : UaPdu
     , 31 : IntercomSignalPdu
     , 32 : IntercomControlPdu
+    , 33 : AggregateStatePdu
     , 36 : IsPartOfPdu
     , 37 : MinefieldStatePdu
     , 40 : MinefieldResponseNackPdu
