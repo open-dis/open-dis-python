@@ -7895,6 +7895,8 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
     Detailed information about aggregating entities and communicating
     information about the aggregated entities is communicated by this PDU
     INCOMPLETE
+
+    TODO create properties for numberOfs, and read them to local vars (that are discarded) in parse
     """
     pduType: enum8 = 33
 
@@ -7977,7 +7979,6 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         for silentEntitySystem in self.silentEntitySystems:
             silentEntitySystem.serialize(outputStream)
         outputStream.write_unsigned_int(self.numberOfVariableDatumRecords)
-        self.variableDatumRecords.serialize(outputStream)
         for variableDatumRecord in self.variableDatumRecords:
             variableDatumRecord.serialize(outputStream)
 
@@ -7986,22 +7987,38 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         inputStream.read_unsigned_byte (or equivalent), since it is not native to int for example"""
         super(AggregateStatePdu, self).parse(inputStream)
         self.aggregateID.parse(inputStream)
-        self.forceID.parse(inputStream)
-        self.aggregateState.parse(inputStream)
+        self.forceID = inputStream.read_unsigned_byte()
+        self.aggregateState = inputStream.read_unsigned_byte()
         self.aggregateType.parse(inputStream)
-        self.formation.parse(inputStream)
+        self.formation = inputStream.read_unsigned_int()
         self.aggregateMarking.parse(inputStream)
         self.dimensions.parse(inputStream)
         self.orientation.parse(inputStream)
         self.centerOfMass.parse(inputStream)
         self.velocity.parse(inputStream)
-        self.numberOfAggregateIDs.parse(inputStream)
-        self.numberOfEntityIDs.parse(inputStream)
-        self.numberOfSilentAggregateSystems.parse(inputStream)
-        self.numberOfSilentEntitySystems.parse(inputStream)
+        self.numberOfAggregateIDs = inputStream.read_unsigned_short()
+        self.numberOfEntityIDs = inputStream.read_unsigned_short()
+        self.numberOfSilentAggregateSystems = inputStream.read_unsigned_short()
+        self.numberOfSilentEntitySystems = inputStream.read_unsigned_short()
         self.aggregateIDs.parse(inputStream)
-        self.entityIDs.parse(inputStream)
-        self.silentAggregateSystems.parse(inputStream)
-        self.silentEntitySystems.parse(inputStream)
-        self.numberOfVariableDatumRecords.parse(inputStream)
-        self.variableDatumRecords.parse(inputStream)
+        for idx in range(0, self.numberOfAggregateIDs): # TODO replace with local
+            element = AggregateIdentifier()
+            element.parse(inputStream)
+            self.aggregateIDs.append(element)
+        for idx in range(0, self.numberOfEntityIDs): # TODO replace with local
+            element = EntityID()
+            element.parse(inputStream)
+            self.entityIDs.append(element)
+        for idx in range(0, self.numberOfSilentAggregateSystems): # TODO replace with local
+            element = SilentAggregateSystem()
+            element.parse(inputStream)
+            self.silentAggregateSystems.append(element)
+        for idx in range(0, self.numberOfSilentEntitySystems): # TODO replace with local
+            element = SilentEntitySystem()
+            element.parse(inputStream)
+            self.silentEntitySystems.append(element)
+        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
+        for idx in range(0, self.numberOfVariableDatumRecords): # TODO replace with local
+            element = VariableDatum()
+            element.parse(inputStream)
+            self.variableDatumRecords.append(element)
