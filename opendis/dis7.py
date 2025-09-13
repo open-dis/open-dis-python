@@ -7891,8 +7891,6 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
     Detailed information about aggregating entities and communicating
     information about the aggregated entities is communicated by this PDU
     INCOMPLETE
-
-    TODO create properties for numberOfs, and read them to local vars (that are discarded) in parse
     """
     pduType: enum8 = 33
 
@@ -7906,15 +7904,10 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
                  orientation: "EulerAngles | None" = None,
                  centerOfMass: "Vector3Float | None" = None,
                  velocity: "Vector3Double | None" = None,
-                 numberOfAggregateIDs: uint16 = 0,
-                 numberOfEntityIDs: uint16 = 0,
-                 numberOfSilentAggregateSystems: uint16 = 0,
-                 numberOfSilentEntitySystems: uint16 = 0,
                  aggregateIDs: list["AggregateIdentifier"] | None = None,
                  entityIDs: list["EntityIdentifier"] | None = None,
                  silentAggregateSystems: list["SilentAggregateSystem"] | None = None,
                  silentEntitySystems: list["SilentEntitySystem"] | None = None,
-                 numberOfVariableDatumRecords: uint32 = 0,
                  variableDatumRecords: list["VariableDatum"] | None = None):
         super(AggregateStatePdu, self).__init__()
         """Identifier of the aggregate issuing the PDU"""
@@ -7933,10 +7926,6 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         self.centerOfMass = centerOfMass or Vector3Float() 
         """Aggregates linear velocity. The coordinate system is dependent on the dead reckoning algorithm"""
         self.velocity = velocity or Vector3Double()
-        self.numberOfAggregateIDs = numberOfAggregateIDs
-        self.numberOfEntityIDs = numberOfEntityIDs
-        self.numberOfSilentAggregateSystems = numberOfSilentAggregateSystems
-        self.numberOfSilentEntitySystems = numberOfSilentEntitySystems
         """Identify subaggregates that are transmitting Aggregate State PDUs"""
         self.aggregateIDs = aggregateIDs or []
         """Constituent entities transmitting Entity State PDUs"""
@@ -7945,12 +7934,30 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         self.silentAggregateSystems = silentAggregateSystems or []
         """Entities not producing Entity State PDUs"""
         self.silentEntitySystems = silentEntitySystems or []
-        self.numberOfVariableDatumRecords = numberOfVariableDatumRecords
         self.variableDatumRecords = variableDatumRecords or []
 
+    @property
+    def numberOfAggregateIDs(self) -> uint16:
+        return len(self.aggregateIDs)
+
+    @property
+    def numberOfEntityIDs(self) -> uint16:
+        return len(self.entityIDs)
+
+    @property
+    def numberOfSilentAggregateSystems(self) -> uint16:
+        return len(self.silentAggregateSystems)
+
+    @property
+    def numberOfSilentEntitySystems(self) -> uint16:
+        return len(self.silentEntitySystems)
+
+    @property
+    def numberOfVariableDatumRecords(self) -> uint32:
+        return len(self.variableDatumRecords)
+
     def serialize(self, outputStream):
-        """serialize the class: TODO anything that is not a custom type needs outputStream.write_unsigned_bytes (or
-        equivalent), since it is not native to int for example"""
+        """serialize the class"""
         super(AggregateStatePdu, self).serialize(outputStream)
         self.aggregateID.serialize(outputStream)
         outputStream.write_unsigned_byte(self.forceID)
@@ -7979,8 +7986,7 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
             variableDatumRecord.serialize(outputStream)
 
     def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects.: TODO anything that is not a custom type needs
-        inputStream.read_unsigned_byte (or equivalent), since it is not native to int for example"""
+        """Parse a message. This may recursively call embedded objects."""
         super(AggregateStatePdu, self).parse(inputStream)
         self.aggregateID.parse(inputStream)
         self.forceID = inputStream.read_unsigned_byte()
@@ -7992,29 +7998,28 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         self.orientation.parse(inputStream)
         self.centerOfMass.parse(inputStream)
         self.velocity.parse(inputStream)
-        self.numberOfAggregateIDs = inputStream.read_unsigned_short()
-        self.numberOfEntityIDs = inputStream.read_unsigned_short()
-        self.numberOfSilentAggregateSystems = inputStream.read_unsigned_short()
-        self.numberOfSilentEntitySystems = inputStream.read_unsigned_short()
-        self.aggregateIDs.parse(inputStream)
-        for idx in range(0, self.numberOfAggregateIDs): # TODO replace with local
+        numberOfAggregateIDs = inputStream.read_unsigned_short()
+        numberOfEntityIDs = inputStream.read_unsigned_short()
+        numberOfSilentAggregateSystems = inputStream.read_unsigned_short()
+        numberOfSilentEntitySystems = inputStream.read_unsigned_short()
+        for idx in range(0, numberOfAggregateIDs):
             element = AggregateIdentifier()
             element.parse(inputStream)
             self.aggregateIDs.append(element)
-        for idx in range(0, self.numberOfEntityIDs): # TODO replace with local
+        for idx in range(0, numberOfEntityIDs):
             element = EntityID()
             element.parse(inputStream)
             self.entityIDs.append(element)
-        for idx in range(0, self.numberOfSilentAggregateSystems): # TODO replace with local
+        for idx in range(0, numberOfSilentAggregateSystems):
             element = SilentAggregateSystem()
             element.parse(inputStream)
             self.silentAggregateSystems.append(element)
-        for idx in range(0, self.numberOfSilentEntitySystems): # TODO replace with local
+        for idx in range(0, numberOfSilentEntitySystems):
             element = SilentEntitySystem()
             element.parse(inputStream)
             self.silentEntitySystems.append(element)
-        self.numberOfVariableDatumRecords = inputStream.read_unsigned_int()
-        for idx in range(0, self.numberOfVariableDatumRecords): # TODO replace with local
+        numberOfVariableDatumRecords = inputStream.read_unsigned_int()
+        for idx in range(0, numberOfVariableDatumRecords):
             element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
