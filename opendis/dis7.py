@@ -7947,31 +7947,39 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         self.variableDatumRecords = variableDatumRecords or []
 
     def serialize(self, outputStream):
-        """serialize the class"""
+        """serialize the class: TODO anything that is not a custom type needs outputStream.write_unsigned_bytes (or
+        equivalent), since it is not native to int for example"""
         super(AggregateStatePdu, self).serialize(outputStream)
         self.aggregateID.serialize(outputStream)
-        self.forceID.serialize(outputStream)
-        self.aggregateState.serialize(outputStream)
+        outputStream.write_unsigned_byte(self.forceID)
+        outputStream.write_unsigned_byte(self.aggregateState)
         self.aggregateType.serialize(outputStream)
-        self.formation.serialize(outputStream)
+        outputStream.write_unsigned_int(self.formation)
         self.aggregateMarking.serialize(outputStream)
         self.dimensions.serialize(outputStream)
         self.orientation.serialize(outputStream)
         self.centerOfMass.serialize(outputStream)
         self.velocity.serialize(outputStream)
-        self.numberOfAggregateIDs.serialize(outputStream)
-        self.numberOfEntityIDs.serialize(outputStream)
-        self.numberOfSilentAggregateSystems.serialize(outputStream)
-        self.numberOfSilentEntitySystems.serialize(outputStream)
-        self.aggregateIDs.serialize(outputStream)
-        self.entityIDs.serialize(outputStream)
-        self.silentAggregateSystems.serialize(outputStream)
-        self.silentEntitySystems.serialize(outputStream)
-        self.numberOfVariableDatumRecords.serialize(outputStream)
+        outputStream.write_unsigned_short(self.numberOfAggregateIDs)
+        outputStream.write_unsigned_short(self.numberOfEntityIDs)
+        outputStream.write_unsigned_short(self.numberOfSilentAggregateSystems)
+        outputStream.write_unsigned_short(self.numberOfSilentEntitySystems)
+        for aggregateID in self.aggregateIDs:
+            aggregateID.serialize(outputStream)
+        for entityID in self.entityIDs:
+            entityID.serialize(outputStream)
+        for silentAggregateSystem in self.silentAggregateSystems:
+            silentAggregateSystem.serialize(outputStream)
+        for silentEntitySystem in self.silentEntitySystems:
+            silentEntitySystem.serialize(outputStream)
+        outputStream.write_unsigned_int(self.numberOfVariableDatumRecords)
         self.variableDatumRecords.serialize(outputStream)
+        for variableDatumRecord in self.variableDatumRecords:
+            variableDatumRecord.serialize(outputStream)
 
     def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
+        """Parse a message. This may recursively call embedded objects.: TODO anything that is not a custom type needs
+        inputStream.read_unsigned_byte (or equivalent), since it is not native to int for example"""
         super(AggregateStatePdu, self).parse(inputStream)
         self.aggregateID.parse(inputStream)
         self.forceID.parse(inputStream)
