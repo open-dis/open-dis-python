@@ -7894,7 +7894,7 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
 
     Detailed information about aggregating entities and communicating
     information about the aggregated entities is communicated by this PDU
-    INCOMPLETE
+    COMPLETE
     """
     pduType: enum8 = 33
 
@@ -7927,7 +7927,7 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         self.dimensions = dimensions or Vector3Float()
         """Orientation of the aggregate, average of the orientations of the constituents"""
         self.orientation = orientation or EulerAngles()
-        self.centerOfMass = centerOfMass or Vector3Float() 
+        self.centerOfMass = centerOfMass or Vector3Float()
         """Aggregates linear velocity. The coordinate system is dependent on the dead reckoning algorithm"""
         self.velocity = velocity or Vector3Double()
         """Identify subaggregates that are transmitting Aggregate State PDUs"""
