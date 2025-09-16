@@ -4160,7 +4160,7 @@ class PduStatus:
     a byte.
     """
 
-    def __init__(self, pduStatus: struct8 = 0):
+    def __init__(self, pduStatus: struct8 = b'0'):
         self.pduStatus = pduStatus
         """Bit fields. The semantics of the bit fields depend on the PDU type"""
 
@@ -4213,13 +4213,13 @@ class Pdu(PduSuperclass):
     def serialize(self, outputStream):
         """serialize the class"""
         super(Pdu, self).serialize(outputStream)
-        outputStream.write_unsigned_byte(self.pduStatus)
+        self.pduStatus.serialize(outputStream)
         outputStream.write_unsigned_byte(self.padding)
 
     def parse(self, inputStream):
         """Parse a message. This may recursively call embedded objects."""
         super(Pdu, self).parse(inputStream)
-        self.pduStatus = inputStream.read_unsigned_byte()
+        self.pduStatus.parse(inputStream)
         self.padding = inputStream.read_unsigned_byte()
 
 
@@ -5315,10 +5315,10 @@ class EntityStatePdu(EntityInformationFamilyPdu):
                  entityLinearVelocity: "Vector3Float | None" = None,
                  entityLocation: "Vector3Double | None" = None,
                  entityOrientation: "EulerAngles | None" = None,
-                 entityAppearance: struct32 = 0,  # [UID 31-43]
+                 entityAppearance: struct32 = b'0000',  # [UID 31-43]
                  deadReckoningParameters: "DeadReckoningParameters | None" = None,
                  marking: "EntityMarking | None" = None,
-                 capabilities: struct32 = 0,  # [UID 55]
+                 capabilities: struct32 = b'0000',  # [UID 55]
                  variableParameters: list["VariableParameter"] | None = None):
         super(EntityStatePdu, self).__init__()
         self.entityID = entityID or EntityID()
@@ -5682,7 +5682,7 @@ class EmissionSystemBeamRecord:
         outputStream.write_unsigned_byte(self.numberOfTargetsInTrackJam)
         outputStream.write_unsigned_byte(self.highDensityTrackJam)
         self.beamStatus.serialize(outputStream)
-        outputStream.write_unsigned_int(self.jammingModeSequence)
+        self.jammingModeSequence.serialize(outputStream)
 
         for anObj in self.trackJamRecords:
             anObj.serialize(outputStream)
@@ -5696,7 +5696,7 @@ class EmissionSystemBeamRecord:
         numberOfTargetsInTrackJam = inputStream.read_unsigned_byte()
         self.highDensityTrackJam = inputStream.read_unsigned_byte()
         self.beamStatus.parse(inputStream)
-        self.jammingModeSequence = inputStream.read_unsigned_int()
+        self.jammingModeSequence.parse(inputStream)
 
         for idx in range(0, numberOfTargetsInTrackJam):
             element = TrackJamData()
