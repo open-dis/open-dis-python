@@ -4203,9 +4203,9 @@ class LiveEntityPdu(PduSuperclass):
 class Pdu(PduSuperclass):
     """Adds some fields to the the classic PDU"""
 
-    def __init__(self, pduStatus: "PduStatus | None" = None):  # (See 6.2.67)
+    def __init__(self, pduStatus: uint8 = 0):  # (See 6.2.67)
         super(Pdu, self).__init__()
-        self.pduStatus = pduStatus or PduStatus().pduStatus
+        self.pduStatus: uint8 = pduStatus
         """PDU Status Record. Described in 6.2.67. This field is not present in earlier DIS versions"""
         self.padding: uint8 = 0
         """zero-filled array of padding"""
@@ -4213,13 +4213,13 @@ class Pdu(PduSuperclass):
     def serialize(self, outputStream):
         """serialize the class"""
         super(Pdu, self).serialize(outputStream)
-        self.pduStatus.serialize(outputStream)
+        outputStream.write_unsigned_byte(self.pduStatus)
         outputStream.write_unsigned_byte(self.padding)
 
     def parse(self, inputStream):
         """Parse a message. This may recursively call embedded objects."""
         super(Pdu, self).parse(inputStream)
-        self.pduStatus.parse(inputStream)
+        self.pduStatus = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
 
 
