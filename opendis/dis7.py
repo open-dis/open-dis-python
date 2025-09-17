@@ -4161,7 +4161,7 @@ class PduStatus:
     a byte.
     """
 
-    def __init__(self, pduStatus: struct8 = 0):
+    def __init__(self, pduStatus: uint8 = 0):
         self.pduStatus = pduStatus
         """Bit fields. The semantics of the bit fields depend on the PDU type"""
 
@@ -4204,9 +4204,9 @@ class LiveEntityPdu(PduSuperclass):
 class Pdu(PduSuperclass):
     """Adds some fields to the the classic PDU"""
 
-    def __init__(self, pduStatus: "PduStatus | None" = None):  # (See 6.2.67)
+    def __init__(self, pduStatus: uint8 = 0):  # (See 6.2.67)
         super(Pdu, self).__init__()
-        self.pduStatus = pduStatus or PduStatus().pduStatus
+        self.pduStatus: uint8 = pduStatus
         """PDU Status Record. Described in 6.2.67. This field is not present in earlier DIS versions"""
         self.padding: uint8 = 0
         """zero-filled array of padding"""
@@ -5316,10 +5316,10 @@ class EntityStatePdu(EntityInformationFamilyPdu):
                  entityLinearVelocity: "Vector3Float | None" = None,
                  entityLocation: "Vector3Double | None" = None,
                  entityOrientation: "EulerAngles | None" = None,
-                 entityAppearance: struct32 = 0,  # [UID 31-43]
+                 entityAppearance: uint32 = 0,  # [UID 31-43]
                  deadReckoningParameters: "DeadReckoningParameters | None" = None,
                  marking: "EntityMarking | None" = None,
-                 capabilities: struct32 = 0,  # [UID 55]
+                 capabilities: uint32 = 0,  # [UID 55]
                  variableParameters: list["VariableParameter"] | None = None):
         super(EntityStatePdu, self).__init__()
         self.entityID = entityID or EntityID()
@@ -5660,7 +5660,7 @@ class EmissionSystemBeamRecord:
                  beamFunction: enum8 = 0,  # [UID 78]
                  highDensityTrackJam: enum8 = 0,  # [UID 79]
                  beamStatus: "BeamStatus | None" = None,
-                 jammingModeSequence: "JammingTechnique | None" = None,
+                 jammingModeSequence:  uint32 = 0,
                  trackJamRecords: list["TrackJamData"] | None = None):
         self.beamDataLength = beamDataLength
         self.beamIDNumber = beamIDNumber
@@ -5670,7 +5670,7 @@ class EmissionSystemBeamRecord:
         self.beamFunction = beamFunction
         self.highDensityTrackJam = highDensityTrackJam
         self.beamStatus = beamStatus or BeamStatus()
-        self.jammingModeSequence = jammingModeSequence or JammingTechnique()
+        self.jammingModeSequence = jammingModeSequence
         self.trackJamRecords = trackJamRecords or []
 
     @property
