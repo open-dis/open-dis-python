@@ -2592,6 +2592,30 @@ class SilentEntitySystem:
             self.appearanceRecordList.append(element)
 
 
+class SilentAggregateSystem:
+    """No section, only referenced in connection with the AggregateStatePDU
+
+    Information about subaggregates not producing Aggregate State PDUs.
+    """
+
+    def __init__(self,
+                 numberOfAggregates: uint16 = 0,
+                 aggregateType: "AggregateType | None" = None):
+        self.numberOfAggregates = numberOfAggregates
+        """number of the type specified by the aggregate type field"""
+        self.aggregateType = aggregateType or AggregateType()
+
+    def serialize(self, outputStream):
+        """serialize the class"""
+        outputStream.write_unsigned_short(self.numberOfAggregates)
+        self.entityType.serialize(outputStream)
+
+    def parse(self, inputStream):
+        """Parse a message. This may recursively call embedded objects."""
+        self.numberOfAggregates = inputStream.read_unsigned_short()
+        self.aggregateType.parse(inputStream)
+
+
 class EventIdentifier:
     """Section 6.2.34
     
@@ -7863,3 +7887,143 @@ class IsPartOfPdu(EntityManagementFamilyPdu):
         self.partLocation.parse(inputStream)
         self.namedLocationID.parse(inputStream)
         self.partEntityType.parse(inputStream)
+
+
+class AggregateStatePdu(EntityManagementFamilyPdu):
+    """Section 7.8.2
+
+    Detailed information about aggregating entities and communicating
+    information about the aggregated entities is communicated by this PDU
+    COMPLETE
+    """
+    pduType: enum8 = 33
+
+    def __init__(self, aggregateID: "AggregateIdentifier | None" = None,
+                 forceID: enum16 = 0,
+                 aggregateState: enum8 = 0,
+                 aggregateType: "AggregateType | None" = None,
+                 formation: enum32 = 0,
+                 aggregateMarking: "AggregateMarking | None" = None,
+                 dimensions: "Vector3Float | None" = None,
+                 orientation: "EulerAngles | None" = None,
+                 centerOfMass: "Vector3Float | None" = None,
+                 velocity: "Vector3Double | None" = None,
+                 aggregateIDs: list["AggregateIdentifier"] | None = None,
+                 entityIDs: list["EntityIdentifier"] | None = None,
+                 silentAggregateSystems: list["SilentAggregateSystem"] | None = None,
+                 silentEntitySystems: list["SilentEntitySystem"] | None = None,
+                 variableDatumRecords: list["VariableDatum"] | None = None):
+        super(AggregateStatePdu, self).__init__()
+        """Identifier of the aggregate issuing the PDU"""
+        self.aggregateID = aggregateID or AggregateIdentifier()
+        """Common force to which the aggregate belongs"""
+        self.forceID = forceID
+        self.aggregateState = aggregateState
+        self.aggregateType = aggregateType or AggregateType()
+        self.formation = formation
+        """Unique marking associated with the aggregate"""
+        self.aggregateMarking = aggregateMarking or AggregateMarking()
+        """Bounding space, in meters, occupied by the aggregate"""
+        self.dimensions = dimensions or Vector3Float()
+        """Orientation of the aggregate, average of the orientations of the constituents"""
+        self.orientation = orientation or EulerAngles()
+        self.centerOfMass = centerOfMass or Vector3Float()
+        """Aggregates linear velocity. The coordinate system is dependent on the dead reckoning algorithm"""
+        self.velocity = velocity or Vector3Double()
+        """Identify subaggregates that are transmitting Aggregate State PDUs"""
+        self.aggregateIDs = aggregateIDs or []
+        """Constituent entities transmitting Entity State PDUs"""
+        self.entityIDs = entityIDs or []
+        """Subaggregates not producing Aggregate State PDUs"""
+        self.silentAggregateSystems = silentAggregateSystems or []
+        """Entities not producing Entity State PDUs"""
+        self.silentEntitySystems = silentEntitySystems or []
+        self.variableDatumRecords = variableDatumRecords or []
+
+    @property
+    def numberOfAggregateIDs(self) -> uint16:
+        return len(self.aggregateIDs)
+
+    @property
+    def numberOfEntityIDs(self) -> uint16:
+        return len(self.entityIDs)
+
+    @property
+    def numberOfSilentAggregateSystems(self) -> uint16:
+        return len(self.silentAggregateSystems)
+
+    @property
+    def numberOfSilentEntitySystems(self) -> uint16:
+        return len(self.silentEntitySystems)
+
+    @property
+    def numberOfVariableDatumRecords(self) -> uint32:
+        return len(self.variableDatumRecords)
+
+    def serialize(self, outputStream):
+        """serialize the class"""
+        super(AggregateStatePdu, self).serialize(outputStream)
+        self.aggregateID.serialize(outputStream)
+        outputStream.write_unsigned_byte(self.forceID)
+        outputStream.write_unsigned_byte(self.aggregateState)
+        self.aggregateType.serialize(outputStream)
+        outputStream.write_unsigned_int(self.formation)
+        self.aggregateMarking.serialize(outputStream)
+        self.dimensions.serialize(outputStream)
+        self.orientation.serialize(outputStream)
+        self.centerOfMass.serialize(outputStream)
+        self.velocity.serialize(outputStream)
+        outputStream.write_unsigned_short(self.numberOfAggregateIDs)
+        outputStream.write_unsigned_short(self.numberOfEntityIDs)
+        outputStream.write_unsigned_short(self.numberOfSilentAggregateSystems)
+        outputStream.write_unsigned_short(self.numberOfSilentEntitySystems)
+        for aggregateID in self.aggregateIDs:
+            aggregateID.serialize(outputStream)
+        for entityID in self.entityIDs:
+            entityID.serialize(outputStream)
+        for silentAggregateSystem in self.silentAggregateSystems:
+            silentAggregateSystem.serialize(outputStream)
+        for silentEntitySystem in self.silentEntitySystems:
+            silentEntitySystem.serialize(outputStream)
+        outputStream.write_unsigned_int(self.numberOfVariableDatumRecords)
+        for variableDatumRecord in self.variableDatumRecords:
+            variableDatumRecord.serialize(outputStream)
+
+    def parse(self, inputStream):
+        """Parse a message. This may recursively call embedded objects."""
+        super(AggregateStatePdu, self).parse(inputStream)
+        self.aggregateID.parse(inputStream)
+        self.forceID = inputStream.read_unsigned_byte()
+        self.aggregateState = inputStream.read_unsigned_byte()
+        self.aggregateType.parse(inputStream)
+        self.formation = inputStream.read_unsigned_int()
+        self.aggregateMarking.parse(inputStream)
+        self.dimensions.parse(inputStream)
+        self.orientation.parse(inputStream)
+        self.centerOfMass.parse(inputStream)
+        self.velocity.parse(inputStream)
+        numberOfAggregateIDs = inputStream.read_unsigned_short()
+        numberOfEntityIDs = inputStream.read_unsigned_short()
+        numberOfSilentAggregateSystems = inputStream.read_unsigned_short()
+        numberOfSilentEntitySystems = inputStream.read_unsigned_short()
+        for idx in range(0, numberOfAggregateIDs):
+            element = AggregateIdentifier()
+            element.parse(inputStream)
+            self.aggregateIDs.append(element)
+        for idx in range(0, numberOfEntityIDs):
+            element = EntityID()
+            element.parse(inputStream)
+            self.entityIDs.append(element)
+        for idx in range(0, numberOfSilentAggregateSystems):
+            element = SilentAggregateSystem()
+            element.parse(inputStream)
+            self.silentAggregateSystems.append(element)
+        for idx in range(0, numberOfSilentEntitySystems):
+            element = SilentEntitySystem()
+            element.parse(inputStream)
+            self.silentEntitySystems.append(element)
+        numberOfVariableDatumRecords = inputStream.read_unsigned_int()
+        for idx in range(0, numberOfVariableDatumRecords):
+            element = VariableDatum()
+            element.parse(inputStream)
+            self.variableDatumRecords.append(element)
