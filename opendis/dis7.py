@@ -5477,7 +5477,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  antennaPatternList=None):
         super(TransmitterPdu, self).__init__()
         self.radioReferenceID = radioReferenceID or EntityID()
-        """ID of the entitythat is the source of the communication"""
+        """ID of the entity that is the source of the communication"""
         self.radioNumber = radioNumber
         """particular radio within an entity"""
         self.radioEntityType = radioEntityType or EntityType()  # TODO: validation
@@ -5491,18 +5491,15 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.frequency = frequency
         self.transmitFrequencyBandwidth = transmitFrequencyBandwidth
         self.power = power
-        """transmission power"""
         self.modulationType = modulationType or ModulationType()
         self.cryptoSystem = cryptoSystem
         self.cryptoKeyId = cryptoKeyId
-        # FIXME: Refactpr modulation parameters into its own record class
+        # FIXME: Refactor modulation parameters into its own record class
         self.modulationParameterCount = modulationParameterCount
         self.padding2 = 0
         self.padding3 = 0
         self.modulationParametersList = modulationParametersList or []
-        """variable length list of modulation parameters"""
         self.antennaPatternList = antennaPatternList or []
-        """variable length list of antenna pattern records"""
         # TODO: zero or more Variable Transmitter Parameters records (see 6.2.95)
 
     @property
