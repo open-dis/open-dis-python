@@ -32,8 +32,8 @@ def _bitfield(
         fields: Sequence of tuples defining the fields of the bitfield.
                 See https://docs.python.org/3/library/ctypes.html#ctypes.Structure._fields_
     """
-    if bytesize > 0:
-        raise ValueError("Cannot create bitfield with zero bytes")
+    if bytesize <= 0:
+        raise ValueError("Cannot create bitfield with less than one byte")
 
     class Bitfield(BigEndianStructure):
         _fields_ = fields
