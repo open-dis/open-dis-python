@@ -6,8 +6,6 @@ from .types import (
     enum8,
     enum16,
     enum32,
-    int8,
-    int16,
     int32,
     uint8,
     uint16,
@@ -19,6 +17,7 @@ from .types import (
     struct16,
     struct32,
 )
+from .record import SpreadSpectrum
 
 
 class DataQueryDatumSpecification:
@@ -2025,11 +2024,11 @@ class ModulationType:
     """
 
     def __init__(self,
-                 spreadSpectrum: struct16 = 0,  # See RPR Enumerations
+                 spreadSpectrum: SpreadSpectrum | None = None,  # See RPR Enumerations
                  majorModulation: enum16 = 0,  # [UID 155]
-                 detail: enum16  =0,  # [UID 156-162]
-                 radioSystem: enum16  =0):  # [UID 163]
-        self.spreadSpectrum = spreadSpectrum
+                 detail: enum16 = 0,  # [UID 156-162]
+                 radioSystem: enum16 = 0):  # [UID 163]
+        self.spreadSpectrum = spreadSpectrum or SpreadSpectrum()
         """This field shall indicate the spread spectrum technique or combination of spread spectrum techniques in use. Bit field. 0=freq hopping, 1=psuedo noise, time hopping=2, reamining bits unused"""
         self.majorModulation = majorModulation
         """the major classification of the modulation type."""
