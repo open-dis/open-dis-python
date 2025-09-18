@@ -4160,7 +4160,7 @@ class PduStatus:
     a byte.
     """
 
-    def __init__(self, pduStatus: struct8 = b'0'):
+    def __init__(self, pduStatus: uint8 = 0):
         self.pduStatus = pduStatus
         """Bit fields. The semantics of the bit fields depend on the PDU type"""
 
@@ -5315,10 +5315,10 @@ class EntityStatePdu(EntityInformationFamilyPdu):
                  entityLinearVelocity: "Vector3Float | None" = None,
                  entityLocation: "Vector3Double | None" = None,
                  entityOrientation: "EulerAngles | None" = None,
-                 entityAppearance: struct32 = b'0000',  # [UID 31-43]
+                 entityAppearance: uint32 = 0,  # [UID 31-43]
                  deadReckoningParameters: "DeadReckoningParameters | None" = None,
                  marking: "EntityMarking | None" = None,
-                 capabilities: struct32 = b'0000',  # [UID 55]
+                 capabilities: uint32 = 0,  # [UID 55]
                  variableParameters: list["VariableParameter"] | None = None):
         super(EntityStatePdu, self).__init__()
         self.entityID = entityID or EntityID()
@@ -7498,8 +7498,6 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
         self.tdlType = inputStream.read_unsigned_short()
         self.sampleRate = inputStream.read_unsigned_int()
         dataLength = inputStream.read_unsigned_short()
-        # TODO: Make validation optional
-        assert dataLength % 8 == 0
         self.samples = inputStream.read_unsigned_short()
         for idx in range(0, dataLength // 8):
             element = inputStream.read_unsigned_byte()
