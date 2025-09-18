@@ -11,8 +11,8 @@ from .types import (
     bf_uint,
 )
 
-from DataInputStream import DataInputStream
-from DataOutputStream import DataOutputStream
+from .DataInputStream import DataInputStream
+from .DataOutputStream import DataOutputStream
 
 
 def _bitfield(
