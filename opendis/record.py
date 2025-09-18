@@ -69,9 +69,9 @@ class NetId:
     ])
     
     def __init__(self,
-                 netNumber: bf_uint,
-                 frequencyTable: bf_enum,  # [UID 299]
-                 mode: bf_enum,  # [UID 298]
+                 netNumber: bf_uint = 0,
+                 frequencyTable: bf_enum = 0,  # [UID 299]
+                 mode: bf_enum = 0,  # [UID 298]
                  padding: bf_uint = 0):
         # Net number ranging from 0 to 999 decimal
         self.netNumber = netNumber
@@ -121,9 +121,9 @@ class SpreadSpectrum:
     ])
 
     def __init__(self,
-                 frequencyHopping: bool,
-                 pseudoNoise: bool,
-                 timeHopping: bool,
+                 frequencyHopping: bool = False,
+                 pseudoNoise: bool = False,
+                 timeHopping: bool = False,
                  padding: bf_uint = 0):
         self.frequencyHopping = frequencyHopping
         self.pseudoNoise = pseudoNoise
