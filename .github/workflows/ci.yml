@@ -1,7 +1,7 @@
 # This workflow will install opendis dependencies, and then run tests and lint with a variety of Python versions
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Build and Test OpenDis
+name: CI
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -28,16 +28,10 @@ jobs:
         poetry install --with dev
     - name: Test with pytest
       run: |
-        poetry run pytest --junitxml=./test_results/test_results.xml --cov=opendis --cov-report term --cov-report=xml:./test_results/coverage.xml
-    - name: Upload Test Results
-      uses: dorny/test-reporter@v1
-      if: always()
+        poetry run pytest --junitxml=./test_results/test_results_${{ matrix.python-version }}.xml --cov=opendis --cov-report term --cov-report=xml:./test_results/coverage_${{ matrix.python-version }}.xml
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
       with:
-        name: JUnit Tests
-        path: test_results/test_results.xml
-        reporter: java-junit
-    - name: Pytest coverage comment
-      uses: MishaKav/pytest-coverage-comment@main
-      with:
-        pytest-xml-coverage-path: ./test_results/coverage.xml
-        junitxml-path: ./test_results/test_results.xml
+        name: test-results-${{ matrix.python-version }}
+        path: test_results/

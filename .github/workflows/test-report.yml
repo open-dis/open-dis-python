@@ -1,0 +1,44 @@
+name: 'Test Report'
+on:
+  workflow_run:
+    workflows: ['CI']                     # runs after CI workflow
+    types:
+      - completed
+permissions:
+  contents: read
+  actions: read
+  checks: write
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: dorny/test-reporter@v2
+      with:
+        artifact: test-results-3.10       # artifact name for Python 3.10
+        name: Python 3.10 Tests          # Name of the check run which will be created
+        path: '*.xml'                     # Path to test results (inside artifact .zip)
+        reporter: java-junit              # Format of test results
+    - uses: dorny/test-reporter@v2
+      with:
+        artifact: test-results-3.11       # artifact name for Python 3.11
+        name: Python 3.11 Tests          # Name of the check run which will be created
+        path: '*.xml'                     # Path to test results (inside artifact .zip)
+        reporter: java-junit              # Format of test results
+  
+  coverage-report:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v4
+      with:
+        name: test-results-3.10
+        path: test_results_3_10/
+    - uses: actions/download-artifact@v4
+      with:
+        name: test-results-3.11
+        path: test_results_3_11/
+    - name: Pytest coverage comment
+      uses: MishaKav/pytest-coverage-comment@main
+      with:
+        pytest-xml-coverage-path: test_results_3_10/coverage_3.10.xml
+        junitxml-path: test_results_3_10/test_results_3.10.xml
