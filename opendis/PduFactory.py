@@ -1,12 +1,12 @@
 __author__ = "mcgredo"
 __date__ = "$Jun 25, 2015 11:31:42 AM$"
 
-from .DataInputStream import DataInputStream
-from .dis7 import *
-from io import BytesIO
-from os import PathLike
-import binascii
 import io
+from os import PathLike
+
+from .dis7 import *
+from .stream import DataInputStream
+
 
 PduTypeDecoders = {
        1 : EntityStatePdu
@@ -86,7 +86,7 @@ def createPdu(data: bytes) -> PduSuperclass | None:
         input: a bytebuffer of DIS data
         output: a python DIS pdu instance of the correct class"""
 
-    memoryStream = BytesIO(data)
+    memoryStream = io.BytesIO(data)
     inputStream = DataInputStream(memoryStream)
 
     return getPdu(inputStream)
