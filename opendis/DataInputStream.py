@@ -15,8 +15,10 @@ from .types import (
     uint8,
     uint16,
     uint32,
+    uint64,
     float32,
     float64,
+    char8,
     char16,
 )
 
@@ -65,3 +67,37 @@ class DataInputStream:
     def read_bytes(self, n: int) -> bytes:
         """Read n bytes from the stream."""
         return self.stream.read(n)
+
+    # Aliases for convenience
+    def read_char8(self) -> char8:
+        return char8(self.read_char())
+
+    def read_float32(self) -> float32:
+        return float32(self.read_float())
+
+    def read_float64(self) -> float64:
+        return float64(self.read_double())
+
+    def read_int8(self) -> int8:
+        return int8(self.read_byte())
+
+    def read_int16(self) -> int16:
+        return int16(self.read_short())
+
+    def read_int32(self) -> int32:
+        return int32(self.read_int())
+
+    def read_int64(self) -> int64:
+        return int64(self.read_long())
+
+    def read_uint8(self) -> uint8:
+        return uint8(self.read_unsigned_byte())
+
+    def read_uint16(self) -> uint16:
+        return uint16(self.read_unsigned_short())
+
+    def read_uint32(self) -> uint32:
+        return uint32(self.read_unsigned_int())
+
+    def read_uint64(self) -> uint64:
+        return uint64(self.read_long())
