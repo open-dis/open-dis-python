@@ -13,6 +13,7 @@ from ctypes import (
 )
 from typing import Literal
 
+from .stream import DataInputStream, DataOutputStream
 from .types import (
     bf_enum,
     bf_int,
