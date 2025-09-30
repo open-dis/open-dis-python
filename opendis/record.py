@@ -4,7 +4,15 @@ This module defines classes for various record types used in DIS PDUs.
 """
 
 from collections.abc import Sequence
-from ctypes import _SimpleCData, BigEndianStructure, c_uint
+from ctypes import (
+    _SimpleCData,
+    BigEndianStructure,
+    c_uint8,
+    c_uint16,
+    c_uint32,
+)
+from typing import Literal
+
 from .types import (
     bf_enum,
     bf_int,
@@ -13,6 +21,32 @@ from .types import (
 
 from .DataInputStream import DataInputStream
 from .DataOutputStream import DataOutputStream
+
+# Type definitions for bitfield field descriptors
+CTypeFieldDescription = tuple[str, type[_SimpleCData], int]
+DisFieldDescription = tuple[str, "DisFieldType", int]
+
+# Field type constants simplify the construction of bitfields
+# which would otherwise require manually specifying ctypes types.
+# The currently implemented bitfields only use integers, but DIS7
+# mentions CHAR types which may be needed in future.
+DisFieldType = Literal["INTEGER"]
+INTEGER = "INTEGER"
+
+
+def field(name: str,
+          ftype: DisFieldType,
+          bits: int) -> CTypeFieldDescription:
+    """Helper function to create the field description tuple used by ctypes."""
+    match (ftype, bits):
+        case (INTEGER, b) if 0 < b <= 8:
+            return (name, c_uint8, bits)
+        case (INTEGER, b) if 8 < b <= 16:
+            return (name, c_uint16, bits)
+        case (INTEGER, b) if 16 < b <= 32:
+            return (name, c_uint32, bits)
+        case _:
+            raise ValueError(f"Unrecognized (ftype, bits): {ftype}, {bits}")
 
 
 def _bitfield(
