@@ -66,8 +66,20 @@ def _bitfield(
     struct_fields = []
     bitsize = 0
     for name, ftype, bits in fields:
+        if ftype not in (INTEGER,):
+            raise ValueError(f"Unsupported field type: {ftype}")
+        if not isinstance(bits, int):
+            raise ValueError(f"Field size must be int: {bits!r}")
+        if bits <= 0 or bits > 32:
+            raise ValueError(f"Field size must be between 1 and 32: got {bits}")
         bitsize += bits
         struct_fields.append(field(name, ftype, bits))
+
+    if bitsize == 0:
+        raise ValueError(f"Bitfield size cannot be zero")
+    elif bitsize % 8 != 0:
+        raise ValueError(f"Bitfield size must be multiple of 8, got {bitsize}")
+    bytesize = bitsize // 8
 
     # Create the struct class
     class Bitfield(BigEndianStructure):
@@ -75,7 +87,7 @@ def _bitfield(
 
         @staticmethod
         def marshalledSize() -> int:
-            return bitsize // 8
+            return bytesize
     
         def serialize(self, outputStream: DataOutputStream) -> None:
             outputStream.write_bytes(bytes(self))
