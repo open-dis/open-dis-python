@@ -48,11 +48,8 @@ def field(name: str,
             raise ValueError(f"Unrecognized (ftype, bits): {ftype}, {bits}")
 
 
-def _bitfield(
-        name: str,
-        bytesize: int,
-        fields: Sequence[DisFieldDescription],
-    ):
+def _bitfield(name: str,
+              fields: Sequence[DisFieldDescription]):
     """Factory function for bitfield structs, which are subclasses of
     ctypes.Structure.
     These are used in records that require them to unpack non-octet-sized fields.
@@ -115,7 +112,7 @@ class NetId:
     YY = Frequency Table
     """
 
-    _struct = _bitfield(name="NetId", bytesize=2, fields=[
+    _struct = _bitfield(name="NetId", fields=[
         ("netNumber", INTEGER, 10),
         ("frequencyTable", INTEGER, 2),
         ("mode", INTEGER, 2),
@@ -167,7 +164,7 @@ class SpreadSpectrum:
     In Python, the presence or absence of each technique is indicated by a bool.
     """
 
-    _struct = _bitfield("SpreadSpectrum", 2, [
+    _struct = _bitfield(name="SpreadSpectrum", fields=[
         ("frequencyHopping", INTEGER, 1),
         ("pseudoNoise", INTEGER, 1),
         ("timeHopping", INTEGER, 1),
