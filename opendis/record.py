@@ -10,6 +10,7 @@ from ctypes import (
     c_uint8,
     c_uint16,
     c_uint32,
+    sizeof,
 )
 from typing import Literal
 
@@ -95,6 +96,10 @@ def _bitfield(
         @classmethod
         def parse(cls, inputStream: DataInputStream) -> "Bitfield":
             return cls.from_buffer_copy(inputStream.read_bytes(bytesize))
+
+    # Sanity check: ensure the struct size matches expected size
+    assert sizeof(Bitfield) == bytesize, \
+        f"Bitfield size mismatch: expected {bytesize}, got {sizeof(Bitfield)}"
 
     # Assign the class name
     Bitfield.__name__ = name
