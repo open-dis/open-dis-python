@@ -20,9 +20,6 @@ from .types import (
     bf_uint,
 )
 
-from .DataInputStream import DataInputStream
-from .DataOutputStream import DataOutputStream
-
 # Type definitions for bitfield field descriptors
 CTypeFieldDescription = tuple[str, type[_SimpleCData], int]
 DisFieldDescription = tuple[str, "DisFieldType", int]
@@ -53,9 +50,7 @@ def field(name: str,
 def _bitfield(
         name: str,
         bytesize: int,
-        fields: Sequence[
-            tuple[str, type[_SimpleCData]] | tuple[str, type[_SimpleCData], int]
-        ],
+        fields: Sequence[DisFieldDescription],
     ):
     """Factory function for bitfield structs, which are subclasses of
     ctypes.Structure.
@@ -64,18 +59,23 @@ def _bitfield(
     Args:
         name: Name of the bitfield struct.
         bytesize: Size of the bitfield in bytes.
-        fields: Sequence of tuples defining the fields of the bitfield.
-                See https://docs.python.org/3/library/ctypes.html#ctypes.Structure._fields_
+        fields: Sequence of tuples defining fields of the bitfield, in the form
+            (field_name, "INTEGER", field_size_in_bits).
     """
-    if bytesize <= 0:
-        raise ValueError("Cannot create bitfield with less than one byte")
+    # Argument validation
+    struct_fields = []
+    bitsize = 0
+    for name, ftype, bits in fields:
+        bitsize += bits
+        struct_fields.append(field(name, ftype, bits))
 
+    # Create the struct class
     class Bitfield(BigEndianStructure):
-        _fields_ = fields
-    
+        _fields_ = struct_fields
+
         @staticmethod
         def marshalledSize() -> int:
-            return bytesize
+            return bitsize // 8
     
         def serialize(self, outputStream: DataOutputStream) -> None:
             outputStream.write_bytes(bytes(self))
@@ -83,6 +83,8 @@ def _bitfield(
         @classmethod
         def parse(cls, inputStream: DataInputStream) -> "Bitfield":
             return cls.from_buffer_copy(inputStream.read_bytes(bytesize))
+
+    # Assign the class name
     Bitfield.__name__ = name
     return Bitfield
 
@@ -97,10 +99,10 @@ class NetId:
     """
 
     _struct = _bitfield(name="NetId", bytesize=2, fields=[
-        ("netNumber", c_uint, 10),
-        ("frequencyTable", c_uint, 2),
-        ("mode", c_uint, 2),
-        ("padding", c_uint, 2)
+        ("netNumber", INTEGER, 10),
+        ("frequencyTable", INTEGER, 2),
+        ("mode", INTEGER, 2),
+        ("padding", INTEGER, 2)
     ])
     
     def __init__(self,
@@ -149,10 +151,10 @@ class SpreadSpectrum:
     """
 
     _struct = _bitfield("SpreadSpectrum", 2, [
-        ("frequencyHopping", c_uint, 1),
-        ("pseudoNoise", c_uint, 1),
-        ("timeHopping", c_uint, 1),
-        ("padding", c_uint, 13)
+        ("frequencyHopping", INTEGER, 1),
+        ("pseudoNoise", INTEGER, 1),
+        ("timeHopping", INTEGER, 1),
+        ("padding", INTEGER, 13)
     ])
 
     def __init__(self,
