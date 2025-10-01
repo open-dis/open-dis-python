@@ -5425,8 +5425,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  modulationType: "ModulationType | None" = None,
                  cryptoSystem: enum16 = 0,  # [UID 166]
                  cryptoKeyId: struct16 = 0,  # See Table 175
-                 modulationParameterCount: uint8 = 0,  # in bytes
-                 modulationParametersList=None,
+                 modulationParameters: ModulationParameters | None = None,
                  antennaPatternList=None):
         super(TransmitterPdu, self).__init__()
         self.radioReferenceID = radioReferenceID or EntityID()
@@ -5447,13 +5446,16 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.modulationType = modulationType or ModulationType()
         self.cryptoSystem = cryptoSystem
         self.cryptoKeyId = cryptoKeyId
-        # FIXME: Refactor modulation parameters into its own record class
-        self.modulationParameterCount = modulationParameterCount
         self.padding2 = 0
         self.padding3 = 0
-        self.modulationParametersList = modulationParametersList or []
-        self.antennaPatternList = antennaPatternList or []
-        # TODO: zero or more Variable Transmitter Parameters records (see 6.2.95)
+        self.modulationParameters = modulationParameters
+
+    @property
+    def modulationParametersLength(self) -> uint8:
+        if self.modulationParameters:
+            return self.modulationParameters.marshalledSize()
+        else:
+            return 0
 
     @property
     def variableTransmitterParameterCount(self) -> uint16:
@@ -5485,8 +5487,12 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         outputStream.write_uint8(len(self.modulationParametersList))
         outputStream.write_uint16(self.padding2)
         outputStream.write_uint8(self.padding3)
-        for anObj in self.modulationParametersList:
-            anObj.serialize(outputStream)
+
+        # Serialize parameter records
+
+        ## Modulation Parameters
+        if self.modulationParameters:
+            self.modulationParameters.serialize(outputStream)
 
         for anObj in self.antennaPatternList:
             anObj.serialize(outputStream)
@@ -5514,33 +5520,14 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.padding2 = inputStream.read_uint16()
         self.padding3 = inputStream.read_uint8()
 
-        """Vendor product MACE from BattleSpace Inc, only uses 1 byte per modulation param"""
-        """SISO Spec dictates it should be 2 bytes"""
-        """Instead of dumping the packet we can make an assumption that some vendors use 1 byte per param"""
-        """Although we will still send out 2 bytes per param as per spec"""
-        endsize = self.antennaPatternCount * 39
-        mod_bytes = 2
+        # Parse parameter records
 
-        if (self.modulationParameterCount > 0):
-            curr = inputStream.stream.tell()
-            remaining = inputStream.stream.read(None)
-            mod_bytes = (len(remaining) -
-                         endsize) / self.modulationParameterCount
-            inputStream.stream.seek(curr, 0)
-
-        if (mod_bytes > 2):
-            print("Malformed Packet")
-        else:
-            for idx in range(0, self.modulationParameterCount):
-                if mod_bytes == 2:
-                    element = inputStream.read_unsigned_short()
-                else:
-                    element = inputStream.read_unsigned_byte()
-                self.modulationParametersList.append(element)
-            for idx in range(0, self.antennaPatternCount):
-                element = BeamAntennaPattern()
-                element.parse(inputStream)
-                self.antennaPatternList.append(element)
+        ## Modulation Parameters
+        if modulationParametersLength > 0:
+            mp_data = inputStream.read_bytes(modulationParametersLength)
+            self.modulationParameters = ModulationParameters(
+                UnknownRadio(mp_data)
+            )
 
 
 class ElectromagneticEmissionsPdu(DistributedEmissionsFamilyPdu):
