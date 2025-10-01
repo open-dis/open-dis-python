@@ -20,6 +20,9 @@ from .types import (
     bf_enum,
     bf_int,
     bf_uint,
+    uint8,
+    uint16,
+    uint32,
 )
 
 # Type definitions for bitfield field descriptors
@@ -237,3 +240,84 @@ class SpreadSpectrum:
         self.frequencyHopping = bool(record_bitfield.frequencyHopping)
         self.pseudoNoise = bool(record_bitfield.pseudoNoise)
         self.timeHopping = bool(record_bitfield.timeHopping)
+
+
+class GenericRadio:
+    """Annex C.2 Generic Radio record
+    
+    There are no other specific Transmitter, Signal, or Receiver PDU
+    requirements unique to a generic radio.
+    """
+
+    def marshalledSize(self) -> int:
+        return 0
+    
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        pass
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        pass
+
+
+class SimpleIntercomRadio:
+    """Annex C.3 Simple Intercom Radio
+    
+    A Simple Intercom shall be identified by both the Transmitter PDU
+    Modulation Type record—Radio System field indicating a system type of
+    Generic Radio or Simple Intercom (1) and by the Modulation Type
+    record—Major Modulation field set to No Statement (0).
+
+    This class has specific field requirements for the TransmitterPdu.
+    """
+
+    def marshalledSize(self) -> int:
+        return 0
+    
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        pass
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        pass
+
+
+# C.4 HAVE QUICK Radios
+
+class BasicHaveQuickMP:
+    """Annex C 4.2.2, Table C.3 — Basic HAVE QUICK MP record"""
+
+    def __init__(self,
+                 net_id: NetId | None = None,
+                 mwod_index: uint16 = 1,
+                 reserved16: uint16 = 0,
+                 reserved8_1: uint8 = 0,
+                 reserved8_2: uint8 = 0,
+                 time_of_day: uint32 = 0,
+                 padding: uint32 = 0):
+        self.net_id = net_id or NetId()
+        self.mwod_index = mwod_index
+        self.reserved16 = reserved16
+        self.reserved8_1 = reserved8_1
+        self.reserved8_2 = reserved8_2
+        self.time_of_day = time_of_day
+        self.padding = padding
+
+    def marshalledSize(self) -> int:
+        return 16  # bytes
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        self.net_id.serialize(outputStream)
+        outputStream.write_uint16(self.mwod_index)
+        outputStream.write_uint16(self.reserved16)
+        outputStream.write_uint8(self.reserved8_1)
+        outputStream.write_uint8(self.reserved8_2)
+        outputStream.write_uint32(self.time_of_day)
+        outputStream.write_uint32(self.padding)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.net_id.parse(inputStream)
+        self.mwod_index = inputStream.read_uint16()
+        self.reserved16 = inputStream.read_uint16()
+        self.reserved8_1 = inputStream.read_uint8()
+        self.reserved8_2 = inputStream.read_uint8()
+        self.time_of_day = inputStream.read_uint32()
+        self.padding = inputStream.read_uint32()
