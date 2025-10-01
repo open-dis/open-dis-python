@@ -3,6 +3,7 @@
 This module defines classes for various record types used in DIS PDUs.
 """
 
+from abc import abstractmethod
 from collections.abc import Sequence
 from ctypes import (
     _SimpleCData,
@@ -242,7 +243,26 @@ class SpreadSpectrum:
         self.timeHopping = bool(record_bitfield.timeHopping)
 
 
-class GenericRadio:
+class ModulationParametersRecord:
+    """Base class for modulation parameters records, as defined in Annex C."""
+
+    @abstractmethod
+    def marshalledSize(self) -> int:
+        """Return the size of the record when serialized."""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        """Serialize the record to the output stream."""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def parse(self, inputStream: DataInputStream) -> None:
+        """Parse the record from the input stream."""
+        raise NotImplementedError()
+
+
+class GenericRadio(ModulationParametersRecord):
     """Annex C.2 Generic Radio record
     
     There are no other specific Transmitter, Signal, or Receiver PDU
@@ -259,7 +279,7 @@ class GenericRadio:
         pass
 
 
-class SimpleIntercomRadio:
+class SimpleIntercomRadio(ModulationParametersRecord):
     """Annex C.3 Simple Intercom Radio
     
     A Simple Intercom shall be identified by both the Transmitter PDU
@@ -282,7 +302,7 @@ class SimpleIntercomRadio:
 
 # C.4 HAVE QUICK Radios
 
-class BasicHaveQuickMP:
+class BasicHaveQuickMP(ModulationParametersRecord):
     """Annex C 4.2.2, Table C.3 — Basic HAVE QUICK MP record"""
 
     def __init__(self,
@@ -321,3 +341,32 @@ class BasicHaveQuickMP:
         self.reserved8_2 = inputStream.read_uint8()
         self.time_of_day = inputStream.read_uint32()
         self.padding = inputStream.read_uint32()
+
+
+class ModulationParameters:
+    """Section 6.2.58
+
+    Modulation parameters associated with a specific radio system.
+
+    This class is not designed to be instantiated directly with no arguments.
+    """
+
+    def __init__(self,
+                 # record must be provided as there is no default value.
+                 record: ModulationParametersRecord):
+        self.record = record
+        # ModulationParameters requires padding to 64-bit (8-byte) boundary
+        self.padding = 8 - (self.record.marshalledSize() % 8) % 8
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        self.record.serialize(outputStream)
+        outputStream.write_bytes(b'\x00' * self.padding)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.record.parse(inputStream)
+        bytes_to_read = 8 - (self.record.marshalledSize() % 8) % 8
+        if bytes_to_read > 0:
+            self.padding = int.from_bytes(
+                inputStream.read_bytes(bytes_to_read),
+                byteorder='big'
+            )
