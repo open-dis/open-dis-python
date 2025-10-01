@@ -5474,58 +5474,58 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         """
         return len(self.modulationParametersList)
 
-    def serialize(self, outputStream):
+    def serialize(self, outputStream: DataOutputStream) -> None:
         """serialize the class"""
         super(TransmitterPdu, self).serialize(outputStream)
         self.radioReferenceID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.radioNumber)
+        outputStream.write_uint16(self.radioNumber)
         self.radioEntityType.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.transmitState)
-        outputStream.write_unsigned_byte(self.inputSource)
-        outputStream.write_unsigned_short(
+        outputStream.write_uint8(self.transmitState)
+        outputStream.write_uint8(self.inputSource)
+        outputStream.write_uint16(
             self.variableTransmitterParameterCount)
         self.antennaLocation.serialize(outputStream)
         self.relativeAntennaLocation.serialize(outputStream)
-        outputStream.write_unsigned_short(self.antennaPatternType)
-        outputStream.write_unsigned_short(len(self.antennaPatternList))
-        outputStream.write_long(self.frequency)
-        outputStream.write_float(self.transmitFrequencyBandwidth)
-        outputStream.write_float(self.power)
+        outputStream.write_uint16(self.antennaPatternType)
+        outputStream.write_uint16(len(self.antennaPatternList))
+        outputStream.write_uint64(self.frequency)
+        outputStream.write_float32(self.transmitFrequencyBandwidth)
+        outputStream.write_float32(self.power)
         self.modulationType.serialize(outputStream)
-        outputStream.write_unsigned_short(self.cryptoSystem)
-        outputStream.write_unsigned_short(self.cryptoKeyId)
-        outputStream.write_unsigned_byte(len(self.modulationParametersList))
-        outputStream.write_unsigned_short(self.padding2)
-        outputStream.write_unsigned_byte(self.padding3)
+        outputStream.write_uint16(self.cryptoSystem)
+        outputStream.write_uint16(self.cryptoKeyId)
+        outputStream.write_uint8(len(self.modulationParametersList))
+        outputStream.write_uint16(self.padding2)
+        outputStream.write_uint8(self.padding3)
         for anObj in self.modulationParametersList:
             anObj.serialize(outputStream)
 
         for anObj in self.antennaPatternList:
             anObj.serialize(outputStream)
 
-    def parse(self, inputStream):
+    def parse(self, inputStream: DataInputStream) -> None:
         """Parse a message. This may recursively call embedded objects."""
         super(TransmitterPdu, self).parse(inputStream)
         self.radioReferenceID.parse(inputStream)
-        self.radioNumber = inputStream.read_unsigned_short()
+        self.radioNumber = inputStream.read_uint16()
         self.radioEntityType.parse(inputStream)
-        self.transmitState = inputStream.read_unsigned_byte()
-        self.inputSource = inputStream.read_unsigned_byte()
-        variableTransmitterParameterCount = inputStream.read_unsigned_short(
-        )
+        self.transmitState = inputStream.read_uint8()
+        self.inputSource = inputStream.read_uint8()
+        variableTransmitterParameterCount = inputStream.read_uint16()
         self.antennaLocation.parse(inputStream)
         self.relativeAntennaLocation.parse(inputStream)
-        self.antennaPatternType = inputStream.read_unsigned_short()
-        self.antennaPatternCount = inputStream.read_unsigned_short()
-        self.frequency = inputStream.read_long()
-        self.transmitFrequencyBandwidth = inputStream.read_float()
-        self.power = inputStream.read_float()
+        self.antennaPatternType = inputStream.read_uint16()
+        self.antennaPatternCount = inputStream.read_uint16()
+        self.frequency = inputStream.read_uint64()
+        self.transmitFrequencyBandwidth = inputStream.read_float32()
+        self.power = inputStream.read_float32()
         self.modulationType.parse(inputStream)
-        self.cryptoSystem = inputStream.read_unsigned_short()
-        self.cryptoKeyId = inputStream.read_unsigned_short()
-        self.modulationParameterCount = inputStream.read_unsigned_byte()
-        self.padding2 = inputStream.read_unsigned_short()
-        self.padding3 = inputStream.read_unsigned_byte()
+        self.cryptoSystem = inputStream.read_uint16()
+        self.cryptoKeyId = inputStream.read_uint16()
+        modulationParametersLength = inputStream.read_uint8()
+        self.padding2 = inputStream.read_uint16()
+        self.padding3 = inputStream.read_uint8()
+
         """Vendor product MACE from BattleSpace Inc, only uses 1 byte per modulation param"""
         """SISO Spec dictates it should be 2 bytes"""
         """Instead of dumping the packet we can make an assumption that some vendors use 1 byte per param"""
