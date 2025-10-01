@@ -2,6 +2,8 @@
 #This code is licensed under the BSD software license
 #
 
+from .record import ModulationType
+from .stream import DataInputStream, DataOutputStream
 from .types import (
     enum8,
     enum16,
@@ -17,7 +19,6 @@ from .types import (
     struct16,
     struct32,
 )
-from .record import ModulationType
 
 
 class DataQueryDatumSpecification:
