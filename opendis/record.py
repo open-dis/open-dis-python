@@ -262,6 +262,22 @@ class ModulationParametersRecord:
         raise NotImplementedError()
 
 
+class UnknownRadio(ModulationParametersRecord):
+    """Placeholder for unknown or unimplemented radio types."""
+
+    def __init__(self, data: bytes):
+        self.data = data
+
+    def marshalledSize(self) -> int:
+        return len(self.data)
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_bytes(self.data)
+
+    def parse(self, inputStream: DataInputStream, bytelength: int = 0) -> None:
+        self.data = inputStream.read_bytes(bytelength)
+
+
 class GenericRadio(ModulationParametersRecord):
     """Annex C.2 Generic Radio record
     

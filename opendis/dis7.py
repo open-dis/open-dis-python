@@ -3,6 +3,10 @@
 #
 
 from .record import (
+    ModulationType,
+    ModulationParameters,
+    UnknownRadio,
+)
 from .stream import DataInputStream, DataOutputStream
 from .types import (
     enum8,
