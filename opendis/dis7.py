@@ -2,7 +2,7 @@
 #This code is licensed under the BSD software license
 #
 
-from .record import ModulationType
+from .record import (
 from .stream import DataInputStream, DataOutputStream
 from .types import (
     enum8,
@@ -668,22 +668,6 @@ class NamedLocationIdentification:
         """Parse a message. This may recursively call embedded objects."""
         self.stationName = inputStream.read_unsigned_short()
         self.stationNumber = inputStream.read_unsigned_short()
-
-
-class ModulationParameters:
-    """Section 6.2.58
-
-    Modulation parameters associated with a specific radio system. INCOMPLETE.
-    """
-
-    def __init__(self):
-        pass
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
 
 
 class EulerAngles:

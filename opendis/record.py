@@ -358,6 +358,9 @@ class ModulationParameters:
         # ModulationParameters requires padding to 64-bit (8-byte) boundary
         self.padding = 8 - (self.record.marshalledSize() % 8) % 8
 
+    def marshalledSize(self) -> int:
+        return self.record.marshalledSize() + self.padding
+
     def serialize(self, outputStream: DataOutputStream) -> None:
         self.record.serialize(outputStream)
         outputStream.write_bytes(b'\x00' * self.padding)
@@ -370,3 +373,5 @@ class ModulationParameters:
                 inputStream.read_bytes(bytes_to_read),
                 byteorder='big'
             )
+        else:
+            self.padding = 0
