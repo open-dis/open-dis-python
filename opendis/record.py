@@ -16,6 +16,7 @@ from typing import Literal
 
 from .stream import DataInputStream, DataOutputStream
 from .types import (
+    enum16,
     bf_enum,
     bf_int,
     bf_uint,
@@ -101,6 +102,44 @@ def _bitfield(name: str,
     # Assign the class name
     Bitfield.__name__ = name
     return Bitfield
+
+
+class ModulationType:
+    """Section 6.2.59
+    
+    Information about the type of modulation used for radio transmission.
+    """
+
+    def __init__(self,
+                 spreadSpectrum: "SpreadSpectrum | None" = None,  # See RPR Enumerations
+                 majorModulation: enum16 = 0,  # [UID 155]
+                 detail: enum16 = 0,  # [UID 156-162]
+                 radioSystem: enum16 = 0):  # [UID 163]
+        self.spreadSpectrum = spreadSpectrum or SpreadSpectrum()
+        """This field shall indicate the spread spectrum technique or combination of spread spectrum techniques in use. Bit field. 0=freq hopping, 1=psuedo noise, time hopping=2, remaining bits unused"""
+        self.majorModulation = majorModulation
+        self.detail = detail
+        self.radioSystem = radioSystem
+
+    def marshalledSize(self) -> int:
+        size = 0
+        size += self.spreadSpectrum.marshalledSize()
+        size += 2  # majorModulation
+        size += 2  # detail
+        size += 2  # radioSystem
+        return size
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        self.spreadSpectrum.serialize(outputStream)
+        outputStream.write_uint16(self.majorModulation)
+        outputStream.write_uint16(self.detail)
+        outputStream.write_uint16(self.radioSystem)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.spreadSpectrum.parse(inputStream)
+        self.majorModulation = inputStream.read_uint16()
+        self.detail = inputStream.read_uint16()
+        self.radioSystem = inputStream.read_uint16()
 
 
 class NetId:
