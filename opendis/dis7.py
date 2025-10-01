@@ -17,7 +17,7 @@ from .types import (
     struct16,
     struct32,
 )
-from .record import SpreadSpectrum
+from .record import ModulationType
 
 
 class DataQueryDatumSpecification:
@@ -2015,41 +2015,6 @@ class IOCommunicationsNode:
         self.communcationsNodeType = inputStream.read_unsigned_byte()
         self.padding = inputStream.read_unsigned_byte()
         self.communicationsNodeID.parse(inputStream)
-
-
-class ModulationType:
-    """Section 6.2.59
-    
-    Information about the type of modulation used for radio transmission.
-    """
-
-    def __init__(self,
-                 spreadSpectrum: SpreadSpectrum | None = None,  # See RPR Enumerations
-                 majorModulation: enum16 = 0,  # [UID 155]
-                 detail: enum16 = 0,  # [UID 156-162]
-                 radioSystem: enum16 = 0):  # [UID 163]
-        self.spreadSpectrum = spreadSpectrum or SpreadSpectrum()
-        """This field shall indicate the spread spectrum technique or combination of spread spectrum techniques in use. Bit field. 0=freq hopping, 1=psuedo noise, time hopping=2, reamining bits unused"""
-        self.majorModulation = majorModulation
-        """the major classification of the modulation type."""
-        self.detail = detail
-        """provide certain detailed information depending upon the major modulation type"""
-        self.radioSystem = radioSystem
-        """the radio system associated with this Transmitter PDU and shall be used as the basis to interpret other fields whose values depend on a specific radio system."""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_short(self.spreadSpectrum)
-        outputStream.write_unsigned_short(self.majorModulation)
-        outputStream.write_unsigned_short(self.detail)
-        outputStream.write_unsigned_short(self.radioSystem)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.spreadSpectrum = inputStream.read_unsigned_short()
-        self.majorModulation = inputStream.read_unsigned_short()
-        self.detail = inputStream.read_unsigned_short()
-        self.radioSystem = inputStream.read_unsigned_short()
 
 
 class LinearSegmentParameter:
