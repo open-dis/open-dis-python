@@ -7,7 +7,6 @@ from typing import Sequence
 from .record import (
     AntennaPatternRecord,
     ModulationType,
-    ModulationParameters,
     ModulationParametersRecord,
     UnknownRadio,
     UnknownAntennaPattern,
