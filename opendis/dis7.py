@@ -942,21 +942,28 @@ class VariableTransmitterParameters:
     Relates to radios. NOT COMPLETE.
     """
 
-    def __init__(self, recordType: enum32 = 0, recordLength: uint16 = 4):
+    def __init__(self, recordType: enum32 = 0, data: bytes = b""):
         self.recordType = recordType  # [UID 66]  Variable Parameter Record Type
-        """Type of VTP. Enumeration from EBV"""
-        self.recordLength = recordLength
-        """Length, in bytes"""
+        self.data = data
+    
+    def marshalledSize(self) -> int:
+        return 6 + len(self.data)
+    
+    @property
+    def recordLength(self) -> uint16:
+        return self.marshalledSize()
 
-    def serialize(self, outputStream):
+    def serialize(self, outputStream: DataOutputStream) -> None:
         """serialize the class"""
-        outputStream.write_unsigned_int(self.recordType)
-        outputStream.write_unsigned_int(self.recordLength)
+        outputStream.write_uint32(self.recordType)
+        outputStream.write_uint16(self.recordLength)
+        outputStream.write_bytes(self.data)
 
-    def parse(self, inputStream):
+    def parse(self, inputStream: DataInputStream) -> None:
         """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_unsigned_int()
-        self.recordLength = inputStream.read_unsigned_int()
+        self.recordType = inputStream.read_uint32()
+        recordLength = inputStream.read_uint16()
+        self.data = inputStream.read_bytes(recordLength)
 
 
 class Attribute:
