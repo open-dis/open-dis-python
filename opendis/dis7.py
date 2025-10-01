@@ -5524,10 +5524,9 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
 
         ## Modulation Parameters
         if modulationParametersLength > 0:
-            mp_data = inputStream.read_bytes(modulationParametersLength)
-            self.modulationParameters = ModulationParameters(
-                UnknownRadio(mp_data)
-            )
+            radio = UnknownRadio()
+            radio.parse(inputStream, bytelength=modulationParametersLength)
+            self.modulationParameters = ModulationParameters(radio)
 
 
 class ElectromagneticEmissionsPdu(DistributedEmissionsFamilyPdu):
