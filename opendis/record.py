@@ -265,7 +265,7 @@ class ModulationParametersRecord:
 class UnknownRadio(ModulationParametersRecord):
     """Placeholder for unknown or unimplemented radio types."""
 
-    def __init__(self, data: bytes):
+    def __init__(self, data: bytes = b''):
         self.data = data
 
     def marshalledSize(self) -> int:
