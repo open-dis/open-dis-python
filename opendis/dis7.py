@@ -2,6 +2,8 @@
 #This code is licensed under the BSD software license
 #
 
+from typing import Sequence
+
 from .record import (
     AntennaPatternRecord,
     ModulationType,
@@ -5423,11 +5425,9 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  radioEntityType: "EntityType | None" = None,
                  transmitState: enum8 = 0,  # [UID 164]
                  inputSource: enum8 = 0,  # [UID 165]
-                 variableTransmitterParameterCount: uint16 = 0,
                  antennaLocation: "Vector3Double | None" = None,
                  relativeAntennaLocation: "Vector3Float | None" = None,
                  antennaPatternType: enum16 = 0,  # [UID 167]
-                 antennaPatternCount: uint16 = 0,  # in bytes
                  frequency: uint64 = 0,  # in Hz
                  transmitFrequencyBandwidth: float32 = 0.0,  # in Hz
                  power: float32 = 0.0,  # in decibel-milliwatts
@@ -5435,7 +5435,8 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  cryptoSystem: enum16 = 0,  # [UID 166]
                  cryptoKeyId: struct16 = 0,  # See Table 175
                  modulationParameters: ModulationParameters | None = None,
-                 antennaPatternList=None):
+                 antennaPattern: AntennaPatternRecord | None = None,
+                 variableTransmitterParameters: Sequence[VariableTransmitterParameters] | None = None):
         super(TransmitterPdu, self).__init__()
         self.radioReferenceID = radioReferenceID or EntityID()
         """ID of the entity that is the source of the communication"""
@@ -5448,7 +5449,6 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float(
         )
         self.antennaPatternType = antennaPatternType
-        self.antennaPatternCount = antennaPatternCount
         self.frequency = frequency
         self.transmitFrequencyBandwidth = transmitFrequencyBandwidth
         self.power = power
@@ -5459,6 +5459,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.padding3 = 0
         self.modulationParameters = modulationParameters
         self.antennaPattern = antennaPattern
+        self.variableTransmitterParameters = variableTransmitterParameters or []
 
     @property
     def antennaPatternLength(self) -> uint16:
@@ -5476,21 +5477,16 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
 
     @property
     def variableTransmitterParameterCount(self) -> uint16:
-        """How many variable transmitter parameters are in the variable length list.
-        In earlier versions of DIS these were known as articulation parameters.
-        """
-        return len(self.modulationParametersList)
+        return len(self.variableTransmitterParameters)
 
     def serialize(self, outputStream: DataOutputStream) -> None:
-        """serialize the class"""
         super(TransmitterPdu, self).serialize(outputStream)
         self.radioReferenceID.serialize(outputStream)
         outputStream.write_uint16(self.radioNumber)
         self.radioEntityType.serialize(outputStream)
         outputStream.write_uint8(self.transmitState)
         outputStream.write_uint8(self.inputSource)
-        outputStream.write_uint16(
-            self.variableTransmitterParameterCount)
+        outputStream.write_uint16(self.variableTransmitterParameterCount)
         self.antennaLocation.serialize(outputStream)
         self.relativeAntennaLocation.serialize(outputStream)
         outputStream.write_uint16(self.antennaPatternType)
@@ -5514,6 +5510,10 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         ## Antenna Pattern
         if self.antennaPattern:
             self.antennaPattern.serialize(outputStream)
+
+        ## Variable Transmitter Parameters
+        for vtp in self.variableTransmitterParameters:
+            vtp.serialize(outputStream)
 
     def parse(self, inputStream: DataInputStream) -> None:
         """Parse a message. This may recursively call embedded objects."""
