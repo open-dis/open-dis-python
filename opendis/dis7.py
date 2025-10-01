@@ -3,9 +3,11 @@
 #
 
 from .record import (
+    AntennaPatternRecord,
     ModulationType,
     ModulationParameters,
     UnknownRadio,
+    UnknownAntennaPattern,
 )
 from .stream import DataInputStream, DataOutputStream
 from .types import (
@@ -5449,6 +5451,14 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.padding2 = 0
         self.padding3 = 0
         self.modulationParameters = modulationParameters
+        self.antennaPattern = antennaPattern
+
+    @property
+    def antennaPatternLength(self) -> uint16:
+        if self.antennaPattern:
+            return self.antennaPattern.marshalledSize()
+        else:
+            return 0
 
     @property
     def modulationParametersLength(self) -> uint8:
@@ -5477,14 +5487,14 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.antennaLocation.serialize(outputStream)
         self.relativeAntennaLocation.serialize(outputStream)
         outputStream.write_uint16(self.antennaPatternType)
-        outputStream.write_uint16(len(self.antennaPatternList))
+        outputStream.write_uint16(self.antennaPatternLength)
         outputStream.write_uint64(self.frequency)
         outputStream.write_float32(self.transmitFrequencyBandwidth)
         outputStream.write_float32(self.power)
         self.modulationType.serialize(outputStream)
         outputStream.write_uint16(self.cryptoSystem)
         outputStream.write_uint16(self.cryptoKeyId)
-        outputStream.write_uint8(len(self.modulationParametersList))
+        outputStream.write_uint8(self.modulationParametersLength)
         outputStream.write_uint16(self.padding2)
         outputStream.write_uint8(self.padding3)
 
@@ -5494,8 +5504,9 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         if self.modulationParameters:
             self.modulationParameters.serialize(outputStream)
 
-        for anObj in self.antennaPatternList:
-            anObj.serialize(outputStream)
+        ## Antenna Pattern
+        if self.antennaPattern:
+            self.antennaPattern.serialize(outputStream)
 
     def parse(self, inputStream: DataInputStream) -> None:
         """Parse a message. This may recursively call embedded objects."""
@@ -5509,7 +5520,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.antennaLocation.parse(inputStream)
         self.relativeAntennaLocation.parse(inputStream)
         self.antennaPatternType = inputStream.read_uint16()
-        self.antennaPatternCount = inputStream.read_uint16()
+        antennaPatternLength = inputStream.read_uint16()
         self.frequency = inputStream.read_uint64()
         self.transmitFrequencyBandwidth = inputStream.read_float32()
         self.power = inputStream.read_float32()
@@ -5527,6 +5538,20 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
             radio = UnknownRadio()
             radio.parse(inputStream, bytelength=modulationParametersLength)
             self.modulationParameters = ModulationParameters(radio)
+        else:
+            self.modulationParameters = None
+
+        ## Antenna Pattern
+        if antennaPatternLength > 0:
+            self.antennaPattern = UnknownAntennaPattern()
+            self.antennaPattern.parse(
+                inputStream,
+                bytelength=antennaPatternLength
+            )
+        else:
+            self.antennaPattern = None
+
+
 
 
 class ElectromagneticEmissionsPdu(DistributedEmissionsFamilyPdu):

@@ -391,3 +391,42 @@ class ModulationParameters:
             )
         else:
             self.padding = 0
+
+
+class AntennaPatternRecord:
+    """Section 6.2.8
+    
+    The total length of each record shall be a multiple of 64 bits.
+    """
+
+    @abstractmethod
+    def marshalledSize(self) -> int:
+        """Return the size of the record when serialized."""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        """Serialize the record to the output stream."""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def parse(self, inputStream: DataInputStream) -> None:
+        """Parse the record from the input stream."""
+        raise NotImplementedError()
+
+
+class UnknownAntennaPattern(AntennaPatternRecord):
+    """Placeholder for unknown or unimplemented antenna pattern types."""
+
+    def __init__(self, data: bytes = b''):
+        self.data = data
+
+    def marshalledSize(self) -> int:
+        return len(self.data)
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_bytes(self.data)
+
+    def parse(self, inputStream: DataInputStream, bytelength: int = 0) -> None:
+        """Parse a message. This may recursively call embedded objects."""
+        self.data = inputStream.read_bytes(bytelength)
