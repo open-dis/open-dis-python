@@ -8,6 +8,7 @@ from .record import (
     AntennaPatternRecord,
     ModulationType,
     ModulationParameters,
+    ModulationParametersRecord,
     UnknownRadio,
     UnknownAntennaPattern,
 )
@@ -5434,7 +5435,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  modulationType: "ModulationType | None" = None,
                  cryptoSystem: enum16 = 0,  # [UID 166]
                  cryptoKeyId: struct16 = 0,  # See Table 175
-                 modulationParameters: ModulationParameters | None = None,
+                 modulationParameters: ModulationParametersRecord | None = None,
                  antennaPattern: AntennaPatternRecord | None = None,
                  variableTransmitterParameters: Sequence[VariableTransmitterParameters] | None = None):
         super(TransmitterPdu, self).__init__()
@@ -5544,7 +5545,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         if modulationParametersLength > 0:
             radio = UnknownRadio()
             radio.parse(inputStream, bytelength=modulationParametersLength)
-            self.modulationParameters = ModulationParameters(radio)
+            self.modulationParameters = radio
         else:
             self.modulationParameters = None
 
