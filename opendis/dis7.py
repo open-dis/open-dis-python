@@ -15,6 +15,7 @@ from .record import (
     GenericRadio,
     SimpleIntercomRadio,
     BasicHaveQuickMP,
+    CCTTSincgarsMP,
     VariableTransmitterParametersRecord,
     HighFidelityHAVEQUICKRadio,
     UnknownVariableTransmitterParameters,

@@ -309,6 +309,50 @@ class BasicHaveQuickMP(ModulationParametersRecord):
         self.padding = inputStream.read_uint32()
 
 
+class CCTTSincgarsMP(ModulationParametersRecord):
+    """Annex C 6.2.3, Table C.7 — CCTT SINCGARS MP record"""
+
+    def __init__(self,
+                 fh_net_id: uint16 = 0,
+                 hop_set_id: uint16 = 0,
+                 lockout_set_id: uint16 = 0,
+                 start_of_message: enum8 = 0,
+                 clear_channel: enum8 = 0,
+                 fh_sync_time_offset: uint32 = 0,
+                 transmission_security_key: uint16 = 0):
+        self.fh_net_id = fh_net_id
+        self.hop_set_id = hop_set_id
+        self.lockout_set_id = lockout_set_id
+        self.start_of_message = start_of_message
+        self.clear_channel = clear_channel
+        self.fh_sync_time_offset = fh_sync_time_offset
+        self.transmission_security_key = transmission_security_key
+        self.padding: uint16 = 0
+
+    def marshalledSize(self) -> int:
+        return 16  # bytes
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_uint16(self.fh_net_id)
+        outputStream.write_uint16(self.hop_set_id)
+        outputStream.write_uint16(self.lockout_set_id)
+        outputStream.write_uint8(self.start_of_message)
+        outputStream.write_uint8(self.clear_channel)
+        outputStream.write_uint32(self.fh_sync_time_offset)
+        outputStream.write_uint16(self.transmission_security_key)
+        outputStream.write_uint16(self.padding)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.fh_net_id = inputStream.read_uint16()
+        self.hop_set_id = inputStream.read_uint16()
+        self.lockout_set_id = inputStream.read_uint16()
+        self.start_of_message = inputStream.read_uint8()
+        self.clear_channel = inputStream.read_uint8()
+        self.fh_sync_time_offset = inputStream.read_uint32()
+        self.transmission_security_key = inputStream.read_uint16()
+        self.padding = inputStream.read_uint16()
+
+
 class AntennaPatternRecord(ABC):
     """6.2.8 Antenna Pattern record
     
