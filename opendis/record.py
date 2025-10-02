@@ -3,6 +3,7 @@
 This module defines classes for various record types used in DIS PDUs.
 """
 
+from abc import abstractmethod
 from collections.abc import Sequence
 from ctypes import (
     _SimpleCData,
@@ -16,9 +17,13 @@ from typing import Literal
 
 from .stream import DataInputStream, DataOutputStream
 from .types import (
+    enum16,
     bf_enum,
     bf_int,
     bf_uint,
+    uint8,
+    uint16,
+    uint32,
 )
 
 # Type definitions for bitfield field descriptors
@@ -101,6 +106,44 @@ def _bitfield(name: str,
     # Assign the class name
     Bitfield.__name__ = name
     return Bitfield
+
+
+class ModulationType:
+    """Section 6.2.59
+    
+    Information about the type of modulation used for radio transmission.
+    """
+
+    def __init__(self,
+                 spreadSpectrum: "SpreadSpectrum | None" = None,  # See RPR Enumerations
+                 majorModulation: enum16 = 0,  # [UID 155]
+                 detail: enum16 = 0,  # [UID 156-162]
+                 radioSystem: enum16 = 0):  # [UID 163]
+        self.spreadSpectrum = spreadSpectrum or SpreadSpectrum()
+        """This field shall indicate the spread spectrum technique or combination of spread spectrum techniques in use. Bit field. 0=freq hopping, 1=psuedo noise, time hopping=2, remaining bits unused"""
+        self.majorModulation = majorModulation
+        self.detail = detail
+        self.radioSystem = radioSystem
+
+    def marshalledSize(self) -> int:
+        size = 0
+        size += self.spreadSpectrum.marshalledSize()
+        size += 2  # majorModulation
+        size += 2  # detail
+        size += 2  # radioSystem
+        return size
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        self.spreadSpectrum.serialize(outputStream)
+        outputStream.write_uint16(self.majorModulation)
+        outputStream.write_uint16(self.detail)
+        outputStream.write_uint16(self.radioSystem)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.spreadSpectrum.parse(inputStream)
+        self.majorModulation = inputStream.read_uint16()
+        self.detail = inputStream.read_uint16()
+        self.radioSystem = inputStream.read_uint16()
 
 
 class NetId:
@@ -198,3 +241,192 @@ class SpreadSpectrum:
         self.frequencyHopping = bool(record_bitfield.frequencyHopping)
         self.pseudoNoise = bool(record_bitfield.pseudoNoise)
         self.timeHopping = bool(record_bitfield.timeHopping)
+
+
+class ModulationParametersRecord:
+    """Base class for modulation parameters records, as defined in Annex C."""
+
+    @abstractmethod
+    def marshalledSize(self) -> int:
+        """Return the size of the record when serialized."""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        """Serialize the record to the output stream."""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def parse(self, inputStream: DataInputStream) -> None:
+        """Parse the record from the input stream."""
+        raise NotImplementedError()
+
+
+class UnknownRadio(ModulationParametersRecord):
+    """Placeholder for unknown or unimplemented radio types."""
+
+    def __init__(self, data: bytes = b''):
+        self.data = data
+
+    def marshalledSize(self) -> int:
+        return len(self.data)
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_bytes(self.data)
+
+    def parse(self, inputStream: DataInputStream, bytelength: int = 0) -> None:
+        self.data = inputStream.read_bytes(bytelength)
+
+
+class GenericRadio(ModulationParametersRecord):
+    """Annex C.2 Generic Radio record
+    
+    There are no other specific Transmitter, Signal, or Receiver PDU
+    requirements unique to a generic radio.
+    """
+
+    def marshalledSize(self) -> int:
+        return 0
+    
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        pass
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        pass
+
+
+class SimpleIntercomRadio(ModulationParametersRecord):
+    """Annex C.3 Simple Intercom Radio
+    
+    A Simple Intercom shall be identified by both the Transmitter PDU
+    Modulation Type record—Radio System field indicating a system type of
+    Generic Radio or Simple Intercom (1) and by the Modulation Type
+    record—Major Modulation field set to No Statement (0).
+
+    This class has specific field requirements for the TransmitterPdu.
+    """
+
+    def marshalledSize(self) -> int:
+        return 0
+    
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        pass
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        pass
+
+
+# C.4 HAVE QUICK Radios
+
+class BasicHaveQuickMP(ModulationParametersRecord):
+    """Annex C 4.2.2, Table C.3 — Basic HAVE QUICK MP record"""
+
+    def __init__(self,
+                 net_id: NetId | None = None,
+                 mwod_index: uint16 = 1,
+                 reserved16: uint16 = 0,
+                 reserved8_1: uint8 = 0,
+                 reserved8_2: uint8 = 0,
+                 time_of_day: uint32 = 0,
+                 padding: uint32 = 0):
+        self.net_id = net_id or NetId()
+        self.mwod_index = mwod_index
+        self.reserved16 = reserved16
+        self.reserved8_1 = reserved8_1
+        self.reserved8_2 = reserved8_2
+        self.time_of_day = time_of_day
+        self.padding = padding
+
+    def marshalledSize(self) -> int:
+        return 16  # bytes
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        self.net_id.serialize(outputStream)
+        outputStream.write_uint16(self.mwod_index)
+        outputStream.write_uint16(self.reserved16)
+        outputStream.write_uint8(self.reserved8_1)
+        outputStream.write_uint8(self.reserved8_2)
+        outputStream.write_uint32(self.time_of_day)
+        outputStream.write_uint32(self.padding)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.net_id.parse(inputStream)
+        self.mwod_index = inputStream.read_uint16()
+        self.reserved16 = inputStream.read_uint16()
+        self.reserved8_1 = inputStream.read_uint8()
+        self.reserved8_2 = inputStream.read_uint8()
+        self.time_of_day = inputStream.read_uint32()
+        self.padding = inputStream.read_uint32()
+
+
+class ModulationParameters:
+    """Section 6.2.58
+
+    Modulation parameters associated with a specific radio system.
+
+    This class is not designed to be instantiated directly with no arguments.
+    """
+
+    def __init__(self,
+                 # record must be provided as there is no default value.
+                 record: ModulationParametersRecord):
+        self.record = record
+        # ModulationParameters requires padding to 64-bit (8-byte) boundary
+        self.padding = 8 - (self.record.marshalledSize() % 8) % 8
+
+    def marshalledSize(self) -> int:
+        return self.record.marshalledSize() + self.padding
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        self.record.serialize(outputStream)
+        outputStream.write_bytes(b'\x00' * self.padding)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.record.parse(inputStream)
+        bytes_to_read = 8 - (self.record.marshalledSize() % 8) % 8
+        if bytes_to_read > 0:
+            self.padding = int.from_bytes(
+                inputStream.read_bytes(bytes_to_read),
+                byteorder='big'
+            )
+        else:
+            self.padding = 0
+
+
+class AntennaPatternRecord:
+    """Section 6.2.8
+    
+    The total length of each record shall be a multiple of 64 bits.
+    """
+
+    @abstractmethod
+    def marshalledSize(self) -> int:
+        """Return the size of the record when serialized."""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        """Serialize the record to the output stream."""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def parse(self, inputStream: DataInputStream) -> None:
+        """Parse the record from the input stream."""
+        raise NotImplementedError()
+
+
+class UnknownAntennaPattern(AntennaPatternRecord):
+    """Placeholder for unknown or unimplemented antenna pattern types."""
+
+    def __init__(self, data: bytes = b''):
+        self.data = data
+
+    def marshalledSize(self) -> int:
+        return len(self.data)
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_bytes(self.data)
+
+    def parse(self, inputStream: DataInputStream, bytelength: int = 0) -> None:
+        """Parse a message. This may recursively call embedded objects."""
+        self.data = inputStream.read_bytes(bytelength)
