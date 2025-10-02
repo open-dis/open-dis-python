@@ -269,40 +269,6 @@ class BasicHaveQuickMP(ModulationParametersRecord):
         self.padding = inputStream.read_uint32()
 
 
-class ModulationParameters:
-    """Section 6.2.58
-
-    Modulation parameters associated with a specific radio system.
-
-    This class is not designed to be instantiated directly with no arguments.
-    """
-
-    def __init__(self,
-                 # record must be provided as there is no default value.
-                 record: ModulationParametersRecord):
-        self.record = record
-        # ModulationParameters requires padding to 64-bit (8-byte) boundary
-        self.padding = 8 - (self.record.marshalledSize() % 8) % 8
-
-    def marshalledSize(self) -> int:
-        return self.record.marshalledSize() + self.padding
-
-    def serialize(self, outputStream: DataOutputStream) -> None:
-        self.record.serialize(outputStream)
-        outputStream.write_bytes(b'\x00' * self.padding)
-
-    def parse(self, inputStream: DataInputStream) -> None:
-        self.record.parse(inputStream)
-        bytes_to_read = 8 - (self.record.marshalledSize() % 8) % 8
-        if bytes_to_read > 0:
-            self.padding = int.from_bytes(
-                inputStream.read_bytes(bytes_to_read),
-                byteorder='big'
-            )
-        else:
-            self.padding = 0
-
-
 class AntennaPatternRecord:
     """Section 6.2.8
     
