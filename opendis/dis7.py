@@ -12,6 +12,12 @@ from .record import (
     UnknownAntennaPattern,
     EulerAngles,
     BeamAntennaPattern,
+    GenericRadio,
+    SimpleIntercomRadio,
+    BasicHaveQuickMP,
+    VariableTransmitterParametersRecord,
+    HighFidelityHAVEQUICKRadio,
+    UnknownVariableTransmitterParameters,
 )
 from .stream import DataInputStream, DataOutputStream
 from .types import (
@@ -853,36 +859,6 @@ class AttachedParts:
         self.partAttachedTo = inputStream.read_unsigned_short()
         self.parameterType = inputStream.read_unsigned_int()
         self.parameterValue = inputStream.read_long()
-
-
-class VariableTransmitterParameters:
-    """Section 6.2.94
-    
-    Relates to radios. NOT COMPLETE.
-    """
-
-    def __init__(self, recordType: enum32 = 0, data: bytes = b""):
-        self.recordType = recordType  # [UID 66]  Variable Parameter Record Type
-        self.data = data
-    
-    def marshalledSize(self) -> int:
-        return 6 + len(self.data)
-    
-    @property
-    def recordLength(self) -> uint16:
-        return self.marshalledSize()
-
-    def serialize(self, outputStream: DataOutputStream) -> None:
-        """serialize the class"""
-        outputStream.write_uint32(self.recordType)
-        outputStream.write_uint16(self.recordLength)
-        outputStream.write_bytes(self.data)
-
-    def parse(self, inputStream: DataInputStream) -> None:
-        """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_uint32()
-        recordLength = inputStream.read_uint16()
-        self.data = inputStream.read_bytes(recordLength)
 
 
 class Attribute:
@@ -5353,7 +5329,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  cryptoKeyId: struct16 = 0,  # See Table 175
                  modulationParameters: ModulationParametersRecord | None = None,
                  antennaPattern: AntennaPatternRecord | None = None,
-                 variableTransmitterParameters: Sequence[VariableTransmitterParameters] | None = None):
+                 variableTransmitterParameters: Sequence[VariableTransmitterParametersRecord] | None = None):
         super(TransmitterPdu, self).__init__()
         self.radioReferenceID = radioReferenceID or EntityID()
         """ID of the entity that is the source of the communication"""
