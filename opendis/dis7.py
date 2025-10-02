@@ -5470,6 +5470,16 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
             self.antennaPattern = None
         
         ## TODO: Variable Transmitter Parameters
+        for _ in range(0, variableTransmitterParameterCount):
+            recordType = inputStream.read_uint32()
+            if recordType == 3000:  # High Fidelity HAVE QUICK/SATURN Radio
+                vtp = HighFidelityHAVEQUICKRadio()
+                vtp.parse(inputStream)
+            else:  # Unknown VTP record type
+                vtp = UnknownVariableTransmitterParameters()
+                vtp.recordType = recordType
+                vtp.parse(inputStream)
+            self.variableTransmitterParameters.append(vtp)
 
 
 class ElectromagneticEmissionsPdu(DistributedEmissionsFamilyPdu):
