@@ -3,7 +3,7 @@
 This module defines classes for various record types used in DIS PDUs.
 """
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 import bitfield
 from .stream import DataInputStream, DataOutputStream
@@ -153,7 +153,7 @@ class SpreadSpectrum:
         self.timeHopping = bool(record_bitfield.timeHopping)
 
 
-class ModulationParametersRecord:
+class ModulationParametersRecord(ABC):
     """Base class for modulation parameters records, as defined in Annex C."""
 
     @abstractmethod
@@ -269,7 +269,7 @@ class BasicHaveQuickMP(ModulationParametersRecord):
         self.padding = inputStream.read_uint32()
 
 
-class AntennaPatternRecord:
+class AntennaPatternRecord(ABC):
     """Section 6.2.8
     
     The total length of each record shall be a multiple of 64 bits.
