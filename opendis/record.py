@@ -452,13 +452,11 @@ class UnknownVariableTransmitterParameters(VariableTransmitterParametersRecord):
         return self.marshalledSize()
 
     def serialize(self, outputStream: DataOutputStream) -> None:
-        """serialize the class"""
         outputStream.write_uint32(self.recordType)
         outputStream.write_uint16(self.recordLength)
         outputStream.write_bytes(self.data)
 
     def parse(self, inputStream: DataInputStream) -> None:
-        """Parse a message. This may recursively call embedded objects."""
         self.recordType = inputStream.read_uint32()
         recordLength = inputStream.read_uint16()
         self.data = inputStream.read_bytes(recordLength)
