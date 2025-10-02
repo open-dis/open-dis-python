@@ -5305,11 +5305,11 @@ class StartResumePdu(SimulationManagementFamilyPdu):
 
 
 class TransmitterPdu(RadioCommunicationsFamilyPdu):
-    """Section 7.7.2
+    """7.7.2 Transmitter PDU
     
     Detailed information about a radio transmitter. This PDU requires manually
     written code to complete, since the modulation parameters are of variable
-    length. UNFINISHED
+    length.
     """
     pduType: enum8 = 25  # [UID 4]
 
