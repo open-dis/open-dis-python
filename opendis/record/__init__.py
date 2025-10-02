@@ -6,8 +6,8 @@ This module defines classes for various record types used in DIS PDUs.
 from abc import ABC, abstractmethod
 
 from . import bitfield
-from .stream import DataInputStream, DataOutputStream
-from .types import (
+from ..stream import DataInputStream, DataOutputStream
+from ..types import (
     enum8,
     enum16,
     enum32,

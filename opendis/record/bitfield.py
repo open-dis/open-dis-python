@@ -17,6 +17,7 @@ from ctypes import (
 from typing import Literal, Sequence
 
 from opendis.stream import DataInputStream, DataOutputStream
+from opendis.types import bf_enum, bf_int, bf_uint
 
 # Type definitions for bitfield field descriptors
 CTypeFieldDescription = tuple[str, type[_SimpleCData], int]
