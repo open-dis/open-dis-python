@@ -8,14 +8,49 @@ from abc import ABC, abstractmethod
 import bitfield
 from .stream import DataInputStream, DataOutputStream
 from .types import (
+    enum8,
     enum16,
     bf_enum,
     bf_int,
     bf_uint,
+    float32,
     uint8,
     uint16,
     uint32,
 )
+
+
+class EulerAngles:
+    """Section 6.2.32 Euler Angles record
+
+    Three floating point values representing an orientation, psi, theta,
+    and phi, aka the euler angles, in radians.
+    These angles shall be specified with respect to the entity's coordinate
+    system.
+    """
+
+    def __init__(self,
+                 psi: float32 = 0.0,
+                 theta: float32 = 0.0,
+                 phi: float32 = 0.0):  # in radians
+        self.psi = psi
+        self.theta = theta
+        self.phi = phi
+
+    def marshalledSize(self) -> int:
+        return 12
+
+    def serialize(self, outputStream):
+        """serialize the class"""
+        outputStream.write_float32(self.psi)
+        outputStream.write_float32(self.theta)
+        outputStream.write_float32(self.phi)
+
+    def parse(self, inputStream):
+        """Parse a message. This may recursively call embedded objects."""
+        self.psi = inputStream.read_float32()
+        self.theta = inputStream.read_float32()
+        self.phi = inputStream.read_float32()
 
 
 class ModulationType:
@@ -310,3 +345,61 @@ class UnknownAntennaPattern(AntennaPatternRecord):
     def parse(self, inputStream: DataInputStream, bytelength: int = 0) -> None:
         """Parse a message. This may recursively call embedded objects."""
         self.data = inputStream.read_bytes(bytelength)
+
+
+class BeamAntennaPattern(AntennaPatternRecord):
+    """6.2.8.2 Beam Antenna Pattern record
+    
+    Used when the antenna pattern type field has a value of 1. Specifies the
+    direction, pattern, and polarization of radiation from an antenna.
+    """
+
+    def __init__(self,
+                 beamDirection: "EulerAngles | None" = None,
+                 azimuthBeamwidth: float32 = 0.0,  # in radians
+                 elevationBeamwidth: float32 = 0.0,  # in radians
+                 referenceSystem: enum8 = 0,  # [UID 168]
+                 ez: float32 = 0.0,
+                 ex: float32 = 0.0,
+                 phase: float32 = 0.0):  # in radians
+        self.beamDirection = beamDirection or EulerAngles()
+        """The rotation that transforms the reference coordinate sytem into the beam coordinate system. Either world coordinates or entity coordinates may be used as the reference coordinate system, as specified by the reference system field of the antenna pattern record."""
+        self.azimuthBeamwidth = azimuthBeamwidth
+        self.elevationBeamwidth = elevationBeamwidth
+        self.referenceSystem = referenceSystem
+        self.padding1: uint8 = 0
+        self.padding2: uint16 = 0
+        self.ez = ez
+        """This field shall specify the magnitude of the Z-component (in beam coordinates) of the Electrical field at some arbitrary single point in the main beam and in the far field of the antenna."""
+        self.ex = ex
+        """This field shall specify the magnitude of the X-component (in beam coordinates) of the Electrical field at some arbitrary single point in the main beam and in the far field of the antenna."""
+        self.phase = phase
+        """This field shall specify the phase angle between EZ and EX in radians. If fully omni-directional antenna is modeled using beam pattern type one, the omni-directional antenna shall be represented by beam direction Euler angles psi, theta, and phi of zero, an azimuth beamwidth of 2PI, and an elevation beamwidth of PI"""
+        self.padding3: uint32 = 0
+
+    def marshalledSize(self) -> int:
+        return 40
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        self.beamDirection.serialize(outputStream)
+        outputStream.write_float32(self.azimuthBeamwidth)
+        outputStream.write_float32(self.elevationBeamwidth)
+        outputStream.write_uint8(self.referenceSystem)
+        outputStream.write_uint8(self.padding1)
+        outputStream.write_uint16(self.padding2)
+        outputStream.write_float32(self.ez)
+        outputStream.write_float32(self.ex)
+        outputStream.write_float32(self.phase)
+        outputStream.write_uint32(self.padding3)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.beamDirection.parse(inputStream)
+        self.azimuthBeamwidth = inputStream.read_float32()
+        self.elevationBeamwidth = inputStream.read_float32()
+        self.referenceSystem = inputStream.read_uint8()
+        self.padding1 = inputStream.read_uint8()
+        self.padding2 = inputStream.read_uint16()
+        self.ez = inputStream.read_float32()
+        self.ex = inputStream.read_float32()
+        self.phase = inputStream.read_float32()
+        self.padding3 = inputStream.read_uint32()
