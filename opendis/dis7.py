@@ -5436,8 +5436,21 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
 
         ## Modulation Parameters
         if modulationParametersLength > 0:
-            radio = UnknownRadio()
-            radio.parse(inputStream, bytelength=modulationParametersLength)
+            if self.modulationType.radioSystem == 1:  # Generic | Simple Intercom
+                if self.modulationType.majorModulation == 0:
+                    radio = SimpleIntercomRadio()
+                else:
+                    radio = GenericRadio()
+                radio.parse(inputStream)
+            elif self.modulationType.radioSystem in (2, 3, 4):  # HAVE QUICK I | II | HAVE QUICK IIA
+                radio = BasicHaveQuickMP()
+                radio.parse(inputStream)
+            elif self.modulationType.radioSystem == 6:  # CCTT SINCGARS
+                radio = CCTTSincgarsMP()
+                radio.parse(inputStream)
+            else:  # Other | Unknown
+                radio = UnknownRadio()
+                radio.parse(inputStream, bytelength=modulationParametersLength)
             self.modulationParameters = radio
         else:
             self.modulationParameters = None
