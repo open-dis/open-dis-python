@@ -5353,7 +5353,11 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.padding3 = 0
         self.modulationParameters = modulationParameters
         self.antennaPattern = antennaPattern
-        self.variableTransmitterParameters = variableTransmitterParameters or []
+        self.variableTransmitterParameters = (
+            list(variableTransmitterParameters)
+            if variableTransmitterParameters
+            else []
+        )
 
     @property
     def antennaPatternLength(self) -> uint16:
