@@ -10,6 +10,7 @@ from .stream import DataInputStream, DataOutputStream
 from .types import (
     enum8,
     enum16,
+    enum32,
     bf_enum,
     bf_int,
     bf_uint,
@@ -403,3 +404,121 @@ class BeamAntennaPattern(AntennaPatternRecord):
         self.ex = inputStream.read_float32()
         self.phase = inputStream.read_float32()
         self.padding3 = inputStream.read_uint32()
+
+
+class VariableTransmitterParametersRecord(ABC):
+    """6.2.95 Variable Transmitter Parameters record
+    
+    One or more VTP records may be associated with a radio system, and the same
+    VTP record may be associated with multiple radio systems.
+    Specific VTP records applicable to a radio system are identified in the
+    subclause that defines the radio system’s unique requirements in Annex C.
+    The total length of each record shall be a multiple of 64 bits.
+    """
+    recordType: enum32
+
+    @abstractmethod
+    def marshalledSize(self) -> int:
+        """Return the size of the record when serialized."""
+
+    @abstractmethod
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        """Serialize the record to the output stream."""
+    
+    @abstractmethod
+    def parse(self, inputStream: DataInputStream) -> None:
+        """Parse the record from the input stream.
+        
+        The recordType field is assumed to have been read, so as to identify
+        the type of VTP record to be parsed, before this method is called.
+        """
+
+
+class UnknownVariableTransmitterParameters(VariableTransmitterParametersRecord):
+    """Placeholder for unknown or unimplemented variable transmitter parameter
+    types.
+    """
+    recordType: enum32 = 0
+
+    def __init__(self, recordType: enum32 = 0, data: bytes = b""):
+        self.recordType = recordType  # [UID 66]  Variable Parameter Record Type
+        self.data = data
+    
+    def marshalledSize(self) -> int:
+        return 6 + len(self.data)
+    
+    @property
+    def recordLength(self) -> uint16:
+        return self.marshalledSize()
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        """serialize the class"""
+        outputStream.write_uint32(self.recordType)
+        outputStream.write_uint16(self.recordLength)
+        outputStream.write_bytes(self.data)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        """Parse a message. This may recursively call embedded objects."""
+        self.recordType = inputStream.read_uint32()
+        recordLength = inputStream.read_uint16()
+        self.data = inputStream.read_bytes(recordLength)
+
+
+class HighFidelityHAVEQUICKRadio(VariableTransmitterParametersRecord):
+    """Annex C C4.2.3, Table C.4 — High Fidelity HAVE QUICK Radio record"""
+    recordType: enum32 = 3000
+
+    def __init__(self,
+                 netId: NetId | None = None,
+                 todTransmitIndicator: enum8 = 0,
+                 todDelta: uint32 = 0,
+                 wod1: uint32 = 0,
+                 wod2: uint32 = 0,
+                 wod3: uint32 = 0,
+                 wod4: uint32 = 0,
+                 wod5: uint32 = 0,
+                 wod6: uint32 = 0):
+        self.padding1: uint16 = 0
+        self.netId = netId or NetId()
+        self.todTransmitIndicator = todTransmitIndicator
+        self.padding2: uint8 = 0
+        self.todDelta = todDelta
+        self.wod1 = wod1
+        self.wod2 = wod2
+        self.wod3 = wod3
+        self.wod4 = wod4
+        self.wod5 = wod5
+        self.wod6 = wod6
+    
+    @property
+    def recordLength(self) -> uint16:
+        return self.marshalledSize()
+    
+    def marshalledSize(self) -> int:
+        return 40
+    
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_uint16(self.padding1)
+        self.netId.serialize(outputStream)
+        outputStream.write_uint8(self.todTransmitIndicator)
+        outputStream.write_uint8(self.padding2)
+        outputStream.write_uint32(self.todDelta)
+        outputStream.write_uint32(self.wod1)
+        outputStream.write_uint32(self.wod2)
+        outputStream.write_uint32(self.wod3)
+        outputStream.write_uint32(self.wod4)
+        outputStream.write_uint32(self.wod5)
+        outputStream.write_uint32(self.wod6)
+    
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.padding1 = inputStream.read_uint16()
+        self.netId.parse(inputStream)
+        self.todTransmitIndicator = inputStream.read_uint8()
+        self.padding2 = inputStream.read_uint8()
+        self.todDelta = inputStream.read_uint32()
+        self.wod1 = inputStream.read_uint32()
+        self.wod2 = inputStream.read_uint32()
+        self.wod3 = inputStream.read_uint32()
+        self.wod4 = inputStream.read_uint32()
+        self.wod5 = inputStream.read_uint32()
+        self.wod6 = inputStream.read_uint32()
