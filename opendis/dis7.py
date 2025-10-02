@@ -5467,15 +5467,19 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
 
         ## Antenna Pattern
         if antennaPatternLength > 0:
-            self.antennaPattern = UnknownAntennaPattern()
-            self.antennaPattern.parse(
-                inputStream,
-                bytelength=antennaPatternLength
-            )
+            if self.antennaPatternType == 1:
+                self.antennaPattern = BeamAntennaPattern()
+                self.antennaPattern.parse(inputStream)
+            else:
+                self.antennaPattern = UnknownAntennaPattern()
+                self.antennaPattern.parse(
+                    inputStream,
+                    bytelength=antennaPatternLength
+                )
         else:
             self.antennaPattern = None
-
-
+        
+        ## TODO: Variable Transmitter Parameters
 
 
 class ElectromagneticEmissionsPdu(DistributedEmissionsFamilyPdu):
