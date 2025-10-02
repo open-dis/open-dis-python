@@ -154,7 +154,11 @@ class SpreadSpectrum:
 
 
 class ModulationParametersRecord(ABC):
-    """Base class for modulation parameters records, as defined in Annex C."""
+    """6.2.58 Modulation Parameters record
+    
+    Base class for modulation parameters records, as defined in Annex C.
+    The total length of each record shall be a multiple of 64 bits.
+    """
 
     @abstractmethod
     def marshalledSize(self) -> int:
@@ -270,7 +274,7 @@ class BasicHaveQuickMP(ModulationParametersRecord):
 
 
 class AntennaPatternRecord(ABC):
-    """Section 6.2.8
+    """6.2.8 Antenna Pattern record
     
     The total length of each record shall be a multiple of 64 bits.
     """
