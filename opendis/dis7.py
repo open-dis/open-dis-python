@@ -10,6 +10,15 @@ from .record import (
     ModulationParametersRecord,
     UnknownRadio,
     UnknownAntennaPattern,
+    EulerAngles,
+    BeamAntennaPattern,
+    GenericRadio,
+    SimpleIntercomRadio,
+    BasicHaveQuickMP,
+    CCTTSincgarsMP,
+    VariableTransmitterParametersRecord,
+    HighFidelityHAVEQUICKRadio,
+    UnknownVariableTransmitterParameters,
 )
 from .stream import DataInputStream, DataOutputStream
 from .types import (
@@ -678,34 +687,6 @@ class NamedLocationIdentification:
         self.stationNumber = inputStream.read_unsigned_short()
 
 
-class EulerAngles:
-    """Section 6.2.33
-
-    Three floating point values representing an orientation, psi, theta,
-    and phi, aka the euler angles, in radians.
-    """
-
-    def __init__(self,
-                 psi: float32 = 0.0,
-                 theta: float32 = 0.0,
-                 phi: float32 = 0.0):  # in radians
-        self.psi = psi
-        self.theta = theta
-        self.phi = phi
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_float(self.psi)
-        outputStream.write_float(self.theta)
-        outputStream.write_float(self.phi)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.psi = inputStream.read_float()
-        self.theta = inputStream.read_float()
-        self.phi = inputStream.read_float()
-
-
 class DirectedEnergyPrecisionAimpoint:
     """Section 6.2.20.3
 
@@ -843,63 +824,6 @@ class OwnershipStatus:
         self.padding = inputStream.read_unsigned_byte()
 
 
-class BeamAntennaPattern:
-    """Section 6.2.9.2
-    
-    Used when the antenna pattern type field has a value of 1. Specifies the
-    direction, pattern, and polarization of radiation from an antenna.
-    """
-
-    def __init__(self,
-                 beamDirection: "EulerAngles | None" = None,
-                 azimuthBeamwidth: float32 = 0.0,  # in radians
-                 elevationBeamwidth: float32 = 0.0,  # in radians
-                 referenceSystem: enum8 = 0,  # [UID 168]
-                 ez: float32 = 0.0,
-                 ex: float32 = 0.0,
-                 phase: float32 = 0.0):  # in radians
-        self.beamDirection = EulerAngles()
-        """The rotation that transforms the reference coordinate sytem into the beam coordinate system. Either world coordinates or entity coordinates may be used as the reference coordinate system, as specified by the reference system field of the antenna pattern record."""
-        self.azimuthBeamwidth = azimuthBeamwidth
-        self.elevationBeamwidth = elevationBeamwidth
-        self.referenceSystem = referenceSystem
-        self.padding1: uint8 = 0
-        self.padding2: uint16 = 0
-        self.ez = ez
-        """This field shall specify the magnitude of the Z-component (in beam coordinates) of the Electrical field at some arbitrary single point in the main beam and in the far field of the antenna."""
-        self.ex = ex
-        """This field shall specify the magnitude of the X-component (in beam coordinates) of the Electrical field at some arbitrary single point in the main beam and in the far field of the antenna."""
-        self.phase = phase
-        """This field shall specify the phase angle between EZ and EX in radians. If fully omni-directional antenna is modeled using beam pattern type one, the omni-directional antenna shall be represented by beam direction Euler angles psi, theta, and phi of zero, an azimuth beamwidth of 2PI, and an elevation beamwidth of PI"""
-        self.padding3: uint32 = 0
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        self.beamDirection.serialize(outputStream)
-        outputStream.write_float(self.azimuthBeamwidth)
-        outputStream.write_float(self.elevationBeamwidth)
-        outputStream.write_unsigned_byte(self.referenceSystem)
-        outputStream.write_unsigned_byte(self.padding1)
-        outputStream.write_unsigned_short(self.padding2)
-        outputStream.write_float(self.ez)
-        outputStream.write_float(self.ex)
-        outputStream.write_float(self.phase)
-        outputStream.write_unsigned_int(self.padding3)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.beamDirection.parse(inputStream)
-        self.azimuthBeamwidth = inputStream.read_float()
-        self.elevationBeamwidth = inputStream.read_float()
-        self.referenceSystem = inputStream.read_unsigned_byte()
-        self.padding1 = inputStream.read_unsigned_byte()
-        self.padding2 = inputStream.read_unsigned_short()
-        self.ez = inputStream.read_float()
-        self.ex = inputStream.read_float()
-        self.phase = inputStream.read_float()
-        self.padding3 = inputStream.read_unsigned_int()
-
-
 class AttachedParts:
     """Section 6.2.93.3
     
@@ -936,36 +860,6 @@ class AttachedParts:
         self.partAttachedTo = inputStream.read_unsigned_short()
         self.parameterType = inputStream.read_unsigned_int()
         self.parameterValue = inputStream.read_long()
-
-
-class VariableTransmitterParameters:
-    """Section 6.2.94
-    
-    Relates to radios. NOT COMPLETE.
-    """
-
-    def __init__(self, recordType: enum32 = 0, data: bytes = b""):
-        self.recordType = recordType  # [UID 66]  Variable Parameter Record Type
-        self.data = data
-    
-    def marshalledSize(self) -> int:
-        return 6 + len(self.data)
-    
-    @property
-    def recordLength(self) -> uint16:
-        return self.marshalledSize()
-
-    def serialize(self, outputStream: DataOutputStream) -> None:
-        """serialize the class"""
-        outputStream.write_uint32(self.recordType)
-        outputStream.write_uint16(self.recordLength)
-        outputStream.write_bytes(self.data)
-
-    def parse(self, inputStream: DataInputStream) -> None:
-        """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_uint32()
-        recordLength = inputStream.read_uint16()
-        self.data = inputStream.read_bytes(recordLength)
 
 
 class Attribute:
@@ -5411,11 +5305,11 @@ class StartResumePdu(SimulationManagementFamilyPdu):
 
 
 class TransmitterPdu(RadioCommunicationsFamilyPdu):
-    """Section 7.7.2
+    """7.7.2 Transmitter PDU
     
     Detailed information about a radio transmitter. This PDU requires manually
     written code to complete, since the modulation parameters are of variable
-    length. UNFINISHED
+    length.
     """
     pduType: enum8 = 25  # [UID 4]
 
@@ -5436,7 +5330,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                  cryptoKeyId: struct16 = 0,  # See Table 175
                  modulationParameters: ModulationParametersRecord | None = None,
                  antennaPattern: AntennaPatternRecord | None = None,
-                 variableTransmitterParameters: Sequence[VariableTransmitterParameters] | None = None):
+                 variableTransmitterParameters: Sequence[VariableTransmitterParametersRecord] | None = None):
         super(TransmitterPdu, self).__init__()
         self.radioReferenceID = radioReferenceID or EntityID()
         """ID of the entity that is the source of the communication"""
@@ -5459,7 +5353,11 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.padding3 = 0
         self.modulationParameters = modulationParameters
         self.antennaPattern = antennaPattern
-        self.variableTransmitterParameters = variableTransmitterParameters or []
+        self.variableTransmitterParameters = (
+            list(variableTransmitterParameters)
+            if variableTransmitterParameters
+            else []
+        )
 
     @property
     def antennaPatternLength(self) -> uint16:
@@ -5542,23 +5440,50 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
 
         ## Modulation Parameters
         if modulationParametersLength > 0:
-            radio = UnknownRadio()
-            radio.parse(inputStream, bytelength=modulationParametersLength)
+            if self.modulationType.radioSystem == 1:  # Generic | Simple Intercom
+                if self.modulationType.majorModulation == 0:
+                    radio = SimpleIntercomRadio()
+                else:
+                    radio = GenericRadio()
+                radio.parse(inputStream)
+            elif self.modulationType.radioSystem in (2, 3, 4):  # HAVE QUICK I | II | HAVE QUICK IIA
+                radio = BasicHaveQuickMP()
+                radio.parse(inputStream)
+            elif self.modulationType.radioSystem == 6:  # CCTT SINCGARS
+                radio = CCTTSincgarsMP()
+                radio.parse(inputStream)
+            else:  # Other | Unknown
+                radio = UnknownRadio()
+                radio.parse(inputStream, bytelength=modulationParametersLength)
             self.modulationParameters = radio
         else:
             self.modulationParameters = None
 
         ## Antenna Pattern
         if antennaPatternLength > 0:
-            self.antennaPattern = UnknownAntennaPattern()
-            self.antennaPattern.parse(
-                inputStream,
-                bytelength=antennaPatternLength
-            )
+            if self.antennaPatternType == 1:
+                self.antennaPattern = BeamAntennaPattern()
+                self.antennaPattern.parse(inputStream)
+            else:
+                self.antennaPattern = UnknownAntennaPattern()
+                self.antennaPattern.parse(
+                    inputStream,
+                    bytelength=antennaPatternLength
+                )
         else:
             self.antennaPattern = None
-
-
+        
+        ## TODO: Variable Transmitter Parameters
+        for _ in range(0, variableTransmitterParameterCount):
+            recordType = inputStream.read_uint32()
+            if recordType == 3000:  # High Fidelity HAVE QUICK/SATURN Radio
+                vtp = HighFidelityHAVEQUICKRadio()
+                vtp.parse(inputStream)
+            else:  # Unknown VTP record type
+                vtp = UnknownVariableTransmitterParameters()
+                vtp.recordType = recordType
+                vtp.parse(inputStream)
+            self.variableTransmitterParameters.append(vtp)
 
 
 class ElectromagneticEmissionsPdu(DistributedEmissionsFamilyPdu):
