@@ -5414,7 +5414,6 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
             vtp.serialize(outputStream)
 
     def parse(self, inputStream: DataInputStream) -> None:
-        """Parse a message. This may recursively call embedded objects."""
         super(TransmitterPdu, self).parse(inputStream)
         self.radioReferenceID.parse(inputStream)
         self.radioNumber = inputStream.read_uint16()
@@ -5473,16 +5472,14 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         else:
             self.antennaPattern = None
         
-        ## TODO: Variable Transmitter Parameters
         for _ in range(0, variableTransmitterParameterCount):
             recordType = inputStream.read_uint32()
+            recordLength = inputStream.read_uint16()
             if recordType == 3000:  # High Fidelity HAVE QUICK/SATURN Radio
                 vtp = HighFidelityHAVEQUICKRadio()
-                vtp.parse(inputStream)
             else:  # Unknown VTP record type
-                vtp = UnknownVariableTransmitterParameters()
-                vtp.recordType = recordType
-                vtp.parse(inputStream)
+                vtp = UnknownVariableTransmitterParameters(recordType)
+            vtp.parse(inputStream, bytelength=recordLength)
             self.variableTransmitterParameters.append(vtp)
 
 
