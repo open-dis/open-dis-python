@@ -16,6 +16,7 @@ from ..types import (
     bf_int,
     bf_uint,
     float32,
+    struct8,
     uint8,
     uint16,
     uint32,
@@ -82,6 +83,60 @@ class EulerAngles(base.Record):
         self.psi = inputStream.read_float32()
         self.theta = inputStream.read_float32()
         self.phi = inputStream.read_float32()
+
+
+class SimulationAddress(base.Record):
+    """6.2.80 Simulation Address record
+    
+    Simulation designation associated with all object identifiers except
+    those contained in Live Entity PDUs.
+    """
+
+    def __init__(self,
+                 site: uint16 = 0,
+                 application: uint16 = 0):
+        self.site = site
+        """A site is defined as a facility, installation, organizational unit or a geographic location that has one or more simulation applications capable of participating in a distributed event."""
+        self.application = application
+        """An application is defined as a software program that is used to generate and process distributed simulation data including live, virtual and constructive data."""
+
+    def marshalledSize(self) -> int:
+        return 4
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_unsigned_short(self.site)
+        outputStream.write_unsigned_short(self.application)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.site = inputStream.read_unsigned_short()
+        self.application = inputStream.read_unsigned_short()
+
+
+class EventIdentifier(base.Record):
+    """6.2.33 Event Identifier record
+    
+    Identifies an event in the world. Use this format for every PDU EXCEPT
+    the LiveEntityPdu.
+    """
+    # TODO: Distinguish EventIdentifier and LiveEventIdentifier
+
+    def __init__(self,
+                 simulationAddress: "SimulationAddress | None" = None,
+                 eventNumber: uint16 = 0):
+        self.simulationAddress = simulationAddress or SimulationAddress()
+        """Site and application IDs"""
+        self.eventNumber = eventNumber
+
+    def marshalledSize(self) -> int:
+        return self.simulationAddress.marshalledSize() + 2
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        self.simulationAddress.serialize(outputStream)
+        outputStream.write_unsigned_short(self.eventNumber)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.simulationAddress.parse(inputStream)
+        self.eventNumber = inputStream.read_unsigned_short()
 
 
 class ModulationType(base.Record):

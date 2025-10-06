@@ -12,6 +12,8 @@ from .record import (
     UnknownAntennaPattern,
     EulerAngles,
     Vector3Float,
+    EventIdentifier,
+    SimulationAddress,
     BeamAntennaPattern,
     GenericRadio,
     SimpleIntercomRadio,
