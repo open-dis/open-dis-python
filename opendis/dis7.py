@@ -17,8 +17,8 @@ from .record import (
     BasicHaveQuickMP,
     CCTTSincgarsMP,
     VariableTransmitterParametersRecord,
-    HighFidelityHAVEQUICKRadio,
     UnknownVariableTransmitterParameters,
+    getVariableRecordClass,
 )
 from .stream import DataInputStream, DataOutputStream
 from .types import (
@@ -5475,9 +5475,13 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         for _ in range(0, variableTransmitterParameterCount):
             recordType = inputStream.read_uint32()
             recordLength = inputStream.read_uint16()
-            if recordType == 3000:  # High Fidelity HAVE QUICK/SATURN Radio
-                vtp = HighFidelityHAVEQUICKRadio()
-            else:  # Unknown VTP record type
+            vtpClass = getVariableRecordClass(
+                recordType,
+                expectedType=VariableTransmitterParametersRecord
+            )
+            if vtpClass:
+                vtp = vtpClass()
+            else:
                 vtp = UnknownVariableTransmitterParameters(recordType)
             vtp.parse(inputStream, bytelength=recordLength)
             self.variableTransmitterParameters.append(vtp)

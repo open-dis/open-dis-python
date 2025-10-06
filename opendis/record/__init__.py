@@ -4,6 +4,7 @@ This module defines classes for various record types used in DIS PDUs.
 """
 
 from abc import abstractmethod
+from typing import TypeVar
 
 from . import base, bitfield
 from ..stream import DataInputStream, DataOutputStream
@@ -19,6 +20,8 @@ from ..types import (
     uint16,
     uint32,
 )
+
+VR = TypeVar('VR', bound=base.VariableRecord)
 
 
 class EulerAngles(base.Record):
@@ -604,3 +607,26 @@ class HighFidelityHAVEQUICKRadio(VariableTransmitterParametersRecord):
         self.wod4 = inputStream.read_uint32()
         self.wod5 = inputStream.read_uint32()
         self.wod6 = inputStream.read_uint32()
+
+
+__variableRecordClasses: dict[int, type[base.VariableRecord]] = {
+    3000: HighFidelityHAVEQUICKRadio,
+}
+
+def getVariableRecordClass(
+        recordType: int,
+        expectedType: type[VR] = base.VariableRecord
+) -> type[VR] | None:
+    if not isinstance(recordType, int) or recordType < 0:
+        raise ValueError(
+            f"recordType must be a non-negative integer, got {recordType!r}"
+        )
+    vrClass = __variableRecordClasses.get(recordType, None)
+    if vrClass is None:
+        return None
+    if not issubclass(vrClass, expectedType):
+        raise TypeError(
+            f"Record Type {recordType}: Record class {vrClass.__name__} is not "
+            f"a subclass of {expectedType.__name__}"
+        )
+    return vrClass  # type: ignore[return-value]
