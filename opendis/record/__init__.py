@@ -3,9 +3,9 @@
 This module defines classes for various record types used in DIS PDUs.
 """
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
-from . import bitfield
+from . import base, bitfield
 from ..stream import DataInputStream, DataOutputStream
 from ..types import (
     enum8,
@@ -21,7 +21,7 @@ from ..types import (
 )
 
 
-class EulerAngles:
+class EulerAngles(base.Record):
     """Section 6.2.32 Euler Angles record
 
     Three floating point values representing an orientation, psi, theta,
@@ -41,20 +41,18 @@ class EulerAngles:
     def marshalledSize(self) -> int:
         return 12
 
-    def serialize(self, outputStream):
-        """serialize the class"""
+    def serialize(self, outputStream: DataOutputStream) -> None:
         outputStream.write_float32(self.psi)
         outputStream.write_float32(self.theta)
         outputStream.write_float32(self.phi)
 
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
+    def parse(self, inputStream: DataInputStream) -> None:
         self.psi = inputStream.read_float32()
         self.theta = inputStream.read_float32()
         self.phi = inputStream.read_float32()
 
 
-class ModulationType:
+class ModulationType(base.Record):
     """Section 6.2.59
     
     Information about the type of modulation used for radio transmission.
@@ -92,7 +90,7 @@ class ModulationType:
         self.radioSystem = inputStream.read_uint16()
 
 
-class NetId:
+class NetId(base.Record):
     """Annex C, Table C.5
 
     Represents an Operational Net in the format of NXX.XYY, where:
@@ -138,7 +136,7 @@ class NetId:
         self.padding = record_bitfield.padding
 
 
-class SpreadSpectrum:
+class SpreadSpectrum(base.Record):
     """6.2.59 Modulation Type Record, Table 90
 
     Modulation used for radio transmission is characterized in a generic
@@ -189,7 +187,7 @@ class SpreadSpectrum:
         self.timeHopping = bool(record_bitfield.timeHopping)
 
 
-class ModulationParametersRecord(ABC):
+class ModulationParametersRecord(base.Record):
     """6.2.58 Modulation Parameters record
     
     Base class for modulation parameters records, as defined in Annex C.
@@ -198,18 +196,15 @@ class ModulationParametersRecord(ABC):
 
     @abstractmethod
     def marshalledSize(self) -> int:
-        """Return the size of the record when serialized."""
-        raise NotImplementedError()
+        """Return the size (in bytes) of the record when serialized."""
     
     @abstractmethod
     def serialize(self, outputStream: DataOutputStream) -> None:
         """Serialize the record to the output stream."""
-        raise NotImplementedError()
     
     @abstractmethod
     def parse(self, inputStream: DataInputStream) -> None:
         """Parse the record from the input stream."""
-        raise NotImplementedError()
 
 
 class UnknownRadio(ModulationParametersRecord):
@@ -353,7 +348,7 @@ class CCTTSincgarsMP(ModulationParametersRecord):
         self.padding = inputStream.read_uint16()
 
 
-class AntennaPatternRecord(ABC):
+class AntennaPatternRecord(base.Record):
     """6.2.8 Antenna Pattern record
     
     The total length of each record shall be a multiple of 64 bits.
@@ -361,18 +356,15 @@ class AntennaPatternRecord(ABC):
 
     @abstractmethod
     def marshalledSize(self) -> int:
-        """Return the size of the record when serialized."""
-        raise NotImplementedError()
+        """Return the size (in bytes) of the record when serialized."""
     
     @abstractmethod
     def serialize(self, outputStream: DataOutputStream) -> None:
         """Serialize the record to the output stream."""
-        raise NotImplementedError()
     
     @abstractmethod
     def parse(self, inputStream: DataInputStream) -> None:
         """Parse the record from the input stream."""
-        raise NotImplementedError()
 
 
 class UnknownAntennaPattern(AntennaPatternRecord):
@@ -450,7 +442,7 @@ class BeamAntennaPattern(AntennaPatternRecord):
         self.padding3 = inputStream.read_uint32()
 
 
-class VariableTransmitterParametersRecord(ABC):
+class VariableTransmitterParametersRecord(base.Record):
     """6.2.95 Variable Transmitter Parameters record
     
     One or more VTP records may be associated with a radio system, and the same
@@ -463,7 +455,7 @@ class VariableTransmitterParametersRecord(ABC):
 
     @abstractmethod
     def marshalledSize(self) -> int:
-        """Return the size of the record when serialized."""
+        """Return the size (in bytes) of the record when serialized."""
 
     @abstractmethod
     def serialize(self, outputStream: DataOutputStream) -> None:
