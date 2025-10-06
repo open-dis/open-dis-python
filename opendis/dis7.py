@@ -21,6 +21,9 @@ from .record import (
     CCTTSincgarsMP,
     VariableTransmitterParametersRecord,
     UnknownVariableTransmitterParameters,
+    DamageDescriptionRecord,
+    UnknownDamage,
+    DirectedEnergyDamage,
     getVariableRecordClass,
 )
 from .stream import DataInputStream, DataOutputStream
@@ -1343,75 +1346,6 @@ class UAFundamentalParameter:
         self.azimuthalBeamwidthHorizontal = inputStream.read_float()
         self.beamCenterDepressionElevation = inputStream.read_float()
         self.beamwidthDownElevation = inputStream.read_float()
-
-
-class DirectedEnergyDamage:
-    """Section 6.2.15.2
-    
-    Damage sustained by an entity due to directed energy. Location of the
-    damage based on a relative x,y,z location from the center of the entity.
-    """
-    recordType: enum32 = 4500  # [UID 66] Variable Record Type
-    recordLength: uint16 = 40  # in bytes
-
-    def __init__(
-            self,
-            damageLocation: "Vector3Float | None" = None,
-            damageDiameter: float32 = 0.0,  # in metres
-            temperature: float32 = -273.15,  # in degrees Celsius
-            componentIdentification: enum8 = 0,  # [UID 314]
-            componentDamageStatus: enum8 = 0,  # [UID 315]
-            componentVisualDamageStatus: struct8 = 0,  # [UID 317]
-            componentVisualSmokeColor: enum8 = 0,  # [UID 316]
-            fireEventID: "EventIdentifier | None" = None):
-        self.padding: uint16 = 0
-        self.damageLocation = damageLocation or Vector3Float()
-        """location of damage, relative to center of entity"""
-        self.damageDiameter = damageDiameter
-        """Size of damaged area, in meters."""
-        self.temperature = temperature
-        """average temp of the damaged area, in degrees celsius. If firing entitty does not model this, use a value of -273.15"""
-        self.componentIdentification = componentIdentification
-        """enumeration"""
-        self.componentDamageStatus = componentDamageStatus
-        """enumeration"""
-        self.componentVisualDamageStatus = componentVisualDamageStatus
-        """enumeration"""
-        self.componentVisualSmokeColor = componentVisualSmokeColor
-        """enumeration"""
-        self.fireEventID = fireEventID or EventIdentifier()
-        """For any component damage resulting this field shall be set to the fire event ID from that PDU."""
-        self.padding2: uint16 = 0
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_int(self.recordType)
-        outputStream.write_unsigned_short(self.recordLength)
-        outputStream.write_unsigned_short(self.padding)
-        self.damageLocation.serialize(outputStream)
-        outputStream.write_float(self.damageDiameter)
-        outputStream.write_float(self.temperature)
-        outputStream.write_unsigned_byte(self.componentIdentification)
-        outputStream.write_unsigned_byte(self.componentDamageStatus)
-        outputStream.write_unsigned_byte(self.componentVisualDamageStatus)
-        outputStream.write_unsigned_byte(self.componentVisualSmokeColor)
-        self.fireEventID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding2)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
-        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
-        self.padding = inputStream.read_unsigned_short()
-        self.damageLocation.parse(inputStream)
-        self.damageDiameter = inputStream.read_float()
-        self.temperature = inputStream.read_float()
-        self.componentIdentification = inputStream.read_unsigned_byte()
-        self.componentDamageStatus = inputStream.read_unsigned_byte()
-        self.componentVisualDamageStatus = inputStream.read_unsigned_byte()
-        self.componentVisualSmokeColor = inputStream.read_unsigned_byte()
-        self.fireEventID.parse(inputStream)
-        self.padding2 = inputStream.read_unsigned_short()
 
 
 class ExplosionDescriptor:

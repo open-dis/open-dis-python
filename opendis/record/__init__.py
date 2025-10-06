@@ -693,6 +693,128 @@ class HighFidelityHAVEQUICKRadio(VariableTransmitterParametersRecord):
         self.wod6 = inputStream.read_uint32()
 
 
+class DamageDescriptionRecord(base.VariableRecord):
+    """6.2.15 Damage Description record
+    
+    Damage Description records shall use the Standard Variable record format of
+    the Standard Variable Specification record (see 6.2.83). 
+    New Damage Description records may be defined at some future date as needed.
+    """
+
+    @abstractmethod
+    def marshalledSize(self) -> int:
+        """Return the size (in bytes) of the record when serialized."""
+    
+    @abstractmethod
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        """Serialize the record to the output stream."""
+    
+    @abstractmethod
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
+        """Parse the record from the input stream.
+
+        recordType and recordLength are assumed to have been read before this method is called.
+        """
+        if not self.is_positive_int(bytelength):
+            raise ValueError(
+                f"bytelength must be a non-negative integer, got {bytelength!r}"
+            )
+
+
+class UnknownDamage(DamageDescriptionRecord):
+    """Placeholder for unknown or unimplemented damage description types."""
+
+    def __init__(self, recordType: enum32 = 0, data: bytes = b''):
+        self.recordType = recordType  # [UID 66]  Variable Parameter Record Type
+        self.data = data
+
+    def marshalledSize(self) -> int:
+        return 6 + len(self.data)
+
+    @property
+    def recordLength(self) -> uint16:
+        return self.marshalledSize()
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_uint32(self.recordType)
+        outputStream.write_uint16(self.recordLength)
+        outputStream.write_bytes(self.data)
+
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = 0) -> None:
+        # Validate bytelength argument by calling base method
+        super().parse(inputStream, bytelength)
+        assert isinstance(bytelength, int)
+        self.recordType = inputStream.read_uint32()
+        recordLength = inputStream.read_uint16()
+        self.data = inputStream.read_bytes(recordLength)
+
+
+class DirectedEnergyDamage(DamageDescriptionRecord):
+    """6.2.15.2 Directed Energy Damage Description record
+    
+    Damage sustained by an entity due to directed energy. Location of the
+    damage based on a relative x, y, z location from the center of the entity.
+    """
+    recordType: enum32 = 4500  # [UID 66] Variable Record Type
+    recordLength: uint16 = 40  # in bytes
+
+    def __init__(
+            self,
+            damageLocation: "Vector3Float | None" = None,
+            damageDiameter: float32 = 0.0,  # in metres
+            temperature: float32 = -273.15,  # in degrees Celsius
+            componentIdentification: enum8 = 0,  # [UID 314]
+            componentDamageStatus: enum8 = 0,  # [UID 315]
+            componentVisualDamageStatus: struct8 = 0,  # [UID 317]
+            componentVisualSmokeColor: enum8 = 0,  # [UID 316]
+            fireEventID: "EventIdentifier | None" = None):
+        self.padding: uint16 = 0
+        self.damageLocation = damageLocation or Vector3Float()
+        self.damageDiameter = damageDiameter
+        self.temperature = temperature
+        self.componentIdentification = componentIdentification
+        self.componentDamageStatus = componentDamageStatus
+        self.componentVisualDamageStatus = componentVisualDamageStatus
+        self.componentVisualSmokeColor = componentVisualSmokeColor
+        self.fireEventID = fireEventID or EventIdentifier()
+        self.padding2: uint16 = 0
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_unsigned_int(self.recordType)
+        outputStream.write_unsigned_short(self.recordLength)
+        outputStream.write_unsigned_short(self.padding)
+        self.damageLocation.serialize(outputStream)
+        outputStream.write_float(self.damageDiameter)
+        outputStream.write_float(self.temperature)
+        outputStream.write_unsigned_byte(self.componentIdentification)
+        outputStream.write_unsigned_byte(self.componentDamageStatus)
+        outputStream.write_unsigned_byte(self.componentVisualDamageStatus)
+        outputStream.write_unsigned_byte(self.componentVisualSmokeColor)
+        self.fireEventID.serialize(outputStream)
+        outputStream.write_unsigned_short(self.padding2)
+
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = 0) -> None:
+        # Validate bytelength argument by calling base method
+        super().parse(inputStream, bytelength)
+        assert isinstance(bytelength, int)
+        self.padding = inputStream.read_unsigned_short()
+        self.damageLocation.parse(inputStream)
+        self.damageDiameter = inputStream.read_float()
+        self.temperature = inputStream.read_float()
+        self.componentIdentification = inputStream.read_unsigned_byte()
+        self.componentDamageStatus = inputStream.read_unsigned_byte()
+        self.componentVisualDamageStatus = inputStream.read_unsigned_byte()
+        self.componentVisualSmokeColor = inputStream.read_unsigned_byte()
+        self.fireEventID.parse(inputStream)
+        self.padding2 = inputStream.read_unsigned_short()
+
+
 __variableRecordClasses: dict[int, type[base.VariableRecord]] = {
     3000: HighFidelityHAVEQUICKRadio,
 }
