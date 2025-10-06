@@ -1959,32 +1959,6 @@ class LinearSegmentParameter:
         self.padding = inputStream.read_unsigned_int()
 
 
-class SimulationAddress:
-    """Section 6.2.79
-    
-    A Simulation Address record shall consist of the Site Identification number
-    and the Application Identification number.
-    """
-
-    def __init__(self,
-                 site: uint16 = 0,
-                 application: uint16 = 0):
-        self.site = site
-        """A site is defined as a facility, installation, organizational unit or a geographic location that has one or more simulation applications capable of participating in a distributed event."""
-        self.application = application
-        """An application is defined as a software program that is used to generate and process distributed simulation data including live, virtual and constructive data."""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_short(self.site)
-        outputStream.write_unsigned_short(self.application)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.site = inputStream.read_unsigned_short()
-        self.application = inputStream.read_unsigned_short()
-
-
 class SystemIdentifier:
     """Section 6.2.87
     
@@ -2451,31 +2425,6 @@ class SilentAggregateSystem:
         """Parse a message. This may recursively call embedded objects."""
         self.numberOfAggregates = inputStream.read_unsigned_short()
         self.aggregateType.parse(inputStream)
-
-
-class EventIdentifier:
-    """Section 6.2.34
-    
-    Identifies an event in the world. Use this format for every PDU EXCEPT
-    the LiveEntityPdu.
-    """
-
-    def __init__(self,
-                 simulationAddress: "SimulationAddress | None" = None,
-                 eventNumber: uint16 = 0):
-        self.simulationAddress = simulationAddress or SimulationAddress()
-        """Site and application IDs"""
-        self.eventNumber = eventNumber
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.eventNumber)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.simulationAddress.parse(inputStream)
-        self.eventNumber = inputStream.read_unsigned_short()
 
 
 class BlankingSector:
