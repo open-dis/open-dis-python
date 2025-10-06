@@ -24,8 +24,37 @@ from ..types import (
 VR = TypeVar('VR', bound=base.VariableRecord)
 
 
+class Vector3Float(base.Record):
+    """6.2.96 Vector record
+    
+    Vector values for entity coordinates, linear acceleration, and linear
+    velocity shall be represented using a Vector record. This record shall
+    consist of three fields, each a 32-bit floating point number.
+    The unit of measure represented by these fields shall depend on the
+    information represented.
+    """
+
+    def __init__(self, x: float32 = 0.0, y: float32 = 0.0, z: float32 = 0.0):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def marshalledSize(self) -> int:
+        return 12
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_float(self.x)
+        outputStream.write_float(self.y)
+        outputStream.write_float(self.z)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.x = inputStream.read_float()
+        self.y = inputStream.read_float()
+        self.z = inputStream.read_float()
+
+
 class EulerAngles(base.Record):
-    """Section 6.2.32 Euler Angles record
+    """6.2.32 Euler Angles record
 
     Three floating point values representing an orientation, psi, theta,
     and phi, aka the euler angles, in radians.

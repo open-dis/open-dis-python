@@ -11,6 +11,7 @@ from .record import (
     UnknownRadio,
     UnknownAntennaPattern,
     EulerAngles,
+    Vector3Float,
     BeamAntennaPattern,
     GenericRadio,
     SimpleIntercomRadio,
@@ -1817,30 +1818,6 @@ class DirectedEnergyAreaAimpoint:
             element = null()
             element.parse(inputStream)
             self.directedEnergyTargetEnergyDepositionRecordList.append(element)
-
-
-class Vector3Float:
-    """Section 6.2.95
-    
-    Three floating point values, x, y, and z.
-    """
-
-    def __init__(self, x: float32 = 0.0, y: float32 = 0.0, z: float32 = 0.0):
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_float(self.x)
-        outputStream.write_float(self.y)
-        outputStream.write_float(self.z)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.x = inputStream.read_float()
-        self.y = inputStream.read_float()
-        self.z = inputStream.read_float()
 
 
 class Expendable:
