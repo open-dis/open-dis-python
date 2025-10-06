@@ -3,7 +3,7 @@
 __all__ = ["Record", "VariableRecord"]
 
 from abc import abstractmethod
-from typing import Protocol
+from typing import Any, Protocol, TypeGuard
 
 from opendis.stream import DataInputStream, DataOutputStream
 
@@ -32,6 +32,11 @@ class VariableRecord(Protocol):
 
     This base class defines the interface for DIS records with variable sizes.
     """
+
+    @staticmethod
+    def is_positive_int(value: Any) -> TypeGuard[int]:
+        """Check if a value is a positive integer."""
+        return isinstance(value, int) and value >= 0
 
     @abstractmethod
     def marshalledSize(self) -> int:
