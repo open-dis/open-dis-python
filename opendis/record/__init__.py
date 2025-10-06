@@ -187,7 +187,7 @@ class SpreadSpectrum(base.Record):
         self.timeHopping = bool(record_bitfield.timeHopping)
 
 
-class ModulationParametersRecord(base.Record):
+class ModulationParametersRecord(base.VariableRecord):
     """6.2.58 Modulation Parameters record
     
     Base class for modulation parameters records, as defined in Annex C.
@@ -203,8 +203,17 @@ class ModulationParametersRecord(base.Record):
         """Serialize the record to the output stream."""
     
     @abstractmethod
-    def parse(self, inputStream: DataInputStream) -> None:
-        """Parse the record from the input stream."""
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
+        """Parse the record from the input stream.
+
+        If bytelength is provided, it indicates the expected length of the record. Some records may require this information to parse correctly.
+        """
+        if not self.is_positive_int(bytelength):
+            raise ValueError(
+                f"bytelength must be a non-negative integer, got {bytelength!r}"
+            )
 
 
 class UnknownRadio(ModulationParametersRecord):
@@ -219,7 +228,12 @@ class UnknownRadio(ModulationParametersRecord):
     def serialize(self, outputStream: DataOutputStream) -> None:
         outputStream.write_bytes(self.data)
 
-    def parse(self, inputStream: DataInputStream, bytelength: int = 0) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = 0) -> None:
+        # Validate bytelength argument by calling base method
+        super().parse(inputStream, bytelength)
+        assert isinstance(bytelength, int)
         self.data = inputStream.read_bytes(bytelength)
 
 
@@ -236,7 +250,9 @@ class GenericRadio(ModulationParametersRecord):
     def serialize(self, outputStream: DataOutputStream) -> None:
         pass
 
-    def parse(self, inputStream: DataInputStream) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
         pass
 
 
@@ -257,7 +273,9 @@ class SimpleIntercomRadio(ModulationParametersRecord):
     def serialize(self, outputStream: DataOutputStream) -> None:
         pass
 
-    def parse(self, inputStream: DataInputStream) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
         pass
 
 
@@ -294,7 +312,9 @@ class BasicHaveQuickMP(ModulationParametersRecord):
         outputStream.write_uint32(self.time_of_day)
         outputStream.write_uint32(self.padding)
 
-    def parse(self, inputStream: DataInputStream) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
         self.net_id.parse(inputStream)
         self.mwod_index = inputStream.read_uint16()
         self.reserved16 = inputStream.read_uint16()
@@ -337,7 +357,9 @@ class CCTTSincgarsMP(ModulationParametersRecord):
         outputStream.write_uint16(self.transmission_security_key)
         outputStream.write_uint16(self.padding)
 
-    def parse(self, inputStream: DataInputStream) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
         self.fh_net_id = inputStream.read_uint16()
         self.hop_set_id = inputStream.read_uint16()
         self.lockout_set_id = inputStream.read_uint16()
@@ -348,7 +370,7 @@ class CCTTSincgarsMP(ModulationParametersRecord):
         self.padding = inputStream.read_uint16()
 
 
-class AntennaPatternRecord(base.Record):
+class AntennaPatternRecord(base.VariableRecord):
     """6.2.8 Antenna Pattern record
     
     The total length of each record shall be a multiple of 64 bits.
@@ -363,8 +385,15 @@ class AntennaPatternRecord(base.Record):
         """Serialize the record to the output stream."""
     
     @abstractmethod
-    def parse(self, inputStream: DataInputStream) -> None:
-        """Parse the record from the input stream."""
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
+        """Parse the record from the input stream.
+
+        The recordType field is assumed to have been read, so as to identify
+        the type of Antenna Pattern record to be parsed, before this method is
+        called.
+        """
 
 
 class UnknownAntennaPattern(AntennaPatternRecord):
@@ -379,8 +408,12 @@ class UnknownAntennaPattern(AntennaPatternRecord):
     def serialize(self, outputStream: DataOutputStream) -> None:
         outputStream.write_bytes(self.data)
 
-    def parse(self, inputStream: DataInputStream, bytelength: int = 0) -> None:
-        """Parse a message. This may recursively call embedded objects."""
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = 0) -> None:
+        # Validate bytelength argument by calling base method
+        super().parse(inputStream, bytelength)
+        assert isinstance(bytelength, int)
         self.data = inputStream.read_bytes(bytelength)
 
 
@@ -429,7 +462,9 @@ class BeamAntennaPattern(AntennaPatternRecord):
         outputStream.write_float32(self.phase)
         outputStream.write_uint32(self.padding3)
 
-    def parse(self, inputStream: DataInputStream) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
         self.beamDirection.parse(inputStream)
         self.azimuthBeamwidth = inputStream.read_float32()
         self.elevationBeamwidth = inputStream.read_float32()
@@ -442,7 +477,7 @@ class BeamAntennaPattern(AntennaPatternRecord):
         self.padding3 = inputStream.read_uint32()
 
 
-class VariableTransmitterParametersRecord(base.Record):
+class VariableTransmitterParametersRecord(base.VariableRecord):
     """6.2.95 Variable Transmitter Parameters record
     
     One or more VTP records may be associated with a radio system, and the same
@@ -462,12 +497,18 @@ class VariableTransmitterParametersRecord(base.Record):
         """Serialize the record to the output stream."""
     
     @abstractmethod
-    def parse(self, inputStream: DataInputStream) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
         """Parse the record from the input stream.
         
         The recordType field is assumed to have been read, so as to identify
         the type of VTP record to be parsed, before this method is called.
         """
+        if not self.is_positive_int(bytelength):
+            raise ValueError(
+                f"bytelength must be a non-negative integer, got {bytelength!r}"
+            )
 
 
 class UnknownVariableTransmitterParameters(VariableTransmitterParametersRecord):
@@ -492,7 +533,12 @@ class UnknownVariableTransmitterParameters(VariableTransmitterParametersRecord):
         outputStream.write_uint16(self.recordLength)
         outputStream.write_bytes(self.data)
 
-    def parse(self, inputStream: DataInputStream) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = 0) -> None:
+        # Validate bytelength argument by calling base method
+        super().parse(inputStream, bytelength)
+        assert isinstance(bytelength, int)
         self.recordType = inputStream.read_uint32()
         recordLength = inputStream.read_uint16()
         self.data = inputStream.read_bytes(recordLength)
@@ -544,7 +590,9 @@ class HighFidelityHAVEQUICKRadio(VariableTransmitterParametersRecord):
         outputStream.write_uint32(self.wod5)
         outputStream.write_uint32(self.wod6)
     
-    def parse(self, inputStream: DataInputStream) -> None:
+    def parse(self,
+              inputStream: DataInputStream,
+              bytelength: int | None = None) -> None:
         self.padding1 = inputStream.read_uint16()
         self.netId.parse(inputStream)
         self.todTransmitIndicator = inputStream.read_uint8()
