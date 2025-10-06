@@ -693,89 +693,6 @@ class NamedLocationIdentification:
         self.stationNumber = inputStream.read_unsigned_short()
 
 
-class DirectedEnergyPrecisionAimpoint:
-    """Section 6.2.20.3
-
-    DE Precision Aimpoint Record.
-    """
-    recordType: enum32 = 4000
-    recordLength: uint16 = 88
-
-    def __init__(self,
-                 targetSpotLocation: "Vector3Double | None" = None,
-                 targetSpotEntityLocation: "Vector3Float | None" = None,
-                 targetSpotVelocity: "Vector3Float | None" = None,
-                 targetSpotAcceleration: "Vector3Float | None" = None,
-                 targetEntityID: "EntityID | None" = None,
-                 targetComponentID: enum8 = 0,  # [UID 314]
-                 beamSpotType: enum8 = 0,  # [UID 311]
-                 beamSpotCrossSectionSemiMajorAxis: float32 = 0.0,  # in meters
-                 beamSpotCrossSectionSemiMinorAxis: float32 = 0.0,  # in meters
-                 beamSpotCrossSectionOrientationAngle: float32 = 0.0,  # in radians
-                 peakIrradiance: float32 = 0.0):  # in W/m^2
-        self.padding: uint16 = 0
-        self.targetSpotLocation = targetSpotLocation or Vector3Double()
-        """Position of Target Spot in World Coordinates."""
-        self.targetSpotEntityLocation = targetSpotEntityLocation or Vector3Float(
-        )
-        """Position (meters) of Target Spot relative to Entity Position."""
-        self.targetSpotVelocity = targetSpotVelocity or Vector3Float()
-        """Velocity (meters/sec) of Target Spot."""
-        self.targetSpotAcceleration = targetSpotAcceleration or Vector3Float()
-        """Acceleration (meters/sec/sec) of Target Spot."""
-        self.targetEntityID = targetEntityID or EntityID()
-        """Unique ID of the target entity."""
-        self.targetComponentID = targetComponentID
-        """Target Component ID ENUM, same as in DamageDescriptionRecord."""
-        self.beamSpotType = beamSpotType
-        """Spot Shape ENUM."""
-        self.beamSpotCrossSectionSemiMajorAxis = beamSpotCrossSectionSemiMajorAxis
-        """Beam Spot Cross Section Semi-Major Axis."""
-        self.beamSpotCrossSectionSemiMinorAxis = beamSpotCrossSectionSemiMinorAxis
-        """Beam Spot Cross Section Semi-Major Axis."""
-        self.beamSpotCrossSectionOrientationAngle = beamSpotCrossSectionOrientationAngle
-        """Beam Spot Cross Section Orientation Angle."""
-        self.peakIrradiance = peakIrradiance
-        """Peak irradiance"""
-        self.padding2: uint32 = 0
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_int(self.recordType)
-        outputStream.write_unsigned_short(self.recordLength)
-        outputStream.write_unsigned_short(self.padding)
-        self.targetSpotLocation.serialize(outputStream)
-        self.targetSpotEntityLocation.serialize(outputStream)
-        self.targetSpotVelocity.serialize(outputStream)
-        self.targetSpotAcceleration.serialize(outputStream)
-        self.targetEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.targetComponentID)
-        outputStream.write_unsigned_byte(self.beamSpotType)
-        outputStream.write_float(self.beamSpotCrossSectionSemiMajorAxis)
-        outputStream.write_float(self.beamSpotCrossSectionSemiMinorAxis)
-        outputStream.write_float(self.beamSpotCrossSectionOrientationAngle)
-        outputStream.write_float(self.peakIrradiance)
-        outputStream.write_unsigned_int(self.padding2)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
-        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
-        self.padding = inputStream.read_unsigned_short()
-        self.targetSpotLocation.parse(inputStream)
-        self.targetSpotEntityLocation.parse(inputStream)
-        self.targetSpotVelocity.parse(inputStream)
-        self.targetSpotAcceleration.parse(inputStream)
-        self.targetEntityID.parse(inputStream)
-        self.targetComponentID = inputStream.read_unsigned_byte()
-        self.beamSpotType = inputStream.read_unsigned_byte()
-        self.beamSpotCrossSectionSemiMajorAxis = inputStream.read_float()
-        self.beamSpotCrossSectionSemiMinorAxis = inputStream.read_float()
-        self.beamSpotCrossSectionOrientationAngle = inputStream.read_float()
-        self.peakIrradiance = inputStream.read_float()
-        self.padding2 = inputStream.read_unsigned_int()
-
-
 class IFFDataSpecification:
     """Section 6.2.43
 
@@ -1692,68 +1609,6 @@ class DatumSpecification:
             element = VariableDatum()
             element.parse(inputStream)
             self.variableDatumRecords.append(element)
-
-
-class DirectedEnergyAreaAimpoint:
-    """Section 6.2.20.2
-
-    DE Precision Aimpoint Record. NOT COMPLETE
-    """
-    recordType: enum32 = 4001  # [UID 66]
-
-    def __init__(self,
-                 recordLength: uint16 = 0,
-                 beamAntennaParameters: list | None = None,
-                 directedEnergyTargetEnergyDepositions: list | None 
-= None):
-        """Type of Record enumeration"""
-        self.recordLength = recordLength
-        """Length of Record"""
-        self.padding: uint16 = 0
-        self.beamAntennaParameters = beamAntennaParameters or []
-        """list of beam antenna records. See 6.2.9.2"""
-        self.directedEnergyTargetEnergyDepositionRecordList = directedEnergyTargetEnergyDepositions or []
-        """list of DE target deposition records. See 6.2.21.4"""
-
-    @property
-    def beamAntennaPatternRecordCount(self) -> uint16:
-        return len(self.beamAntennaParameters)
-
-    @property
-    def directedEnergyTargetEnergyDepositionRecordCount(self) -> uint16:
-        return len(self.directedEnergyTargetEnergyDepositionRecordList)
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_int(self.recordType)
-        outputStream.write_unsigned_short(self.recordLength)
-        outputStream.write_unsigned_short(self.padding)
-        outputStream.write_unsigned_short(self.beamAntennaPatternRecordCount)
-        outputStream.write_unsigned_short(
-            self.directedEnergyTargetEnergyDepositionRecordCount
-        )
-        for anObj in self.beamAntennaParameters:
-            anObj.serialize(outputStream)
-
-        for anObj in self.directedEnergyTargetEnergyDepositionRecordList:
-            anObj.serialize(outputStream)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
-        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
-        self.padding = inputStream.read_unsigned_short()
-        beamAntennaPatternRecordCount = inputStream.read_unsigned_short()
-        directedEnergyTargetEnergyDepositionRecordCount = inputStream.read_unsigned_short()
-        for idx in range(0, beamAntennaPatternRecordCount):
-            element = null()
-            element.parse(inputStream)
-            self.beamAntennaParameters.append(element)
-
-        for idx in range(0, directedEnergyTargetEnergyDepositionRecordCount):
-            element = null()
-            element.parse(inputStream)
-            self.directedEnergyTargetEnergyDepositionRecordList.append(element)
 
 
 class Expendable:
@@ -3180,34 +3035,6 @@ class EntityIdentifier:
         """Parse a message. This may recursively call embedded objects."""
         self.simulationAddress.parse(inputStream)
         self.entityNumber = inputStream.read_unsigned_short()
-
-
-class DirectedEnergyTargetEnergyDeposition:
-    """Section 6.2.20.4
-
-    DE energy deposition properties for a target entity.
-    """
-
-    def __init__(self,
-                 targetEntityID: "EntityIdentifier | None" = None,
-                 peakIrradiance: float32 = 0.0):  # in W/m^2
-        self.targetEntityID = targetEntityID or EntityID()
-        """Unique ID of the target entity."""
-        self.padding: uint16 = 0
-        self.peakIrradiance = peakIrradiance
-        """Peak irrandiance"""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        self.targetEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding)
-        outputStream.write_float(self.peakIrradiance)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.targetEntityID.parse(inputStream)
-        self.padding = inputStream.read_unsigned_short()
-        self.peakIrradiance = inputStream.read_float()
 
 
 class EntityID:
