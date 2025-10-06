@@ -3,11 +3,12 @@
 __all__ = ["Record", "VariableRecord"]
 
 from abc import abstractmethod
-from typing import Any, Protocol, TypeGuard
+from typing import Any, Protocol, TypeGuard, runtime_checkable
 
 from opendis.stream import DataInputStream, DataOutputStream
 
 
+@runtime_checkable
 class Record(Protocol):
     """Base class for all Record types.
     
@@ -27,6 +28,7 @@ class Record(Protocol):
         """Parse the record from the input stream."""
 
 
+@runtime_checkable
 class VariableRecord(Protocol):
     """Base class for all Variable Record types.
 
