@@ -24,7 +24,9 @@ from .record import (
     CCTTSincgarsMP,
     VariableTransmitterParametersRecord,
     DamageDescriptionRecord,
+    StandardVariableRecord,
     getSVClass,
+    base
 )
 from .stream import DataInputStream, DataOutputStream
 from .types import (
@@ -42,6 +44,28 @@ from .types import (
     struct16,
     struct32,
 )
+
+
+def parseStandardVariableRecord(
+        inputStream: DataInputStream,
+        expectedType: type[base.StandardVariableRecord],
+) -> base.StandardVariableRecord:
+    """Parse a single Standard Variable Record from the input stream.
+    These rely on recordType enums from [UID 66].
+    The mapping of recordType to class is defined in opendis.radio
+
+    Args:
+        inputStream: The DataInputStream to read from.
+    
+    Returns:
+        An instance of a StandardVariableRecord subclass.
+    """
+    recordType = inputStream.read_uint32()
+    recordLength = inputStream.read_uint16()
+    svClass = getSVClass(recordType, expectedType)
+    sv_instance = svClass()
+    sv_instance.parse(inputStream, recordLength)
+    return sv_instance
 
 
 class DataQueryDatumSpecification:
@@ -5085,14 +5109,10 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
             self.antennaPattern = None
         
         for _ in range(0, variableTransmitterParameterCount):
-            recordType = inputStream.read_uint32()
-            recordLength = inputStream.read_uint16()
-            vtpClass = getSVClass(
-                recordType,
-                expectedType=VariableTransmitterParametersRecord
+            vtp = parseStandardVariableRecord(
+                inputStream,
+                VariableTransmitterParametersRecord
             )
-            vtp = vtpClass()
-            vtp.parse(inputStream, bytelength=recordLength)
             self.variableTransmitterParameters.append(vtp)
 
 
@@ -6376,14 +6396,10 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
         self.padding4 = inputStream.read_uint16()
         numberOfDERecords = inputStream.read_uint16()
         for _ in range(0, numberOfDERecords):
-            recordType = inputStream.read_uint32()
-            recordLength = inputStream.read_uint16()
-            vtpClass = getSVClass(
-                recordType,
-                expectedType=DamageDescriptionRecord
+            vtp = parseStandardVariableRecord(
+                inputStream,
+                DamageDescriptionRecord
             )
-            vtp = vtpClass()  # pyright: ignore[reportAbstractUsage]
-            vtp.parse(inputStream, bytelength=recordLength)
             self.dERecords.append(vtp)
 
 
@@ -6654,14 +6670,10 @@ class EntityDamageStatusPdu(WarfareFamilyPdu):
         self.padding2 = inputStream.read_uint16()
         damageDescriptionCount = inputStream.read_uint16()
         for _ in range(0, damageDescriptionCount):
-            recordType = inputStream.read_uint32()
-            recordLength = inputStream.read_uint16()
-            svClass = getSVClass(
-                recordType,
-                expectedType=DamageDescriptionRecord
+            record = parseStandardVariableRecord(
+                inputStream,
+                DamageDescriptionRecord
             )
-            record = svClass()
-            record.parse(inputStream, recordLength)
             self.damageDescriptions.append(record)
 
 

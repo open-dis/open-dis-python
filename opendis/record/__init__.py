@@ -22,6 +22,7 @@ from opendis.types import (
 )
 
 from . import base, bitfield, symbolic_names as sym
+from .base import StandardVariableRecord
 from .common import *
 from .radio import *
 from .warfare import *
