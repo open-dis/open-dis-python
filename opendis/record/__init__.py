@@ -599,39 +599,6 @@ class VariableTransmitterParametersRecord(base.StandardVariableRecord):
     """
 
 
-class UnknownVariableTransmitterParameters(VariableTransmitterParametersRecord):
-    """Placeholder for unknown or unimplemented variable transmitter parameter
-    types.
-    """
-
-    def __init__(self, recordType: enum32 = 0, data: bytes = b""):
-        self.recordType = recordType  # [UID 66]  Variable Parameter Record Type
-        self.data = data
-    
-    def marshalledSize(self) -> int:
-        return 6 + len(self.data)
-    
-    @property
-    def recordLength(self) -> uint16:
-        return self.marshalledSize()
-
-    def serialize(self, outputStream: DataOutputStream) -> None:
-        super().serialize(outputStream)
-        outputStream.write_uint32(self.recordType)
-        outputStream.write_uint16(self.recordLength)
-        outputStream.write_bytes(self.data)
-
-    def parse(self,
-              inputStream: DataInputStream,
-              bytelength: int) -> None:
-        # Validate bytelength argument by calling base method
-        super().parse(inputStream, bytelength)
-        self.recordType = inputStream.read_uint32()
-        recordLength = inputStream.read_uint16()
-        # Read the remaining bytes in the record
-        self.data = inputStream.read_bytes(recordLength - 6)
-
-
 class HighFidelityHAVEQUICKRadio(VariableTransmitterParametersRecord):
     """Annex C C4.2.3, Table C.4 — High Fidelity HAVE QUICK Radio record"""
     recordType: enum32 = 3000
@@ -700,33 +667,6 @@ class DamageDescriptionRecord(base.StandardVariableRecord):
     the Standard Variable Specification record (see 6.2.83). 
     New Damage Description records may be defined at some future date as needed.
     """
-
-
-class UnknownDamage(DamageDescriptionRecord):
-    """Placeholder for unknown or unimplemented damage description types."""
-
-    def __init__(self, recordType: enum32 = 0, data: bytes = b''):
-        self.recordType = recordType  # [UID 66]  Variable Parameter Record Type
-        self.data = data
-
-    def marshalledSize(self) -> int:
-        return 6 + len(self.data)
-
-    def serialize(self, outputStream: DataOutputStream) -> None:
-        super().serialize(outputStream)
-        outputStream.write_uint32(self.recordType)
-        outputStream.write_uint16(self.recordLength)
-        outputStream.write_bytes(self.data)
-
-    def parse(self,
-              inputStream: DataInputStream,
-              bytelength: int) -> None:
-        # Validate bytelength argument by calling base method
-        super().parse(inputStream, bytelength)
-        self.recordType = inputStream.read_uint32()
-        recordLength = inputStream.read_uint16()
-        # Read the remaining bytes in the record
-        self.data = inputStream.read_bytes(recordLength - 6)
 
 
 class DirectedEnergyDamage(DamageDescriptionRecord):
@@ -979,17 +919,46 @@ __variableRecordClasses: dict[int, type[base.StandardVariableRecord]] = {
 def getSVClass(
         recordType: int,
         expectedType: type[SV] = base.StandardVariableRecord
-) -> type[SV] | None:
+) -> type[SV]:
+    """Return a StandardVariableRecord subclass for the given recordType."""
+
+    # Declare a local class since the recordType class variable will need to be
+    # set for each new unrecognised record type.
+    class UnknownStandardVariableRecord(base.StandardVariableRecord):
+        """A placeholder class for unrecognised Standard Variable Records."""
+        recordType: enum32
+
+        def __init__(self, data: bytes = b'') -> None:
+            self.data = data
+
+        def marshalledSize(self) -> uint16:
+            return 6 + len(self.data)
+
+        def serialize(self, outputStream: DataOutputStream) -> None:
+            super().serialize(outputStream)
+            outputStream.write_uint32(self.recordType)
+            outputStream.write_uint16(self.recordLength)
+            outputStream.write_bytes(self.data)
+
+        def parse(self,
+                inputStream: DataInputStream,
+                bytelength: int) -> None:
+            super().parse(inputStream, bytelength)
+            # Subtract 6 bytes for type and length
+            self.data = inputStream.read_bytes(bytelength - 6)
+
     if not isinstance(recordType, int) or recordType < 0:
         raise ValueError(
             f"recordType must be a non-negative integer, got {recordType!r}"
         )
-    vrClass = __variableRecordClasses.get(recordType, None)
-    if vrClass is None:
-        return None
+    UnknownStandardVariableRecord.recordType = recordType
+    vrClass = __variableRecordClasses.get(
+        recordType,
+        UnknownStandardVariableRecord
+    )
     if not issubclass(vrClass, expectedType):
         raise TypeError(
             f"Record Type {recordType}: Record class {vrClass.__name__} is not "
             f"a subclass of {expectedType.__name__}"
         )
-    return vrClass  # type: ignore[return-value]
+    return vrClass

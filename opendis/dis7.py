@@ -22,9 +22,7 @@ from .record import (
     BasicHaveQuickMP,
     CCTTSincgarsMP,
     VariableTransmitterParametersRecord,
-    UnknownVariableTransmitterParameters,
     DamageDescriptionRecord,
-    UnknownDamage,
     DirectedEnergyDamage,
     getSVClass,
 )
@@ -5093,10 +5091,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
                 recordType,
                 expectedType=VariableTransmitterParametersRecord
             )
-            if vtpClass:
-                vtp = vtpClass()
-            else:
-                vtp = UnknownVariableTransmitterParameters(recordType)
+            vtp = vtpClass()
             vtp.parse(inputStream, bytelength=recordLength)
             self.variableTransmitterParameters.append(vtp)
 
@@ -6388,10 +6383,7 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
                 recordType,
                 expectedType=DamageDescriptionRecord
             )
-            if vtpClass:
-                vtp = vtpClass()
-            else:
-                vtp = UnknownVariableTransmitterParameters(recordType)
+            vtp = vtpClass()
             vtp.parse(inputStream, bytelength=recordLength)
             self.dERecords.append(vtp)
 
