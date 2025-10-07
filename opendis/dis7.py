@@ -24,7 +24,6 @@ from .record import (
     CCTTSincgarsMP,
     VariableTransmitterParametersRecord,
     DamageDescriptionRecord,
-    DirectedEnergyDamage,
     getSVClass,
 )
 from .stream import DataInputStream, DataOutputStream

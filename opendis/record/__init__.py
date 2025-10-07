@@ -3,7 +3,6 @@
 This module defines classes for various record types used in DIS PDUs.
 """
 
-from abc import abstractmethod
 from typing import TypeVar
 
 from . import base, bitfield
