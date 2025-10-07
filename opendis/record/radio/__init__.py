@@ -1,7 +1,9 @@
 """Radio Family PDU record types"""
 
 __all__ = [
+    "AntennaPatternRecord",
     "BasicHaveQuickMP",
+    "BeamAntennaPattern",
     "CCTTSincgarsMP",
     "GenericRadio",
     "HighFidelityHAVEQUICKRadio",
@@ -10,6 +12,7 @@ __all__ = [
     "NetId",
     "SimpleIntercomRadio",
     "SpreadSpectrum",
+    "UnknownAntennaPattern",
     "UnknownRadio",
     "VariableTransmitterParametersRecord",
 ]
