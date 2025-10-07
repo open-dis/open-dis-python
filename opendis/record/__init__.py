@@ -946,7 +946,7 @@ class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
                  targetSpotEntityLocation: Vector3Float | None = None,
                  targetSpotVelocity: Vector3Float | None = None,  # in m/s
                  targetSpotAcceleration: Vector3Float | None = None,  # in m/s^2
-                 targetEntityID: "EntityID | None" = None,
+                 targetEntityID: EntityIdentifier | None = None,
                  targetComponentID: enum8 = 0,  # [UID 314]
                  beamSpotType: enum8 = 0,  # [UID 311]
                  beamSpotCrossSectionSemiMajorAxis: float32 = 0.0,  # in meters
@@ -959,7 +959,7 @@ class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
         )
         self.targetSpotVelocity = targetSpotVelocity or Vector3Float()
         self.targetSpotAcceleration = targetSpotAcceleration or Vector3Float()
-        self.targetEntityID = targetEntityID or EntityID()
+        self.targetEntityID = targetEntityID or EntityIdentifier()
         self.targetComponentID = targetComponentID
         self.beamSpotType = beamSpotType
         self.beamSpotCrossSectionSemiMajorAxis = beamSpotCrossSectionSemiMajorAxis
@@ -1016,22 +1016,18 @@ class DirectedEnergyTargetEnergyDeposition(base.Record):
     """
 
     def __init__(self,
-                 targetEntityID: "EntityIdentifier | None" = None,
+                 targetEntityID: EntityIdentifier | None = None,
                  peakIrradiance: float32 = 0.0):  # in W/m^2
-        self.targetEntityID = targetEntityID or EntityID()
-        """Unique ID of the target entity."""
+        self.targetEntityID = targetEntityID or EntityIdentifier()
         self.padding: uint16 = 0
         self.peakIrradiance = peakIrradiance
-        """Peak irrandiance"""
 
-    def serialize(self, outputStream):
-        """serialize the class"""
+    def serialize(self, outputStream: DataOutputStream) -> None:
         self.targetEntityID.serialize(outputStream)
         outputStream.write_uint16(self.padding)
         outputStream.write_float32(self.peakIrradiance)
 
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
+    def parse(self, inputStream: DataInputStream) -> None:
         self.targetEntityID.parse(inputStream)
         self.padding = inputStream.read_uint16()
         self.peakIrradiance = inputStream.read_float32()
