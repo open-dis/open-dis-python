@@ -13,7 +13,6 @@ from .record import (
     EulerAngles,
     Vector3Float,
     WorldCoordinates,
-    EntityID,
     EntityIdentifier,
     EventIdentifier,
     SimulationAddress,
