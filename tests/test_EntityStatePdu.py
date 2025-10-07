@@ -24,9 +24,9 @@ class TestEntityStatePdu(unittest.TestCase):
         self.assertEqual(0, pdu.padding)
 
         # Entity ID
-        self.assertEqual(42, pdu.entityID.siteID)
-        self.assertEqual(4, pdu.entityID.applicationID)
-        self.assertEqual(26, pdu.entityID.entityID)
+        self.assertEqual(42, pdu.entityID.simulationAddress.site)
+        self.assertEqual(4, pdu.entityID.simulationAddress.application)
+        self.assertEqual(26, pdu.entityID.entityNumber)
 
         # Force ID
         self.assertEqual(1, pdu.forceId)
