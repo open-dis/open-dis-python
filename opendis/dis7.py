@@ -6312,93 +6312,88 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
                  munitionType: "EntityType | None" = None,
                  shotStartTime: "ClockTime | None" = None,
                  cumulativeShotTime: float32 = 0.0,  # in seconds
-                 apertureEmitterLocation: Vector3Float | None = None,
+                 apertureEmitterLocation: Vector3Float | None = None,  # in meters
                  apertureDiameter: float32 = 0.0,  # in meters
                  wavelength: float32 = 0.0,  # in meters
-                 peakIrradiance=0.0,
                  pulseRepetitionFrequency: float32 = 0.0,  # in Hz
                  pulseWidth: float32 = 0,  # in seconds
                  flags: struct16 = 0,  # [UID 313]
                  pulseShape: enum8 = 0,  # [UID 312]
-                 dERecords: list | None = None):
+                 dERecords: list[DamageDescriptionRecord] | None = None):
         super(DirectedEnergyFirePdu, self).__init__()
         # TODO: validate entity type?
         self.munitionType = munitionType or EntityType()
-        """Field shall identify the munition type enumeration for the DE weapon beam, Section 7.3.4"""
         self.shotStartTime = shotStartTime or ClockTime()
-        """Field shall indicate the simulation time at start of the shot, Section 7.3.4"""
         self.cumulativeShotTime = cumulativeShotTime
-        """Field shall indicate the current cumulative duration of the shot, Section 7.3.4"""
         self.apertureEmitterLocation = (apertureEmitterLocation
                                         or Vector3Float())
-        """Field shall identify the location of the DE weapon aperture/emitter, Section 7.3.4"""
         self.apertureDiameter = apertureDiameter
-        """Field shall identify the beam diameter at the aperture/emitter, Section 7.3.4"""
         self.wavelength = wavelength
-        """Field shall identify the emissions wavelength in units of meters, Section 7.3.4"""
-        self.peakIrradiance = peakIrradiance
-        """Field shall identify the current peak irradiance of emissions in units of Watts per square meter, Section 7.3.4"""
+        self.padding1: uint32 = 0
         self.pulseRepetitionFrequency = pulseRepetitionFrequency
-        """field shall identify the current pulse repetition frequency in units of cycles per second (Hertz), Section 7.3.4"""
         self.pulseWidth = pulseWidth
-        """field shall identify the pulse width emissions in units of seconds, Section 7.3.4"""
         self.flags = flags
         """16bit Boolean field shall contain various flags to indicate status information needed to process a DE, Section 7.3.4"""
         self.pulseShape = pulseShape
-        """Field shall identify the pulse shape and shall be represented as an 8-bit enumeration, Section 7.3.4"""
-        self.padding1: uint8 = 0
-        self.padding2: uint32 = 0
-        self.padding3: uint16 = 0
-        self.dERecords = dERecords or []
-        """Fields shall contain one or more DE records, records shall conform to the variable record format (Section6.2.82), Section 7.3.4"""
+        self.padding2: uint8 = 0
+        self.padding3: uint32 = 0
+        self.padding4: uint16 = 0
+        self.dERecords: list[DamageDescriptionRecord] = dERecords or []
 
     @property
     def numberOfDERecords(self) -> uint16:
         return len(self.dERecords)
 
-    def serialize(self, outputStream):
-        """serialize the class"""
+    def serialize(self, outputStream: DataOutputStream) -> None:
         super(DirectedEnergyFirePdu, self).serialize(outputStream)
         self.munitionType.serialize(outputStream)
         self.shotStartTime.serialize(outputStream)
-        outputStream.write_float(self.commulativeShotTime)
+        outputStream.write_float32(self.commulativeShotTime)
         self.apertureEmitterLocation.serialize(outputStream)
-        outputStream.write_float(self.apertureDiameter)
-        outputStream.write_float(self.wavelength)
-        outputStream.write_float(self.peakIrradiance)
-        outputStream.write_float(self.pulseRepetitionFrequency)
-        outputStream.write_int(self.pulseWidth)
-        outputStream.write_int(self.flags)
-        outputStream.write_byte(self.pulseShape)
-        outputStream.write_unsigned_byte(self.padding1)
-        outputStream.write_unsigned_int(self.padding2)
-        outputStream.write_unsigned_short(self.padding3)
-        outputStream.write_unsigned_short(self.numberOfDERecords)
-        for anObj in self.dERecords:
-            anObj.serialize(outputStream)
+        outputStream.write_float32(self.apertureDiameter)
+        outputStream.write_float32(self.wavelength)
+        outputStream.write_uint32(self.padding1)
+        outputStream.write_float32(self.pulseRepetitionFrequency)
+        outputStream.write_float32(self.pulseWidth)
+        outputStream.write_uint16(self.flags)
+        outputStream.write_uint8(self.pulseShape)
+        outputStream.write_uint8(self.padding2)
+        outputStream.write_uint32(self.padding3)
+        outputStream.write_uint16(self.padding4)
+        outputStream.write_uint16(self.numberOfDERecords)
+        for record in self.dERecords:
+            record.serialize(outputStream)
 
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
+    def parse(self, inputStream: DataInputStream) -> None:
         super(DirectedEnergyFirePdu, self).parse(inputStream)
         self.munitionType.parse(inputStream)
         self.shotStartTime.parse(inputStream)
-        self.commulativeShotTime = inputStream.read_float()
+        self.commulativeShotTime = inputStream.read_float32()
         self.apertureEmitterLocation.parse(inputStream)
-        self.apertureDiameter = inputStream.read_float()
-        self.wavelength = inputStream.read_float()
-        self.peakIrradiance = inputStream.read_float()
-        self.pulseRepetitionFrequency = inputStream.read_float()
-        self.pulseWidth = inputStream.read_int()
-        self.flags = inputStream.read_int()
-        self.pulseShape = inputStream.read_byte()
-        self.padding1 = inputStream.read_unsigned_byte()
-        self.padding2 = inputStream.read_unsigned_int()
-        self.padding3 = inputStream.read_unsigned_short()
-        numberOfDERecords = inputStream.read_unsigned_short()
-        for idx in range(0, numberOfDERecords):
-            element = null()
-            element.parse(inputStream)
-            self.dERecords.append(element)
+        self.apertureDiameter = inputStream.read_float32()
+        self.wavelength = inputStream.read_float32()
+        self.padding1 = inputStream.read_uint32()
+        self.pulseRepetitionFrequency = inputStream.read_float32()
+        self.pulseWidth = inputStream.read_float32()
+        self.flags = inputStream.read_uint16()
+        self.pulseShape = inputStream.read_uint8()
+        self.padding2 = inputStream.read_uint8()
+        self.padding3 = inputStream.read_uint32()
+        self.padding4 = inputStream.read_uint16()
+        numberOfDERecords = inputStream.read_uint16()
+        for _ in range(0, numberOfDERecords):
+            recordType = inputStream.read_uint32()
+            recordLength = inputStream.read_uint16()
+            vtpClass = getSVClass(
+                recordType,
+                expectedType=DamageDescriptionRecord
+            )
+            if vtpClass:
+                vtp = vtpClass()
+            else:
+                vtp = UnknownVariableTransmitterParameters(recordType)
+            vtp.parse(inputStream, bytelength=recordLength)
+            self.dERecords.append(vtp)
 
 
 class DetonationPdu(WarfareFamilyPdu):

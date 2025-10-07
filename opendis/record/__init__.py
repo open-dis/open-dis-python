@@ -971,6 +971,9 @@ class DirectedEnergyTargetEnergyDeposition(base.Record):
 
 __variableRecordClasses: dict[int, type[base.StandardVariableRecord]] = {
     3000: HighFidelityHAVEQUICKRadio,
+    4000: DirectedEnergyPrecisionAimpoint,
+    4001: DirectedEnergyAreaAimpoint,
+    4500: DirectedEnergyDamage,
 }
 
 def getSVClass(
