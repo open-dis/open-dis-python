@@ -16,6 +16,7 @@ from ..types import (
     bf_int,
     bf_uint,
     float32,
+    float64,
     struct8,
     uint8,
     uint16,
@@ -52,6 +53,34 @@ class Vector3Float(base.Record):
         self.x = inputStream.read_float()
         self.y = inputStream.read_float()
         self.z = inputStream.read_float()
+
+
+class WorldCoordinates(base.Record):
+    """6.2.98 World Coordinates record
+
+    Location of the origin of the entity's or object's coordinate system,
+    target locations, detonation locations, and other points shall be specified
+    by a set of three coordinates: X, Y, and Z, represented by 64-bit floating
+    point numbers.
+    """
+
+    def __init__(self, x: float64 = 0.0, y: float64 = 0.0, z: float64 = 0.0):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def marshalledSize(self) -> int:
+        return 24
+
+    def serialize(self, outputStream: DataOutputStream) -> None:
+        outputStream.write_float64(self.x)
+        outputStream.write_float64(self.y)
+        outputStream.write_float64(self.z)
+
+    def parse(self, inputStream: DataInputStream) -> None:
+        self.x = inputStream.read_float64()
+        self.y = inputStream.read_float64()
+        self.z = inputStream.read_float64()
 
 
 class EulerAngles(base.Record):
@@ -764,14 +793,14 @@ class DirectedEnergyDamage(DamageDescriptionRecord):
 
     def __init__(
             self,
-            damageLocation: "Vector3Float | None" = None,
+            damageLocation: Vector3Float | None = None,
             damageDiameter: float32 = 0.0,  # in metres
             temperature: float32 = -273.15,  # in degrees Celsius
             componentIdentification: enum8 = 0,  # [UID 314]
             componentDamageStatus: enum8 = 0,  # [UID 315]
             componentVisualDamageStatus: struct8 = 0,  # [UID 317]
             componentVisualSmokeColor: enum8 = 0,  # [UID 316]
-            fireEventID: "EventIdentifier | None" = None):
+            fireEventID: EventIdentifier | None = None):
         self.padding: uint16 = 0
         self.damageLocation = damageLocation or Vector3Float()
         self.damageDiameter = damageDiameter

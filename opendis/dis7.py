@@ -12,6 +12,7 @@ from .record import (
     UnknownAntennaPattern,
     EulerAngles,
     Vector3Float,
+    WorldCoordinates,
     EventIdentifier,
     SimulationAddress,
     BeamAntennaPattern,
@@ -930,12 +931,12 @@ class Association:
     def __init__(self,
                  associationType: enum8 = 0,  # [UID 330]
                  associatedEntityID: "EntityID | None" = None,
-                 associatedLocation: "Vector3Double | None" = None):
+                 associatedLocation: WorldCoordinates | None = None):
         self.associationType = associationType
         self.padding4: uint8 = 0
         self.associatedEntityID = associatedEntityID or EntityID()
         """identity of associated entity. If none, NO_SPECIFIC_ENTITY"""
-        self.associatedLocation = associatedLocation or Vector3Double()
+        self.associatedLocation = associatedLocation or WorldCoordinates()
         """location, in world coordinates"""
 
     def serialize(self, outputStream):
@@ -1003,9 +1004,9 @@ class AntennaLocation:
     """
 
     def __init__(self,
-                 antennaLocation: "Vector3Double | None" = None,
+                 antennaLocation: WorldCoordinates | None = None,
                  relativeAntennaLocation: "Vector3Float | None" = None):
-        self.antennaLocation = antennaLocation or Vector3Double()
+        self.antennaLocation = antennaLocation or WorldCoordinates()
         """Location of the radiating portion of the antenna in world coordinates"""
         self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float(
         )
@@ -1691,8 +1692,8 @@ class LinearSegmentParameter:
                  segmentModification: enum8 = 0,  # [UID 241]
                  generalSegmentAppearance: struct16 = 0,  # [UID 229]
                  specificSegmentAppearance: struct32 = 0,  # TODO: find reference
-                 segmentLocation: "Vector3Double | None" = None,
-                 segmentOrientation: "EulerAngles | None" = None,
+                 segmentLocation: WorldCoordinates | None = None,
+                 segmentOrientation: EulerAngles | None = None,
                  segmentLength: float32 = 0.0,  # in meters
                  segmentWidth: float32 = 0.0,  # in meters
                  segmentHeight: float32 = 0.0,  # in meters
@@ -1705,7 +1706,7 @@ class LinearSegmentParameter:
         """general dynamic appearance attributes of the segment. This record shall be defined as a 16-bit record of enumerations. The values defined for this record are included in Section 12 of SISO-REF-010."""
         self.specificSegmentAppearance = specificSegmentAppearance
         """This field shall specify specific dynamic appearance attributes of the segment. This record shall be defined as a 32-bit record of enumerations."""
-        self.segmentLocation = segmentLocation or Vector3Double()
+        self.segmentLocation = segmentLocation or WorldCoordinates()
         """This field shall specify the location of the linear segment in the simulated world and shall be represented by a World Coordinates record"""
         self.segmentOrientation = segmentOrientation or EulerAngles()
         """orientation of the linear segment about the segment location and shall be represented by a Euler Angles record"""
@@ -2291,17 +2292,17 @@ class LaunchedMunitionRecord:
     """
 
     def __init__(self,
-                 fireEventID: "EventIdentifier | None" = None,
-                 firingEntityID: "EventIdentifier | None" = None,
-                 targetEntityID: "EventIdentifier | None" = None,
-                 targetLocation: "Vector3Double | None" = None):
+                 fireEventID: EventIdentifier | None = None,
+                 firingEntityID: EventIdentifier | None = None,
+                 targetEntityID: EventIdentifier | None = None,
+                 targetLocation: WorldCoordinates | None = None):
         self.fireEventID = fireEventID or EventIdentifier()
         self.padding: uint16 = 0
         self.firingEntityID = firingEntityID or EventIdentifier()
         self.padding2: uint16 = 0
         self.targetEntityID = targetEntityID or EventIdentifier()
         self.padding3: uint16 = 0
-        self.targetLocation = targetLocation or Vector3Double()
+        self.targetLocation = targetLocation or WorldCoordinates()
 
     def serialize(self, outputStream):
         """serialize the class"""
@@ -3234,34 +3235,6 @@ class EnvironmentGeneral:
         self.padding2 = inputStream.read_unsigned_byte()
 
 
-class Vector3Double:
-    """Section 6.2.97
-
-    Three double precision floating point values, x, y, and z.
-    Used for world coordinates.
-    """
-
-    def __init__(self, x: float32 = 0.0, y: float32 = 0.0, z: float32 = 0.0):
-        self.x = x
-        """X value"""
-        self.y = y
-        """y Value"""
-        self.z = z
-        """Z value"""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_double(self.x)
-        outputStream.write_double(self.y)
-        outputStream.write_double(self.z)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.x = inputStream.read_double()
-        self.y = inputStream.read_double()
-        self.z = inputStream.read_double()
-
-
 class GridAxis:
     """Section 6.2.41
 
@@ -3820,18 +3793,18 @@ class EntityStateUpdatePdu(EntityInformationFamilyPdu):
 
     def __init__(self,
                  entityID=None,
-                 entityLinearVelocity: "Vector3Float | None" = None,
-                 entityLocation: "Vector3Double | None" = None,
-                 entityOrientation: "EulerAngles | None" = None,
+                 entityLinearVelocity: Vector3Float | None = None,
+                 entityLocation: WorldCoordinates | None = None,
+                 entityOrientation: EulerAngles | None = None,
                  entityAppearance: struct32 = 0,  # [UID 31-43]
-                 variableParameters: list["VariableParameter"] | None = None):
+                 variableParameters: list[VariableParameter] | None = None):
         super(EntityStateUpdatePdu, self).__init__()
         self.entityID = entityID or EntityID()
         """This field shall identify the entity issuing the PDU, and shall be represented by an Entity Identifier record (see 6.2.28)."""
         self.padding1: uint8 = 0
         self.entityLinearVelocity = entityLinearVelocity or Vector3Float()
         """This field shall specify an entitys linear velocity. The coordinate system for an entitys linear velocity depends on the dead reckoning algorithm used. This field shall be represented by a Linear Velocity Vector record [see 6.2.95 item c)])."""
-        self.entityLocation = entityLocation or Vector3Double()
+        self.entityLocation = entityLocation or WorldCoordinates()
         """This field shall specify an entitys physical location in the simulated world and shall be represented by a World Coordinates record (see 6.2.97)."""
         self.entityOrientation = entityOrientation or EulerAngles()
         """This field shall specify an entitys orientation and shall be represented by an Euler Angles record (see 6.2.33)."""
@@ -4736,17 +4709,17 @@ class DesignatorPdu(DistributedEmissionsFamilyPdu):
     pduType: enum8 = 24  # [UID 4]
 
     def __init__(self,
-                 designatingEntityID: "EntityID | None" = None,
+                 designatingEntityID: EntityID | None = None,
                  codeName: enum16 = 0,  # [UID 80]
-                 designatedEntityID: "EntityID | None" = None,
+                 designatedEntityID: EntityID | None = None,
                  designatorCode: enum16 = 0,  # [UID 81]
                  designatorPower: float32 = 0.0,  # in W
                  designatorWavelength: float32 = 0.0,  # in microns
-                 designatorSpotWrtDesignated: "Vector3Float | None" = None,
-                 designatorSpotLocation: "Vector3Double | None" = None,
+                 designatorSpotWrtDesignated: Vector3Float | None = None,
+                 designatorSpotLocation: WorldCoordinates | None = None,
                  # Dead Reckoning Parameters
                  deadReckoningAlgorithm: enum8 = 0,  # [UID 44]
-                 entityLinearAcceleration: "Vector3Float | None" = None):
+                 entityLinearAcceleration: Vector3Float | None = None):
         super(DesignatorPdu, self).__init__()
         self.designatingEntityID = designatingEntityID or EntityID()
         """ID of the entity designating"""
@@ -4763,7 +4736,7 @@ class DesignatorPdu(DistributedEmissionsFamilyPdu):
         self.designatorSpotWrtDesignated = designatorSpotWrtDesignated or Vector3Float(
         )
         """designator spot wrt the designated entity"""
-        self.designatorSpotLocation = designatorSpotLocation or Vector3Double()
+        self.designatorSpotLocation = designatorSpotLocation or WorldCoordinates()
         """designator spot wrt the designated entity"""
         self.deadReckoningAlgorithm = deadReckoningAlgorithm
         """Dead reckoning algorithm"""
@@ -4856,18 +4829,18 @@ class EntityStatePdu(EntityInformationFamilyPdu):
     pduType: enum8 = 1  # [UID 4]
 
     def __init__(self,
-                 entityID: "EntityID | None" = None,
+                 entityID: EntityID | None = None,
                  forceId: enum8 = 0,  # [UID 6]
-                 entityType: "EntityType | None" = None,
-                 alternativeEntityType: "EntityType | None" = None,
-                 entityLinearVelocity: "Vector3Float | None" = None,
-                 entityLocation: "Vector3Double | None" = None,
-                 entityOrientation: "EulerAngles | None" = None,
+                 entityType: EntityType | None = None,
+                 alternativeEntityType: EntityType | None = None,
+                 entityLinearVelocity: Vector3Float | None = None,
+                 entityLocation: WorldCoordinates | None = None,
+                 entityOrientation: EulerAngles | None = None,
                  entityAppearance: uint32 = 0,  # [UID 31-43]
-                 deadReckoningParameters: "DeadReckoningParameters | None" = None,
-                 marking: "EntityMarking | None" = None,
+                 deadReckoningParameters: DeadReckoningParameters | None = None,
+                 marking: EntityMarking | None = None,
                  capabilities: uint32 = 0,  # [UID 55]
-                 variableParameters: list["VariableParameter"] | None = None):
+                 variableParameters: list[VariableParameter] | None = None):
         super(EntityStatePdu, self).__init__()
         self.entityID = entityID or EntityID()
         """Unique ID for an entity that is tied to this state information"""
@@ -4878,7 +4851,7 @@ class EntityStatePdu(EntityInformationFamilyPdu):
         self.alternativeEntityType = alternativeEntityType or EntityType()
         self.entityLinearVelocity = entityLinearVelocity or Vector3Float()
         """Describes the speed of the entity in the world"""
-        self.entityLocation = entityLocation or Vector3Double()
+        self.entityLocation = entityLocation or WorldCoordinates()
         """describes the location of the entity in the world"""
         self.entityOrientation = entityOrientation or EulerAngles()
         """describes the orientation of the entity, in euler angles"""
@@ -5005,16 +4978,16 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
     def __init__(self,
                  radioReferenceID: "EntityID | ObjectIdentifier | None" = None,
                  radioNumber: uint16 = 0,
-                 radioEntityType: "EntityType | None" = None,
+                 radioEntityType: EntityType | None = None,
                  transmitState: enum8 = 0,  # [UID 164]
                  inputSource: enum8 = 0,  # [UID 165]
-                 antennaLocation: "Vector3Double | None" = None,
-                 relativeAntennaLocation: "Vector3Float | None" = None,
+                 antennaLocation: WorldCoordinates | None = None,
+                 relativeAntennaLocation: Vector3Float | None = None,
                  antennaPatternType: enum16 = 0,  # [UID 167]
                  frequency: uint64 = 0,  # in Hz
                  transmitFrequencyBandwidth: float32 = 0.0,  # in Hz
                  power: float32 = 0.0,  # in decibel-milliwatts
-                 modulationType: "ModulationType | None" = None,
+                 modulationType: ModulationType | None = None,
                  cryptoSystem: enum16 = 0,  # [UID 166]
                  cryptoKeyId: struct16 = 0,  # See Table 175
                  modulationParameters: ModulationParametersRecord | None = None,
@@ -5028,7 +5001,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         self.radioEntityType = radioEntityType or EntityType()  # TODO: validation
         self.transmitState = transmitState
         self.inputSource = inputSource
-        self.antennaLocation = antennaLocation or Vector3Double()
+        self.antennaLocation = antennaLocation or WorldCoordinates()
         self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float(
         )
         self.antennaPatternType = antennaPatternType
@@ -5571,17 +5544,17 @@ class PointObjectStatePdu(SyntheticEnvironmentFamilyPdu):
     pduType: enum8 = 43  # [UID 4]
 
     def __init__(self,
-                 objectID: "EntityID | None" = None,
-                 referencedObjectID: "EntityID | None" = None,
+                 objectID: EntityID | None = None,
+                 referencedObjectID: EntityID | None = None,
                  updateNumber: uint16 = 0,
                  forceID: enum8 = 0,  # [UID 6]
                  modifications : enum8 = 0,  # [UID 240]
-                 objectType: "ObjectType | None" = None,
-                 objectLocation: "Vector3Double | None" = None,
-                 objectOrientation: "EulerAngles | None" = None,
+                 objectType: ObjectType | None = None,
+                 objectLocation: WorldCoordinates | None = None,
+                 objectOrientation: EulerAngles | None = None,
                  objectAppearance: struct32 | struct16 = 0,  # [UID 229]
-                 requesterID: "SimulationAddress | None" = None,
-                 receivingID: "SimulationAddress | None" = None):
+                 requesterID: SimulationAddress | None = None,
+                 receivingID: SimulationAddress | None = None):
         super(PointObjectStatePdu, self).__init__()
         # TODO: Validate ObjectID?
         self.objectID = objectID or EntityID()
@@ -5596,7 +5569,7 @@ class PointObjectStatePdu(SyntheticEnvironmentFamilyPdu):
         """modifications"""
         self.objectType = objectType or ObjectType()
         """Object type"""
-        self.objectLocation = objectLocation or Vector3Double()
+        self.objectLocation = objectLocation or WorldCoordinates()
         """Object location"""
         self.objectOrientation = objectOrientation or EulerAngles()
         """Object orientation"""
@@ -6016,17 +5989,17 @@ class ArealObjectStatePdu(SyntheticEnvironmentFamilyPdu):
     pduType: enum8 = 45  # [UID 4]
 
     def __init__(self,
-                 objectID: "EntityID | None" = None,
-                 referencedObjectID: "EntityID | None" = None,
+                 objectID: EntityID | None = None,
+                 referencedObjectID: EntityID | None = None,
                  updateNumber: uint16 = 0,
                  forceId: enum8 = 0,  # [UID 6]
                  modifications: enum8 = 0,  # [UID 242]
-                 objectType: "ObjectType | None" = None,
+                 objectType: ObjectType | None = None,
                  specificObjectAppearance: struct32 = 0,
                  generalObjectAppearance: struct16 = 0,  # [UID 229]
-                 requesterID: "SimulationAddress | None" = None,
-                 receivingID: "SimulationAddress | None" = None,
-                 objectLocation: list["Vector3Double"] | None = None):
+                 requesterID: SimulationAddress | None = None,
+                 receivingID: SimulationAddress | None = None,
+                 objectLocation: list[WorldCoordinates] | None = None):
         super(ArealObjectStatePdu, self).__init__()
         # TODO: validate object ID?
         self.objectID = objectID or EntityID()
@@ -6080,7 +6053,7 @@ class ArealObjectStatePdu(SyntheticEnvironmentFamilyPdu):
         self.requesterID.parse(inputStream)
         self.receivingID.parse(inputStream)
         for idx in range(0, numberOfPoints):
-            element = Vector3Double()
+            element = WorldCoordinates()
             element.parse(inputStream)
             self.objectLocation.append(element)
 
@@ -6159,19 +6132,19 @@ class MinefieldStatePdu(MinefieldFamilyPdu):
                  minefieldID: "MinefieldIdentifier | None" = None,
                  minefieldSequence: uint16 = 0,
                  forceID: enum8 = 0,  # [UID 6]
-                 minefieldType: "EntityType | None" = None,
-                 minefieldLocation: "Vector3Double | None" = None,
-                 minefieldOrientation: "EulerAngles | None" = None,
+                 minefieldType: EntityType | None = None,
+                 minefieldLocation: WorldCoordinates | None = None,
+                 minefieldOrientation: EulerAngles | None = None,
                  appearance: struct16 = 0,  # [UID 190]
                  protocolMode: struct16 = 0,  # See 6.2.69
-                 perimeterPoints: list["Vector2Float"] | None = None,
-                 mineTypes: list["EntityType"] | None = None):
+                 perimeterPoints: list[Vector2Float] | None = None,
+                 mineTypes: list[EntityType] | None = None):
         super(MinefieldStatePdu, self).__init__()
         self.minefieldID = minefieldID or MinefieldIdentifier()
         self.minefieldSequence = minefieldSequence
         self.forceID = forceID
         self.minefieldType = minefieldType or EntityType()
-        self.minefieldLocation = minefieldLocation or Vector3Double()
+        self.minefieldLocation = minefieldLocation or WorldCoordinates()
         """location of center of minefield in world coords"""
         self.minefieldOrientation = minefieldOrientation or EulerAngles()
         self.appearance = appearance
@@ -6486,21 +6459,21 @@ class DetonationPdu(WarfareFamilyPdu):
     pduType: enum8 = 3  # [UID 4]
 
     def __init__(self,
-                 explodingEntityID: "EntityID | None" = None,
-                 eventID: "EventIdentifier | None" = None,
-                 velocity: "Vector3Float | None" = None,
-                 location: "Vector3Double | None" = None,
-                 descriptor: "MunitionDescriptor | None" = None,
-                 locationInEntityCoordinates: "Vector3Float | None" = None,
+                 explodingEntityID: EntityID | None = None,
+                 eventID: EventIdentifier | None = None,
+                 velocity: Vector3Float | None = None,
+                 location: WorldCoordinates | None = None,
+                 descriptor: MunitionDescriptor | None = None,
+                 locationInEntityCoordinates: Vector3Float | None = None,
                  detonationResult: enum8 = 0,  # [UID 62]
-                 variableParameters: list["VariableParameter"] | None = None):
+                 variableParameters: list[VariableParameter] | None = None):
         super(DetonationPdu, self).__init__()
         self.explodingEntityID = explodingEntityID or EntityID()
         """ID of the expendable entity, Section 7.3.3"""
         self.eventID = eventID or EventIdentifier()
         self.velocity = velocity or Vector3Float()
         """velocity of the munition immediately before detonation/impact, Section 7.3.3"""
-        self.location = location or Vector3Double(
+        self.location = location or WorldCoordinates(
         )
         """location of the munition detonation, the expendable detonation, Section 7.3.3"""
         self.descriptor = descriptor or MunitionDescriptor()
@@ -6761,12 +6734,12 @@ class FirePdu(WarfareFamilyPdu):
     pduType: enum8 = 2  # [UID 4]
 
     def __init__(self,
-                 munitionExpendableID: "EntityID | None" = None,
-                 eventID: "EventIdentifier | None" = None,
+                 munitionExpendableID: EntityID | None = None,
+                 eventID: EventIdentifier | None = None,
                  fireMissionIndex: uint32 = 0,
-                 location: "Vector3Double | None" = None,
-                 descriptor: "MunitionDescriptor | None" = None,
-                 velocity: "Vector3Float | None" = None,
+                 location: WorldCoordinates | None = None,
+                 descriptor: MunitionDescriptor | None = None,
+                 velocity: Vector3Float | None = None,
                  range_: float32 = 0.0):  # in meters
         super(FirePdu, self).__init__()
         self.munitionExpendableID = munitionExpendableID or EntityID()
@@ -6775,7 +6748,7 @@ class FirePdu(WarfareFamilyPdu):
         """This field shall contain an identification generated by the firing entity to associate related firing and detonation events. This field shall be represented by an Event Identifier record (see 6.2.34)."""
         self.fireMissionIndex = fireMissionIndex
         """This field shall identify the fire mission (see 5.4.3.3). This field shall be representedby a 32-bit unsigned integer."""
-        self.location = location or Vector3Double(
+        self.location = location or WorldCoordinates(
         )
         """This field shall specify the location, in world coordinates, from which the munition was launched, and shall be represented by a World Coordinates record (see 6.2.97)."""
         self.descriptor = descriptor or MunitionDescriptor()
@@ -7487,15 +7460,15 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
                  aggregateType: "AggregateType | None" = None,
                  formation: enum32 = 0,
                  aggregateMarking: "AggregateMarking | None" = None,
-                 dimensions: "Vector3Float | None" = None,
-                 orientation: "EulerAngles | None" = None,
-                 centerOfMass: "Vector3Float | None" = None,
-                 velocity: "Vector3Double | None" = None,
-                 aggregateIDs: list["AggregateIdentifier"] | None = None,
-                 entityIDs: list["EntityIdentifier"] | None = None,
-                 silentAggregateSystems: list["SilentAggregateSystem"] | None = None,
-                 silentEntitySystems: list["SilentEntitySystem"] | None = None,
-                 variableDatumRecords: list["VariableDatum"] | None = None):
+                 dimensions: Vector3Float | None = None,
+                 orientation: EulerAngles | None = None,
+                 centerOfMass: Vector3Float | None = None,
+                 velocity: WorldCoordinates | None = None,
+                 aggregateIDs: list[AggregateIdentifier] | None = None,
+                 entityIDs: list[EntityIdentifier] | None = None,
+                 silentAggregateSystems: list[SilentAggregateSystem] | None = None,
+                 silentEntitySystems: list[SilentEntitySystem] | None = None,
+                 variableDatumRecords: list[VariableDatum] | None = None):
         super(AggregateStatePdu, self).__init__()
         """Identifier of the aggregate issuing the PDU"""
         self.aggregateID = aggregateID or AggregateIdentifier()
@@ -7512,7 +7485,7 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         self.orientation = orientation or EulerAngles()
         self.centerOfMass = centerOfMass or Vector3Float()
         """Aggregates linear velocity. The coordinate system is dependent on the dead reckoning algorithm"""
-        self.velocity = velocity or Vector3Double()
+        self.velocity = velocity or WorldCoordinates()
         """Identify subaggregates that are transmitting Aggregate State PDUs"""
         self.aggregateIDs = aggregateIDs or []
         """Constituent entities transmitting Entity State PDUs"""
