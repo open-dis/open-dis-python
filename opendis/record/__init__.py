@@ -386,6 +386,7 @@ class UnknownRadio(ModulationParametersRecord):
               bytelength: int | None = None) -> None:
         # Validate bytelength argument by calling base method
         super().parse(inputStream, bytelength)
+        assert isinstance(bytelength, int)
         self.data = inputStream.read_bytes(bytelength)
 
 

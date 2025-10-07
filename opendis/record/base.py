@@ -89,7 +89,7 @@ class StandardVariableRecord(VariableRecord):
         outputStream.write_uint32(self.recordLength)
 
     @abstractmethod
-    def parse(self,
+    def parse(self,  # pyright: ignore [reportIncompatibleMethodOverride]
               inputStream: DataInputStream,
               bytelength: int) -> None:
         """Parse the record from the input stream.
