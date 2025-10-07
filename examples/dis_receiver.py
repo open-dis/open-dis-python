@@ -5,8 +5,7 @@ __date__ = "$Jun 25, 2015 12:10:26 PM$"
 
 import socket
 import time
-import sys
-import array
+from typing import cast
 
 from opendis.dis7 import *
 from opendis.RangeCoordinates import *
@@ -20,7 +19,7 @@ udpSocket.bind(("", UDP_PORT))
 
 print("Listening for DIS on UDP socket {}".format(UDP_PORT))
 
-gps = GPS();
+gps = GPS()
 
 def recv():
     print('Reading from socket...')
@@ -31,6 +30,7 @@ def recv():
     pduTypeName = pdu.__class__.__name__
 
     if pdu.pduType == 1: # PduTypeDecoders.EntityStatePdu:
+        pdu = cast(EntityStatePdu, pdu)  # for static checkers
         loc = (pdu.entityLocation.x, 
                pdu.entityLocation.y, 
                pdu.entityLocation.z,
@@ -42,7 +42,7 @@ def recv():
         body = gps.ecef2llarpy(*loc)
 
         print("Received {}\n".format(pduTypeName)
-              + " Id        : {}\n".format(pdu.entityID.entityID)
+              + " Id        : {}\n".format(pdu.entityID.entityNumber)
               + " Latitude  : {:.2f} degrees\n".format(rad2deg(body[0]))
               + " Longitude : {:.2f} degrees\n".format(rad2deg(body[1]))
               + " Altitude  : {:.0f} meters\n".format(body[2])
