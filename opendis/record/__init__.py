@@ -879,36 +879,45 @@ class DirectedEnergyAreaAimpoint(base.VariableRecord):
     recordType: enum32 = 4001  # [UID 66]
 
     def __init__(self,
-                 recordLength: uint16 = 0,
-                 beamAntennaParameters: list | None = None,
-                 directedEnergyTargetEnergyDepositions: list | None 
-= None):
-        self.recordLength = recordLength
+                 beamAntennaPatterns: list["BeamAntennaPattern"] | None = None,
+                 directedEnergyTargetEnergyDepositions: list["DirectedEnergyTargetEnergyDeposition"] | None = None):
         self.padding: uint16 = 0
-        self.beamAntennaParameters = beamAntennaParameters or []
-        self.directedEnergyTargetEnergyDepositionRecordList = directedEnergyTargetEnergyDepositions or []
+        self.beamAntennaPatterns: list["BeamAntennaPattern"] = beamAntennaPatterns or []
+        self.directedEnergyTargetEnergyDepositions: list["DirectedEnergyTargetEnergyDeposition"] = directedEnergyTargetEnergyDepositions or []
 
     @property
-    def beamAntennaPatternRecordCount(self) -> uint16:
-        return len(self.beamAntennaParameters)
+    def recordLength(self) -> uint16:
+        return self.marshalledSize()
 
     @property
-    def directedEnergyTargetEnergyDepositionRecordCount(self) -> uint16:
-        return len(self.directedEnergyTargetEnergyDepositionRecordList)
+    def beamAntennaPatternCount(self) -> uint16:
+        return len(self.beamAntennaPatterns)
 
+    @property
+    def directedEnergyTargetEnergyDepositionCount(self) -> uint16:
+        return len(self.directedEnergyTargetEnergyDepositions)
+
+    def marshalledSize(self) -> int:
+        size = 8  # recordType, recordLength, padding
+        for record in self.beamAntennaPatterns:
+            size += record.marshalledSize()
+        for record in self.directedEnergyTargetEnergyDepositions:
+            size += record.marshalledSize()
+        return size
+    
     def serialize(self, outputStream: DataOutputStream) -> None:
         outputStream.write_uint32(self.recordType)
         outputStream.write_uint16(self.recordLength)
         outputStream.write_uint16(self.padding)
-        outputStream.write_uint16(self.beamAntennaPatternRecordCount)
+        outputStream.write_uint16(self.beamAntennaPatternCount)
         outputStream.write_uint16(
-            self.directedEnergyTargetEnergyDepositionRecordCount
+            self.directedEnergyTargetEnergyDepositionCount
         )
-        for anObj in self.beamAntennaParameters:
-            anObj.serialize(outputStream)
+        for record in self.beamAntennaPatterns:
+            record.serialize(outputStream)
 
-        for anObj in self.directedEnergyTargetEnergyDepositionRecordList:
-            anObj.serialize(outputStream)
+        for record in self.directedEnergyTargetEnergyDepositions:
+            record.serialize(outputStream)
 
     def parse(self,
               inputStream: DataInputStream,
@@ -918,17 +927,17 @@ class DirectedEnergyAreaAimpoint(base.VariableRecord):
         assert isinstance(bytelength, int)
         recordLength = inputStream.read_uint16()
         self.padding = inputStream.read_uint16()
-        beamAntennaPatternRecordCount = inputStream.read_uint16()
-        directedEnergyTargetEnergyDepositionRecordCount = inputStream.read_uint16()
-        for _ in range(0, beamAntennaPatternRecordCount):
-            element = null()
-            element.parse(inputStream)
-            self.beamAntennaParameters.append(element)
+        beamAntennaPatternCount = inputStream.read_uint16()
+        directedEnergyTargetEnergyDepositionCount = inputStream.read_uint16()
+        for _ in range(0, beamAntennaPatternCount):
+            record = BeamAntennaPattern()
+            record.parse(inputStream)
+            self.beamAntennaPatterns.append(record)
 
-        for idx in range(0, directedEnergyTargetEnergyDepositionRecordCount):
-            element = null()
-            element.parse(inputStream)
-            self.directedEnergyTargetEnergyDepositionRecordList.append(element)
+        for idx in range(0, directedEnergyTargetEnergyDepositionCount):
+            record = DirectedEnergyTargetEnergyDeposition()
+            record.parse(inputStream)
+            self.directedEnergyTargetEnergyDepositions.append(record)
 
 
 class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
@@ -939,7 +948,6 @@ class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
     weapon would not fire unless a target is known and is currently tracked.
     """
     recordType: enum32 = 4000
-    recordLength: uint16 = 88
 
     def __init__(self,
                  targetSpotLocation: WorldCoordinates | None = None,
@@ -955,8 +963,7 @@ class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
                  peakIrradiance: float32 = 0.0):  # in W/m^2
         self.padding: uint16 = 0
         self.targetSpotLocation = targetSpotLocation or WorldCoordinates()
-        self.targetSpotEntityLocation = targetSpotEntityLocation or Vector3Float(
-        )
+        self.targetSpotEntityLocation = targetSpotEntityLocation or Vector3Float()
         self.targetSpotVelocity = targetSpotVelocity or Vector3Float()
         self.targetSpotAcceleration = targetSpotAcceleration or Vector3Float()
         self.targetEntityID = targetEntityID or EntityIdentifier()
@@ -967,6 +974,13 @@ class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
         self.beamSpotCrossSectionOrientationAngle = beamSpotCrossSectionOrientationAngle
         self.peakIrradiance = peakIrradiance
         self.padding2: uint32 = 0
+
+    @property
+    def recordLength(self) -> uint16:
+        return self.marshalledSize()
+    
+    def marshalledSize(self) -> int:
+        return 96
 
     def serialize(self, outputStream: DataOutputStream) -> None:
         outputStream.write_uint32(self.recordType)
@@ -1012,7 +1026,10 @@ class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
 class DirectedEnergyTargetEnergyDeposition(base.Record):
     """6.2.20.4 DE Target Energy Deposition record
 
-    DE energy deposition properties for a target entity.
+    Directed energy deposition properties for a target entity shall be
+    communicated using the DE Target Energy Deposition record. This record is
+    required to be included inside another DE record as it does not have a
+    record type.
     """
 
     def __init__(self,
@@ -1021,6 +1038,9 @@ class DirectedEnergyTargetEnergyDeposition(base.Record):
         self.targetEntityID = targetEntityID or EntityIdentifier()
         self.padding: uint16 = 0
         self.peakIrradiance = peakIrradiance
+
+    def marshalledSize(self) -> int:
+        return self.targetEntityID.marshalledSize() + 6
 
     def serialize(self, outputStream: DataOutputStream) -> None:
         self.targetEntityID.serialize(outputStream)
