@@ -83,28 +83,6 @@ class WorldCoordinates(base.Record):
         self.z = inputStream.read_float64()
 
 
-class EntityID:
-    """more laconically named EntityIdentifier"""
-
-    def __init__(self, siteID=0, applicationID=0, entityID=0):
-        self.siteID = siteID
-        self.applicationID = applicationID
-        self.entityID = entityID
-
-    def serialize(self, outputStream: DataOutputStream) -> None:
-        """serialize the class"""
-        outputStream.write_unsigned_short(self.siteID)
-        outputStream.write_unsigned_short(self.applicationID)
-        outputStream.write_unsigned_short(self.entityID)
-
-    def parse(self, inputStream: DataInputStream) -> None:
-        """Parse a message. This may recursively call embedded objects."""
-
-        self.siteID = inputStream.read_unsigned_short()
-        self.applicationID = inputStream.read_unsigned_short()
-        self.entityID = inputStream.read_unsigned_short()
-
-
 class EntityIdentifier:
     """Section 6.2.28
 
