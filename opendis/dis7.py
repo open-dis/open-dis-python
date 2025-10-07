@@ -26,7 +26,7 @@ from .record import (
     DamageDescriptionRecord,
     UnknownDamage,
     DirectedEnergyDamage,
-    getVariableRecordClass,
+    getSVClass,
 )
 from .stream import DataInputStream, DataOutputStream
 from .types import (
@@ -5089,7 +5089,7 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         for _ in range(0, variableTransmitterParameterCount):
             recordType = inputStream.read_uint32()
             recordLength = inputStream.read_uint16()
-            vtpClass = getVariableRecordClass(
+            vtpClass = getSVClass(
                 recordType,
                 expectedType=VariableTransmitterParametersRecord
             )

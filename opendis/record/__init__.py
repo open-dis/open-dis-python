@@ -973,7 +973,7 @@ __variableRecordClasses: dict[int, type[base.StandardVariableRecord]] = {
     3000: HighFidelityHAVEQUICKRadio,
 }
 
-def getVariableRecordClass(
+def getSVClass(
         recordType: int,
         expectedType: type[SV] = base.StandardVariableRecord
 ) -> type[SV] | None:
