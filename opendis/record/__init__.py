@@ -83,7 +83,7 @@ class WorldCoordinates(base.Record):
         self.z = inputStream.read_float64()
 
 
-class EntityIdentifier:
+class EntityIdentifier(base.Record):
     """Section 6.2.28
 
     Entity Identifier. Unique ID for entities in the world. Consists of a
@@ -95,6 +95,9 @@ class EntityIdentifier:
                  entityNumber: uint16 = 0):
         self.simulationAddress = simulationAddress or SimulationAddress()
         self.entityNumber = entityNumber
+    
+    def marshalledSize(self) -> int:
+        return self.simulationAddress.marshalledSize() + 2
 
     def serialize(self, outputStream: DataOutputStream) -> None:
         self.simulationAddress.serialize(outputStream)
