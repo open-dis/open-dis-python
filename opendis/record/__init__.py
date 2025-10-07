@@ -37,7 +37,7 @@ __variableRecordClasses: dict[int, type[base.StandardVariableRecord]] = {
     4500: DirectedEnergyDamage,
 }
 
-def getSVClass(
+def getStandardVariableClass(
         recordType: int,
         expectedType: type[SV] = base.StandardVariableRecord
 ) -> type[SV]:

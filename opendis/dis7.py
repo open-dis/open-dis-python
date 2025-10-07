@@ -25,7 +25,7 @@ from .record import (
     VariableTransmitterParametersRecord,
     DamageDescriptionRecord,
     StandardVariableRecord,
-    getSVClass,
+    getStandardVariableClass,
     base
 )
 from .stream import DataInputStream, DataOutputStream
@@ -62,7 +62,7 @@ def parseStandardVariableRecord(
     """
     recordType = inputStream.read_uint32()
     recordLength = inputStream.read_uint16()
-    svClass = getSVClass(recordType, expectedType)
+    svClass = getStandardVariableClass(recordType, expectedType)
     sv_instance = svClass()
     sv_instance.parse(inputStream, recordLength)
     return sv_instance
