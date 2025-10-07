@@ -46,12 +46,12 @@ class VariableRecord(Protocol):
     @abstractmethod
     def parse(self,
               inputStream: DataInputStream,
-              bytelength: int) -> None:
+              bytelength: int | None = None) -> None:
         """Parse the record from the input stream.
 
         If bytelength is provided, it indicates the expected length of the record. Some records may require this information to parse correctly.
         """
-        if not self.is_positive_int(bytelength):
+        if bytelength is not None and not self.is_positive_int(bytelength):
             raise ValueError(
                 f"bytelength must be a non-negative integer, got {bytelength!r}"
             )

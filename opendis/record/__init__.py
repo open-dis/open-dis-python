@@ -351,7 +351,7 @@ class UnknownRadio(ModulationParametersRecord):
 
     def parse(self,
               inputStream: DataInputStream,
-              bytelength: int) -> None:
+              bytelength: int | None = None) -> None:
         # Validate bytelength argument by calling base method
         super().parse(inputStream, bytelength)
         self.data = inputStream.read_bytes(bytelength)
@@ -372,7 +372,7 @@ class GenericRadio(ModulationParametersRecord):
 
     def parse(self,
               inputStream: DataInputStream,
-              bytelength: int) -> None:
+              bytelength: int | None = None) -> None:
         pass
 
 
@@ -395,7 +395,7 @@ class SimpleIntercomRadio(ModulationParametersRecord):
 
     def parse(self,
               inputStream: DataInputStream,
-              bytelength: int) -> None:
+              bytelength: int | None = None) -> None:
         pass
 
 
@@ -435,7 +435,7 @@ class BasicHaveQuickMP(ModulationParametersRecord):
 
     def parse(self,
               inputStream: DataInputStream,
-              bytelength: int) -> None:
+              bytelength: int | None = None) -> None:
         # Validate bytelength argument by calling base method
         super().parse(inputStream, bytelength)
         self.net_id.parse(inputStream)
@@ -483,7 +483,7 @@ class CCTTSincgarsMP(ModulationParametersRecord):
 
     def parse(self,
               inputStream: DataInputStream,
-              bytelength: int) -> None:
+              bytelength: int | None = None) -> None:
         # Validate bytelength argument by calling base method
         super().parse(inputStream, bytelength)
         self.fh_net_id = inputStream.read_uint16()
@@ -516,7 +516,7 @@ class UnknownAntennaPattern(AntennaPatternRecord):
         super().serialize(outputStream)
         outputStream.write_bytes(self.data)
 
-    def parse(self,
+    def parse(self,  # pyright: ignore[reportIncompatibleMethodOverride]
               inputStream: DataInputStream,
               bytelength: int) -> None:
         # Validate bytelength argument by calling base method
@@ -573,7 +573,7 @@ class BeamAntennaPattern(AntennaPatternRecord):
 
     def parse(self,
               inputStream: DataInputStream,
-              bytelength: int = 40) -> None:
+              bytelength: int | None = 40) -> None:
         # Validate bytelength argument by calling base method
         super().parse(inputStream, bytelength)
         self.beamDirection.parse(inputStream)
