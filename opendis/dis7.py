@@ -12,6 +12,7 @@ from .record import (
     UnknownAntennaPattern,
     EulerAngles,
     Vector3Float,
+    DEFireFlags,
     WorldCoordinates,
     EntityIdentifier,
     EventIdentifier,
@@ -6312,7 +6313,7 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
                  wavelength: float32 = 0.0,  # in meters
                  pulseRepetitionFrequency: float32 = 0.0,  # in Hz
                  pulseWidth: float32 = 0,  # in seconds
-                 flags: struct16 = 0,  # [UID 313]
+                 flags: DEFireFlags | None = None,  # [UID 313]
                  pulseShape: enum8 = 0,  # [UID 312]
                  dERecords: list[DamageDescriptionRecord] | None = None):
         super(DirectedEnergyFirePdu, self).__init__()
@@ -6327,8 +6328,7 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
         self.padding1: uint32 = 0
         self.pulseRepetitionFrequency = pulseRepetitionFrequency
         self.pulseWidth = pulseWidth
-        self.flags = flags
-        """16bit Boolean field shall contain various flags to indicate status information needed to process a DE, Section 7.3.4"""
+        self.flags = flags or DEFireFlags()
         self.pulseShape = pulseShape
         self.padding2: uint8 = 0
         self.padding3: uint32 = 0
@@ -6350,7 +6350,7 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
         outputStream.write_uint32(self.padding1)
         outputStream.write_float32(self.pulseRepetitionFrequency)
         outputStream.write_float32(self.pulseWidth)
-        outputStream.write_uint16(self.flags)
+        self.flags.serialize(outputStream)
         outputStream.write_uint8(self.pulseShape)
         outputStream.write_uint8(self.padding2)
         outputStream.write_uint32(self.padding3)
@@ -6370,7 +6370,7 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
         self.padding1 = inputStream.read_uint32()
         self.pulseRepetitionFrequency = inputStream.read_float32()
         self.pulseWidth = inputStream.read_float32()
-        self.flags = inputStream.read_uint16()
+        self.flags.parse(inputStream)
         self.pulseShape = inputStream.read_uint8()
         self.padding2 = inputStream.read_uint8()
         self.padding3 = inputStream.read_uint32()
@@ -6383,7 +6383,7 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
                 recordType,
                 expectedType=DamageDescriptionRecord
             )
-            vtp = vtpClass()
+            vtp = vtpClass()  # pyright: ignore[reportAbstractUsage]
             vtp.parse(inputStream, bytelength=recordLength)
             self.dERecords.append(vtp)
 
