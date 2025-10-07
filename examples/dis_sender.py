@@ -8,7 +8,7 @@ import time
 
 from io import BytesIO
 
-from opendis.DataOutputStream import DataOutputStream
+from opendis.stream import DataOutputStream
 from opendis.dis7 import EntityStatePdu
 from opendis.RangeCoordinates import *
 
@@ -23,9 +23,9 @@ gps = GPS() # conversion helper
 def send():
     pdu = EntityStatePdu()
 
-    pdu.entityID.entityID = 42
-    pdu.entityID.siteID = 17
-    pdu.entityID.applicationID = 23
+    pdu.entityID.entityNumber = 42
+    pdu.entityID.simulationAddress.site = 17
+    pdu.entityID.simulationAddress.application = 23
     pdu.marking.setString('Igor3d')
 
      # Entity in Monterey, CA, USA facing North, no roll or pitch
