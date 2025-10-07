@@ -13,6 +13,8 @@ from .record import (
     EulerAngles,
     Vector3Float,
     WorldCoordinates,
+    EntityID,
+    EntityIdentifier,
     EventIdentifier,
     SimulationAddress,
     BeamAntennaPattern,
@@ -3010,57 +3012,6 @@ class ExpendableReload:
         self.maximumQuantity = inputStream.read_unsigned_short()
         self.standardQuantityReloadTime = inputStream.read_unsigned_int()
         self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
-
-
-class EntityIdentifier:
-    """Section 6.2.28
-
-    Entity Identifier. Unique ID for entities in the world. Consists of a
-    simulation address and a entity number.
-    """
-
-    def __init__(self,
-                 simulationAddress: "SimulationAddress | None" = None,
-                 entityNumber: uint16 = 0):
-        self.simulationAddress = simulationAddress or SimulationAddress()
-        """Site and application IDs"""
-        self.entityNumber = entityNumber
-        """Entity number"""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.entityNumber)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.simulationAddress.parse(inputStream)
-        self.entityNumber = inputStream.read_unsigned_short()
-
-
-class EntityID:
-    """more laconically named EntityIdentifier"""
-
-    def __init__(self, siteID=0, applicationID=0, entityID=0):
-        self.siteID = siteID
-        """Site ID"""
-        self.applicationID = applicationID
-        """application number ID"""
-        self.entityID = entityID
-        """Entity number ID"""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_short(self.siteID)
-        outputStream.write_unsigned_short(self.applicationID)
-        outputStream.write_unsigned_short(self.entityID)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-
-        self.siteID = inputStream.read_unsigned_short()
-        self.applicationID = inputStream.read_unsigned_short()
-        self.entityID = inputStream.read_unsigned_short()
 
 
 class EngineFuelReload:
