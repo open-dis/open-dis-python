@@ -58,7 +58,6 @@ class VariableRecord(Protocol):
         # TODO: Implement padding handling
 
 
-@runtime_checkable
 class StandardVariableRecord(VariableRecord):
     """6.2.83 Standard Variable (SV) Record
 

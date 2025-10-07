@@ -6,7 +6,7 @@ import os
 
 from opendis.dis7 import *
 from opendis.PduFactory import *
-from opendis.DataOutputStream import DataOutputStream
+from opendis.stream import DataOutputStream
 
 class TestSignalPdu(unittest.TestCase):
 
