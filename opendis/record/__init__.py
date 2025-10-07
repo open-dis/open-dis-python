@@ -917,10 +917,10 @@ class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
     recordLength: uint16 = 88
 
     def __init__(self,
-                 targetSpotLocation: "Vector3Double | None" = None,
-                 targetSpotEntityLocation: "Vector3Float | None" = None,
-                 targetSpotVelocity: "Vector3Float | None" = None,  # in m/s
-                 targetSpotAcceleration: "Vector3Float | None" = None,  # in m/s^2
+                 targetSpotLocation: WorldCoordinates | None = None,
+                 targetSpotEntityLocation: Vector3Float | None = None,
+                 targetSpotVelocity: Vector3Float | None = None,  # in m/s
+                 targetSpotAcceleration: Vector3Float | None = None,  # in m/s^2
                  targetEntityID: "EntityID | None" = None,
                  targetComponentID: enum8 = 0,  # [UID 314]
                  beamSpotType: enum8 = 0,  # [UID 311]
@@ -929,7 +929,7 @@ class DirectedEnergyPrecisionAimpoint(base.VariableRecord):
                  beamSpotCrossSectionOrientationAngle: float32 = 0.0,  # in radians
                  peakIrradiance: float32 = 0.0):  # in W/m^2
         self.padding: uint16 = 0
-        self.targetSpotLocation = targetSpotLocation or Vector3Double()
+        self.targetSpotLocation = targetSpotLocation or WorldCoordinates()
         self.targetSpotEntityLocation = targetSpotEntityLocation or Vector3Float(
         )
         self.targetSpotVelocity = targetSpotVelocity or Vector3Float()
