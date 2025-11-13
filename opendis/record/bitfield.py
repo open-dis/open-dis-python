@@ -33,17 +33,21 @@ INTEGER = "INTEGER"
 
 def _field(name: str,
           ftype: DisFieldType,
-          bits: int) -> CTypeFieldDescription:
-    """Helper function to create the field description tuple used by ctypes."""
-    match (ftype, bits):
-        case (INTEGER, b) if 0 < b <= 8:
-            return (name, c_uint8, bits)
-        case (INTEGER, b) if 8 < b <= 16:
-            return (name, c_uint16, bits)
-        case (INTEGER, b) if 16 < b <= 32:
-            return (name, c_uint32, bits)
-        case _:
-            raise ValueError(f"Unrecognized (ftype, bits): {ftype}, {bits}")
+          bits: int,
+          base_ctype: type[_SimpleCData]) -> CTypeFieldDescription:
+    """Helper function to create the field description tuple used by ctypes.
+
+    Args:
+        name: Field name
+        ftype: Field type (currently only INTEGER supported)
+        bits: Number of bits for this field
+        base_ctype: The base C type to use for all fields (ensures proper packing)
+    """
+    if ftype != INTEGER:
+        raise ValueError(f"Unrecognized ftype: {ftype}")
+    if bits <= 0 or bits > 32:
+        raise ValueError(f"Field size must be between 1 and 32: got {bits}")
+    return (name, base_ctype, bits)
 
 
 def bitfield(name: str,
@@ -58,10 +62,9 @@ def bitfield(name: str,
         fields: Sequence of tuples defining fields of the bitfield, in the form
             (field_name, "INTEGER", field_size_in_bits).
     """
-    # Argument validation
-    struct_fields = []
+    # First pass: calculate total bitsize and validate
     bitsize = 0
-    for name, ftype, bits in fields:
+    for field_name, ftype, bits in fields:
         if ftype not in (INTEGER,):
             raise ValueError(f"Unsupported field type: {ftype}")
         if not isinstance(bits, int):
@@ -69,13 +72,28 @@ def bitfield(name: str,
         if bits <= 0 or bits > 32:
             raise ValueError(f"Field size must be between 1 and 32: got {bits}")
         bitsize += bits
-        struct_fields.append(_field(name, ftype, bits))
 
     if bitsize == 0:
         raise ValueError(f"Bitfield size cannot be zero")
     elif bitsize % 8 != 0:
         raise ValueError(f"Bitfield size must be multiple of 8, got {bitsize}")
     bytesize = bitsize // 8
+
+    # Determine base ctype based on TOTAL size (critical for Python 3.12+ compatibility)
+    # All fields must use the same underlying type to avoid padding issues
+    if bitsize <= 8:
+        base_ctype = c_uint8
+    elif bitsize <= 16:
+        base_ctype = c_uint16
+    elif bitsize <= 32:
+        base_ctype = c_uint32
+    else:
+        raise ValueError(f"Bitfield size {bitsize} exceeds maximum of 32 bits")
+
+    # Second pass: create fields with consistent base type
+    struct_fields = []
+    for field_name, ftype, bits in fields:
+        struct_fields.append(_field(field_name, ftype, bits, base_ctype))
 
     # Create the struct class
     class Bitfield(BigEndianStructure):
