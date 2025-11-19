@@ -22,9 +22,9 @@ class TestElectromagneticEmissionPdu(unittest.TestCase):
         #self.assertEqual(0, pdu.timestamp)
         self.assertEqual(108, pdu.length)
 
-        self.assertEqual(23, pdu.emittingEntityID.siteID)
-        self.assertEqual(1, pdu.emittingEntityID.applicationID)
-        self.assertEqual(2, pdu.emittingEntityID.entityID)
+        self.assertEqual(23, pdu.emittingEntityID.simulationAddress.site)
+        self.assertEqual(1, pdu.emittingEntityID.simulationAddress.application)
+        self.assertEqual(2, pdu.emittingEntityID.entityNumber)
 
         self.assertEqual(23, pdu.eventID.simulationAddress.site)
         self.assertEqual(1, pdu.eventID.simulationAddress.application)
@@ -55,9 +55,9 @@ class TestElectromagneticEmissionPdu(unittest.TestCase):
         self.assertEqual(0, pdu.systems[0].beamRecords[0].highDensityTrackJam)
         self.assertEqual(0, pdu.systems[0].beamRecords[0].jammingModeSequence)
 
-        self.assertEqual(23, pdu.systems[0].beamRecords[0].trackJamRecords[0].entityID.siteID)
-        self.assertEqual(1, pdu.systems[0].beamRecords[0].trackJamRecords[0].entityID.applicationID)
-        self.assertEqual(1, pdu.systems[0].beamRecords[0].trackJamRecords[0].entityID.entityID)
+        self.assertEqual(23, pdu.systems[0].beamRecords[0].trackJamRecords[0].entityID.simulationAddress.site)
+        self.assertEqual(1, pdu.systems[0].beamRecords[0].trackJamRecords[0].entityID.simulationAddress.application)
+        self.assertEqual(1, pdu.systems[0].beamRecords[0].trackJamRecords[0].entityID.entityNumber)
         self.assertEqual(0, pdu.systems[0].beamRecords[0].trackJamRecords[0].emitterNumber)
         self.assertEqual(0, pdu.systems[0].beamRecords[0].trackJamRecords[0].beamNumber)
         

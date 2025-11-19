@@ -6,7 +6,7 @@ import os
 
 from opendis.dis7 import *
 from opendis.PduFactory import *
-from opendis.DataOutputStream import DataOutputStream
+from opendis.stream import DataOutputStream
 
 class TestSignalPdu(unittest.TestCase):
 
@@ -25,9 +25,9 @@ class TestSignalPdu(unittest.TestCase):
             #self.assertEqual(0, pdu.timestamp)
             self.assertEqual(1056, pdu.length)
 
-            self.assertEqual(1677, pdu.entityID.siteID)
-            self.assertEqual(1678, pdu.entityID.applicationID)
-            self.assertEqual(169, pdu.entityID.entityID )
+            self.assertEqual(1677, pdu.entityID.simulationAddress.site)
+            self.assertEqual(1678, pdu.entityID.simulationAddress.application)
+            self.assertEqual(169, pdu.entityID.entityNumber)
             self.assertEqual(1, pdu.radioID)
             self.assertEqual(4, pdu.encodingScheme)
             self.assertEqual(0, pdu.tdlType)

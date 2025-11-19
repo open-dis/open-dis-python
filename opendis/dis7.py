@@ -11,14 +11,22 @@ from .record import (
     UnknownRadio,
     UnknownAntennaPattern,
     EulerAngles,
+    Vector3Float,
+    DEFireFlags,
+    WorldCoordinates,
+    EntityIdentifier,
+    EventIdentifier,
+    SimulationAddress,
     BeamAntennaPattern,
     GenericRadio,
     SimpleIntercomRadio,
     BasicHaveQuickMP,
     CCTTSincgarsMP,
     VariableTransmitterParametersRecord,
-    HighFidelityHAVEQUICKRadio,
-    UnknownVariableTransmitterParameters,
+    DamageDescriptionRecord,
+    StandardVariableRecord,
+    getStandardVariableClass,
+    base
 )
 from .stream import DataInputStream, DataOutputStream
 from .types import (
@@ -36,6 +44,28 @@ from .types import (
     struct16,
     struct32,
 )
+
+
+def parseStandardVariableRecord(
+        inputStream: DataInputStream,
+        expectedType: type[base.StandardVariableRecord],
+) -> base.StandardVariableRecord:
+    """Parse a single Standard Variable Record from the input stream.
+    These rely on recordType enums from [UID 66].
+    The mapping of recordType to class is defined in opendis.radio
+
+    Args:
+        inputStream: The DataInputStream to read from.
+    
+    Returns:
+        An instance of a StandardVariableRecord subclass.
+    """
+    recordType = inputStream.read_uint32()
+    recordLength = inputStream.read_uint16()
+    svClass = getStandardVariableClass(recordType, expectedType)
+    sv_instance = svClass()
+    sv_instance.parse(inputStream, recordLength)
+    return sv_instance
 
 
 class DataQueryDatumSpecification:
@@ -311,8 +341,8 @@ class DeadReckoningParameters:
     def __init__(self,
                  deadReckoningAlgorithm: enum8 = 0,  # [UID 44]
                  parameters=None,
-                 entityLinearAcceleration: "Vector3Float | None" = None,
-                 entityAngularVelocity: "Vector3Float | None" = None):
+                 entityLinearAcceleration: Vector3Float | None = None,
+                 entityAngularVelocity: Vector3Float | None = None):
         self.deadReckoningAlgorithm = deadReckoningAlgorithm
         """Algorithm to use in computing dead reckoning. See EBV doc."""
         self.parameters = parameters or [0] * 15
@@ -464,7 +494,7 @@ class EntityAssociation:
         """Indicates association status between two entities; 8 bit enum"""
         self.associationType = associationType
         """Type of association; 8 bit enum"""
-        self.entityID = entityID or EntityID()
+        self.entityID = entityID or EntityIdentifier()
         """Object ID of entity associated with this entity"""
         self.ownStationLocation = ownStationLocation
         """Station location on one's own entity. EBV doc."""
@@ -687,89 +717,6 @@ class NamedLocationIdentification:
         self.stationNumber = inputStream.read_unsigned_short()
 
 
-class DirectedEnergyPrecisionAimpoint:
-    """Section 6.2.20.3
-
-    DE Precision Aimpoint Record.
-    """
-    recordType: enum32 = 4000
-    recordLength: uint16 = 88
-
-    def __init__(self,
-                 targetSpotLocation: "Vector3Double | None" = None,
-                 targetSpotEntityLocation: "Vector3Float | None" = None,
-                 targetSpotVelocity: "Vector3Float | None" = None,
-                 targetSpotAcceleration: "Vector3Float | None" = None,
-                 targetEntityID: "EntityID | None" = None,
-                 targetComponentID: enum8 = 0,  # [UID 314]
-                 beamSpotType: enum8 = 0,  # [UID 311]
-                 beamSpotCrossSectionSemiMajorAxis: float32 = 0.0,  # in meters
-                 beamSpotCrossSectionSemiMinorAxis: float32 = 0.0,  # in meters
-                 beamSpotCrossSectionOrientationAngle: float32 = 0.0,  # in radians
-                 peakIrradiance: float32 = 0.0):  # in W/m^2
-        self.padding: uint16 = 0
-        self.targetSpotLocation = targetSpotLocation or Vector3Double()
-        """Position of Target Spot in World Coordinates."""
-        self.targetSpotEntityLocation = targetSpotEntityLocation or Vector3Float(
-        )
-        """Position (meters) of Target Spot relative to Entity Position."""
-        self.targetSpotVelocity = targetSpotVelocity or Vector3Float()
-        """Velocity (meters/sec) of Target Spot."""
-        self.targetSpotAcceleration = targetSpotAcceleration or Vector3Float()
-        """Acceleration (meters/sec/sec) of Target Spot."""
-        self.targetEntityID = targetEntityID or EntityID()
-        """Unique ID of the target entity."""
-        self.targetComponentID = targetComponentID
-        """Target Component ID ENUM, same as in DamageDescriptionRecord."""
-        self.beamSpotType = beamSpotType
-        """Spot Shape ENUM."""
-        self.beamSpotCrossSectionSemiMajorAxis = beamSpotCrossSectionSemiMajorAxis
-        """Beam Spot Cross Section Semi-Major Axis."""
-        self.beamSpotCrossSectionSemiMinorAxis = beamSpotCrossSectionSemiMinorAxis
-        """Beam Spot Cross Section Semi-Major Axis."""
-        self.beamSpotCrossSectionOrientationAngle = beamSpotCrossSectionOrientationAngle
-        """Beam Spot Cross Section Orientation Angle."""
-        self.peakIrradiance = peakIrradiance
-        """Peak irradiance"""
-        self.padding2: uint32 = 0
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_int(self.recordType)
-        outputStream.write_unsigned_short(self.recordLength)
-        outputStream.write_unsigned_short(self.padding)
-        self.targetSpotLocation.serialize(outputStream)
-        self.targetSpotEntityLocation.serialize(outputStream)
-        self.targetSpotVelocity.serialize(outputStream)
-        self.targetSpotAcceleration.serialize(outputStream)
-        self.targetEntityID.serialize(outputStream)
-        outputStream.write_unsigned_byte(self.targetComponentID)
-        outputStream.write_unsigned_byte(self.beamSpotType)
-        outputStream.write_float(self.beamSpotCrossSectionSemiMajorAxis)
-        outputStream.write_float(self.beamSpotCrossSectionSemiMinorAxis)
-        outputStream.write_float(self.beamSpotCrossSectionOrientationAngle)
-        outputStream.write_float(self.peakIrradiance)
-        outputStream.write_unsigned_int(self.padding2)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
-        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
-        self.padding = inputStream.read_unsigned_short()
-        self.targetSpotLocation.parse(inputStream)
-        self.targetSpotEntityLocation.parse(inputStream)
-        self.targetSpotVelocity.parse(inputStream)
-        self.targetSpotAcceleration.parse(inputStream)
-        self.targetEntityID.parse(inputStream)
-        self.targetComponentID = inputStream.read_unsigned_byte()
-        self.beamSpotType = inputStream.read_unsigned_byte()
-        self.beamSpotCrossSectionSemiMajorAxis = inputStream.read_float()
-        self.beamSpotCrossSectionSemiMinorAxis = inputStream.read_float()
-        self.beamSpotCrossSectionOrientationAngle = inputStream.read_float()
-        self.peakIrradiance = inputStream.read_float()
-        self.padding2 = inputStream.read_unsigned_int()
-
-
 class IFFDataSpecification:
     """Section 6.2.43
 
@@ -804,8 +751,10 @@ class OwnershipStatus:
     Used to convey entity and conflict status information associated with transferring ownership of an entity.
     """
 
-    def __init__(self, entityId=None, ownershipStatus=0):
-        self.entityId = entityId or EntityID()
+    def __init__(self,
+                 entityId: EntityIdentifier | None = None,
+                 ownershipStatus=0):
+        self.entityId = entityId or EntityIdentifier()
         """EntityID"""
         self.ownershipStatus = ownershipStatus
         """The ownership and/or ownership conflict status of the entity represented by the Entity ID field."""
@@ -1006,13 +955,13 @@ class Association:
 
     def __init__(self,
                  associationType: enum8 = 0,  # [UID 330]
-                 associatedEntityID: "EntityID | None" = None,
-                 associatedLocation: "Vector3Double | None" = None):
+                 associatedEntityID: EntityIdentifier | None = None,
+                 associatedLocation: WorldCoordinates | None = None):
         self.associationType = associationType
         self.padding4: uint8 = 0
-        self.associatedEntityID = associatedEntityID or EntityID()
+        self.associatedEntityID = associatedEntityID or EntityIdentifier()
         """identity of associated entity. If none, NO_SPECIFIC_ENTITY"""
-        self.associatedLocation = associatedLocation or Vector3Double()
+        self.associatedLocation = associatedLocation or WorldCoordinates()
         """location, in world coordinates"""
 
     def serialize(self, outputStream):
@@ -1080,9 +1029,9 @@ class AntennaLocation:
     """
 
     def __init__(self,
-                 antennaLocation: "Vector3Double | None" = None,
-                 relativeAntennaLocation: "Vector3Float | None" = None):
-        self.antennaLocation = antennaLocation or Vector3Double()
+                 antennaLocation: WorldCoordinates | None = None,
+                 relativeAntennaLocation: Vector3Float | None = None):
+        self.antennaLocation = antennaLocation or WorldCoordinates()
         """Location of the radiating portion of the antenna in world coordinates"""
         self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float(
         )
@@ -1340,75 +1289,6 @@ class UAFundamentalParameter:
         self.azimuthalBeamwidthHorizontal = inputStream.read_float()
         self.beamCenterDepressionElevation = inputStream.read_float()
         self.beamwidthDownElevation = inputStream.read_float()
-
-
-class DirectedEnergyDamage:
-    """Section 6.2.15.2
-    
-    Damage sustained by an entity due to directed energy. Location of the
-    damage based on a relative x,y,z location from the center of the entity.
-    """
-    recordType: enum32 = 4500  # [UID 66] Variable Record Type
-    recordLength: uint16 = 40  # in bytes
-
-    def __init__(
-            self,
-            damageLocation: "Vector3Float | None" = None,
-            damageDiameter: float32 = 0.0,  # in metres
-            temperature: float32 = -273.15,  # in degrees Celsius
-            componentIdentification: enum8 = 0,  # [UID 314]
-            componentDamageStatus: enum8 = 0,  # [UID 315]
-            componentVisualDamageStatus: struct8 = 0,  # [UID 317]
-            componentVisualSmokeColor: enum8 = 0,  # [UID 316]
-            fireEventID: "EventIdentifier | None" = None):
-        self.padding: uint16 = 0
-        self.damageLocation = damageLocation or Vector3Float()
-        """location of damage, relative to center of entity"""
-        self.damageDiameter = damageDiameter
-        """Size of damaged area, in meters."""
-        self.temperature = temperature
-        """average temp of the damaged area, in degrees celsius. If firing entitty does not model this, use a value of -273.15"""
-        self.componentIdentification = componentIdentification
-        """enumeration"""
-        self.componentDamageStatus = componentDamageStatus
-        """enumeration"""
-        self.componentVisualDamageStatus = componentVisualDamageStatus
-        """enumeration"""
-        self.componentVisualSmokeColor = componentVisualSmokeColor
-        """enumeration"""
-        self.fireEventID = fireEventID or EventIdentifier()
-        """For any component damage resulting this field shall be set to the fire event ID from that PDU."""
-        self.padding2: uint16 = 0
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_int(self.recordType)
-        outputStream.write_unsigned_short(self.recordLength)
-        outputStream.write_unsigned_short(self.padding)
-        self.damageLocation.serialize(outputStream)
-        outputStream.write_float(self.damageDiameter)
-        outputStream.write_float(self.temperature)
-        outputStream.write_unsigned_byte(self.componentIdentification)
-        outputStream.write_unsigned_byte(self.componentDamageStatus)
-        outputStream.write_unsigned_byte(self.componentVisualDamageStatus)
-        outputStream.write_unsigned_byte(self.componentVisualSmokeColor)
-        self.fireEventID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding2)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
-        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
-        self.padding = inputStream.read_unsigned_short()
-        self.damageLocation.parse(inputStream)
-        self.damageDiameter = inputStream.read_float()
-        self.temperature = inputStream.read_float()
-        self.componentIdentification = inputStream.read_unsigned_byte()
-        self.componentDamageStatus = inputStream.read_unsigned_byte()
-        self.componentVisualDamageStatus = inputStream.read_unsigned_byte()
-        self.componentVisualSmokeColor = inputStream.read_unsigned_byte()
-        self.fireEventID.parse(inputStream)
-        self.padding2 = inputStream.read_unsigned_short()
 
 
 class ExplosionDescriptor:
@@ -1757,92 +1637,6 @@ class DatumSpecification:
             self.variableDatumRecords.append(element)
 
 
-class DirectedEnergyAreaAimpoint:
-    """Section 6.2.20.2
-
-    DE Precision Aimpoint Record. NOT COMPLETE
-    """
-    recordType: enum32 = 4001  # [UID 66]
-
-    def __init__(self,
-                 recordLength: uint16 = 0,
-                 beamAntennaParameters: list | None = None,
-                 directedEnergyTargetEnergyDepositions: list | None 
-= None):
-        """Type of Record enumeration"""
-        self.recordLength = recordLength
-        """Length of Record"""
-        self.padding: uint16 = 0
-        self.beamAntennaParameters = beamAntennaParameters or []
-        """list of beam antenna records. See 6.2.9.2"""
-        self.directedEnergyTargetEnergyDepositionRecordList = directedEnergyTargetEnergyDepositions or []
-        """list of DE target deposition records. See 6.2.21.4"""
-
-    @property
-    def beamAntennaPatternRecordCount(self) -> uint16:
-        return len(self.beamAntennaParameters)
-
-    @property
-    def directedEnergyTargetEnergyDepositionRecordCount(self) -> uint16:
-        return len(self.directedEnergyTargetEnergyDepositionRecordList)
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_int(self.recordType)
-        outputStream.write_unsigned_short(self.recordLength)
-        outputStream.write_unsigned_short(self.padding)
-        outputStream.write_unsigned_short(self.beamAntennaPatternRecordCount)
-        outputStream.write_unsigned_short(
-            self.directedEnergyTargetEnergyDepositionRecordCount
-        )
-        for anObj in self.beamAntennaParameters:
-            anObj.serialize(outputStream)
-
-        for anObj in self.directedEnergyTargetEnergyDepositionRecordList:
-            anObj.serialize(outputStream)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.recordType = inputStream.read_unsigned_int()  # TODO: validate
-        self.recordLength = inputStream.read_unsigned_short()  # TODO: validate
-        self.padding = inputStream.read_unsigned_short()
-        beamAntennaPatternRecordCount = inputStream.read_unsigned_short()
-        directedEnergyTargetEnergyDepositionRecordCount = inputStream.read_unsigned_short()
-        for idx in range(0, beamAntennaPatternRecordCount):
-            element = null()
-            element.parse(inputStream)
-            self.beamAntennaParameters.append(element)
-
-        for idx in range(0, directedEnergyTargetEnergyDepositionRecordCount):
-            element = null()
-            element.parse(inputStream)
-            self.directedEnergyTargetEnergyDepositionRecordList.append(element)
-
-
-class Vector3Float:
-    """Section 6.2.95
-    
-    Three floating point values, x, y, and z.
-    """
-
-    def __init__(self, x: float32 = 0.0, y: float32 = 0.0, z: float32 = 0.0):
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_float(self.x)
-        outputStream.write_float(self.y)
-        outputStream.write_float(self.z)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.x = inputStream.read_float()
-        self.y = inputStream.read_float()
-        self.z = inputStream.read_float()
-
-
 class Expendable:
     """Section 6.2.36
     
@@ -1923,8 +1717,8 @@ class LinearSegmentParameter:
                  segmentModification: enum8 = 0,  # [UID 241]
                  generalSegmentAppearance: struct16 = 0,  # [UID 229]
                  specificSegmentAppearance: struct32 = 0,  # TODO: find reference
-                 segmentLocation: "Vector3Double | None" = None,
-                 segmentOrientation: "EulerAngles | None" = None,
+                 segmentLocation: WorldCoordinates | None = None,
+                 segmentOrientation: EulerAngles | None = None,
                  segmentLength: float32 = 0.0,  # in meters
                  segmentWidth: float32 = 0.0,  # in meters
                  segmentHeight: float32 = 0.0,  # in meters
@@ -1937,7 +1731,7 @@ class LinearSegmentParameter:
         """general dynamic appearance attributes of the segment. This record shall be defined as a 16-bit record of enumerations. The values defined for this record are included in Section 12 of SISO-REF-010."""
         self.specificSegmentAppearance = specificSegmentAppearance
         """This field shall specify specific dynamic appearance attributes of the segment. This record shall be defined as a 32-bit record of enumerations."""
-        self.segmentLocation = segmentLocation or Vector3Double()
+        self.segmentLocation = segmentLocation or WorldCoordinates()
         """This field shall specify the location of the linear segment in the simulated world and shall be represented by a World Coordinates record"""
         self.segmentOrientation = segmentOrientation or EulerAngles()
         """orientation of the linear segment about the segment location and shall be represented by a Euler Angles record"""
@@ -1978,32 +1772,6 @@ class LinearSegmentParameter:
         self.segmentHeight = inputStream.read_float()
         self.segmentDepth = inputStream.read_float()
         self.padding = inputStream.read_unsigned_int()
-
-
-class SimulationAddress:
-    """Section 6.2.79
-    
-    A Simulation Address record shall consist of the Site Identification number
-    and the Application Identification number.
-    """
-
-    def __init__(self,
-                 site: uint16 = 0,
-                 application: uint16 = 0):
-        self.site = site
-        """A site is defined as a facility, installation, organizational unit or a geographic location that has one or more simulation applications capable of participating in a distributed event."""
-        self.application = application
-        """An application is defined as a software program that is used to generate and process distributed simulation data including live, virtual and constructive data."""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_short(self.site)
-        outputStream.write_unsigned_short(self.application)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.site = inputStream.read_unsigned_short()
-        self.application = inputStream.read_unsigned_short()
 
 
 class SystemIdentifier:
@@ -2048,10 +1816,10 @@ class TrackJamData:
     """
 
     def __init__(self,
-                 entityID: "EntityID | None" = None,
+                 entityID: EntityIdentifier | None = None,
                  emitterNumber: uint8 = 0,
                  beamNumber: uint8 = 0):
-        self.entityID = entityID or EntityID()
+        self.entityID = entityID or EntityIdentifier()
         """the entity tracked or illumated, or an emitter beam targeted with jamming"""
         self.emitterNumber = emitterNumber
         """Emitter system associated with the entity"""
@@ -2129,8 +1897,8 @@ class SimulationManagementPduHeader:
 
     def __init__(self,
                  pduHeader: "PduHeader | None" = None,
-                 originatingID: "SimulationIdentifier | EntityID | None" = None,
-                 receivingID: "SimulationIdentifier | EntityID | None" = None):
+                 originatingID: "SimulationIdentifier | EntityIdentifier | None" = None,
+                 receivingID: "SimulationIdentifier | EntityIdentifier | None" = None):
         self.pduHeader = pduHeader or PduHeader()
         """Conventional PDU header"""
         self.originatingID = originatingID or SimulationIdentifier()
@@ -2474,31 +2242,6 @@ class SilentAggregateSystem:
         self.aggregateType.parse(inputStream)
 
 
-class EventIdentifier:
-    """Section 6.2.34
-    
-    Identifies an event in the world. Use this format for every PDU EXCEPT
-    the LiveEntityPdu.
-    """
-
-    def __init__(self,
-                 simulationAddress: "SimulationAddress | None" = None,
-                 eventNumber: uint16 = 0):
-        self.simulationAddress = simulationAddress or SimulationAddress()
-        """Site and application IDs"""
-        self.eventNumber = eventNumber
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.eventNumber)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.simulationAddress.parse(inputStream)
-        self.eventNumber = inputStream.read_unsigned_short()
-
-
 class BlankingSector:
     """Section 6.2.21.2
     
@@ -2574,17 +2317,17 @@ class LaunchedMunitionRecord:
     """
 
     def __init__(self,
-                 fireEventID: "EventIdentifier | None" = None,
-                 firingEntityID: "EventIdentifier | None" = None,
-                 targetEntityID: "EventIdentifier | None" = None,
-                 targetLocation: "Vector3Double | None" = None):
+                 fireEventID: EventIdentifier | None = None,
+                 firingEntityID: EventIdentifier | None = None,
+                 targetEntityID: EventIdentifier | None = None,
+                 targetLocation: WorldCoordinates | None = None):
         self.fireEventID = fireEventID or EventIdentifier()
         self.padding: uint16 = 0
         self.firingEntityID = firingEntityID or EventIdentifier()
         self.padding2: uint16 = 0
         self.targetEntityID = targetEntityID or EventIdentifier()
         self.padding3: uint16 = 0
-        self.targetLocation = targetLocation or Vector3Double()
+        self.targetLocation = targetLocation or WorldCoordinates()
 
     def serialize(self, outputStream):
         """serialize the class"""
@@ -3294,85 +3037,6 @@ class ExpendableReload:
         self.maximumQuantityReloadTime = inputStream.read_unsigned_int()
 
 
-class EntityIdentifier:
-    """Section 6.2.28
-
-    Entity Identifier. Unique ID for entities in the world. Consists of a
-    simulation address and a entity number.
-    """
-
-    def __init__(self,
-                 simulationAddress: "SimulationAddress | None" = None,
-                 entityNumber: uint16 = 0):
-        self.simulationAddress = simulationAddress or SimulationAddress()
-        """Site and application IDs"""
-        self.entityNumber = entityNumber
-        """Entity number"""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        self.simulationAddress.serialize(outputStream)
-        outputStream.write_unsigned_short(self.entityNumber)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.simulationAddress.parse(inputStream)
-        self.entityNumber = inputStream.read_unsigned_short()
-
-
-class DirectedEnergyTargetEnergyDeposition:
-    """Section 6.2.20.4
-
-    DE energy deposition properties for a target entity.
-    """
-
-    def __init__(self,
-                 targetEntityID: "EntityIdentifier | None" = None,
-                 peakIrradiance: float32 = 0.0):  # in W/m^2
-        self.targetEntityID = targetEntityID or EntityID()
-        """Unique ID of the target entity."""
-        self.padding: uint16 = 0
-        self.peakIrradiance = peakIrradiance
-        """Peak irrandiance"""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        self.targetEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding)
-        outputStream.write_float(self.peakIrradiance)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.targetEntityID.parse(inputStream)
-        self.padding = inputStream.read_unsigned_short()
-        self.peakIrradiance = inputStream.read_float()
-
-
-class EntityID:
-    """more laconically named EntityIdentifier"""
-
-    def __init__(self, siteID=0, applicationID=0, entityID=0):
-        self.siteID = siteID
-        """Site ID"""
-        self.applicationID = applicationID
-        """application number ID"""
-        self.entityID = entityID
-        """Entity number ID"""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_unsigned_short(self.siteID)
-        outputStream.write_unsigned_short(self.applicationID)
-        outputStream.write_unsigned_short(self.entityID)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-
-        self.siteID = inputStream.read_unsigned_short()
-        self.applicationID = inputStream.read_unsigned_short()
-        self.entityID = inputStream.read_unsigned_short()
-
-
 class EngineFuelReload:
     """For each type or location of engine fuel, this record specifies the type, location, fuel measurement units, and reload quantity and maximum quantity. Section 6.2.25."""
 
@@ -3543,34 +3207,6 @@ class EnvironmentGeneral:
         self.padding1 = inputStream.read_unsigned_byte()
         self.geometry = inputStream.read_unsigned_byte()
         self.padding2 = inputStream.read_unsigned_byte()
-
-
-class Vector3Double:
-    """Section 6.2.97
-
-    Three double precision floating point values, x, y, and z.
-    Used for world coordinates.
-    """
-
-    def __init__(self, x: float32 = 0.0, y: float32 = 0.0, z: float32 = 0.0):
-        self.x = x
-        """X value"""
-        self.y = y
-        """y Value"""
-        self.z = z
-        """Z value"""
-
-    def serialize(self, outputStream):
-        """serialize the class"""
-        outputStream.write_double(self.x)
-        outputStream.write_double(self.y)
-        outputStream.write_double(self.z)
-
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
-        self.x = inputStream.read_double()
-        self.y = inputStream.read_double()
-        self.z = inputStream.read_double()
 
 
 class GridAxis:
@@ -3951,14 +3587,14 @@ class SeparationVP:
     def __init__(self,
                  reasonForSeparation: enum8 = 0,  # [UID 282]
                  preEntityIndicator: enum8 = 0,  # [UID 283]
-                 parentEntityID: "EntityID | None" = None,
+                 parentEntityID: EntityIdentifier | None = None,
                  stationLocation: "NamedLocationIdentification | None" = None):
         self.reasonForSeparation = reasonForSeparation
         """Reason for separation. EBV"""
         self.preEntityIndicator = preEntityIndicator
         """Whether the entity existed prior to separation EBV"""
         self.padding1: uint8 = 0
-        self.parentEntityID = parentEntityID or EntityID()
+        self.parentEntityID = parentEntityID or EntityIdentifier()
         """ID of parent"""
         self.padding2: uint16 = 0
         self.stationLocation = stationLocation or NamedLocationIdentification()
@@ -4130,19 +3766,19 @@ class EntityStateUpdatePdu(EntityInformationFamilyPdu):
     pduType: enum8 = 67  # [UID 4]
 
     def __init__(self,
-                 entityID=None,
-                 entityLinearVelocity: "Vector3Float | None" = None,
-                 entityLocation: "Vector3Double | None" = None,
-                 entityOrientation: "EulerAngles | None" = None,
+                 entityID: EntityIdentifier | None = None,
+                 entityLinearVelocity: Vector3Float | None = None,
+                 entityLocation: WorldCoordinates | None = None,
+                 entityOrientation: EulerAngles | None = None,
                  entityAppearance: struct32 = 0,  # [UID 31-43]
-                 variableParameters: list["VariableParameter"] | None = None):
+                 variableParameters: list[VariableParameter] | None = None):
         super(EntityStateUpdatePdu, self).__init__()
-        self.entityID = entityID or EntityID()
+        self.entityID = entityID or EntityIdentifier()
         """This field shall identify the entity issuing the PDU, and shall be represented by an Entity Identifier record (see 6.2.28)."""
         self.padding1: uint8 = 0
         self.entityLinearVelocity = entityLinearVelocity or Vector3Float()
         """This field shall specify an entitys linear velocity. The coordinate system for an entitys linear velocity depends on the dead reckoning algorithm used. This field shall be represented by a Linear Velocity Vector record [see 6.2.95 item c)])."""
-        self.entityLocation = entityLocation or Vector3Double()
+        self.entityLocation = entityLocation or WorldCoordinates()
         """This field shall specify an entitys physical location in the simulated world and shall be represented by a World Coordinates record (see 6.2.97)."""
         self.entityOrientation = entityOrientation or EulerAngles()
         """This field shall specify an entitys orientation and shall be represented by an Euler Angles record (see 6.2.33)."""
@@ -4193,14 +3829,14 @@ class ServiceRequestPdu(LogisticsFamilyPdu):
     pduType: enum8 = 5  # [UID 4]
 
     def __init__(self,
-                 requestingEntityID: "EntityID | None" = None,
-                 servicingEntityID: "EntityID | None" = None,
+                 requestingEntityID: EntityIdentifier | None = None,
+                 servicingEntityID: EntityIdentifier | None = None,
                  serviceTypeRequested: enum8 = 0,  # [UID 63]
                  supplies: list["SupplyQuantity"] | None = None):
         super(ServiceRequestPdu, self).__init__()
-        self.requestingEntityID = requestingEntityID or EntityID()
+        self.requestingEntityID = requestingEntityID or EntityIdentifier()
         """Entity that is requesting service (see 6.2.28), Section 7.4.2"""
-        self.servicingEntityID = servicingEntityID or EntityID()
+        self.servicingEntityID = servicingEntityID or EntityIdentifier()
         """Entity that is providing the service (see 6.2.28), Section 7.4.2"""
         self.serviceTypeRequested = serviceTypeRequested
         """Type of service requested, Section 7.4.2"""
@@ -4244,13 +3880,13 @@ class RepairCompletePdu(LogisticsFamilyPdu):
     pduType: enum8 = 9  # [UID 4]
 
     def __init__(self,
-                 receivingEntityID: "EntityID | None" = None,
-                 repairingEntityID: "EntityID | None" = None,
+                 receivingEntityID: EntityIdentifier | None = None,
+                 repairingEntityID: EntityIdentifier | None = None,
                  repair: enum16 = 0):  # [UID 64]
         super(RepairCompletePdu, self).__init__()
-        self.receivingEntityID = receivingEntityID or EntityID()
+        self.receivingEntityID = receivingEntityID or EntityIdentifier()
         """Entity that is receiving service.  See 6.2.28"""
-        self.repairingEntityID = repairingEntityID or EntityID()
+        self.repairingEntityID = repairingEntityID or EntityIdentifier()
         """Entity that is supplying.  See 6.2.28"""
         self.repair = repair
         """Enumeration for type of repair.  See 6.2.74"""
@@ -4302,17 +3938,17 @@ class CollisionPdu(EntityInformationFamilyPdu):
     pduType: enum8 = 4  # [UID 4]
 
     def __init__(self,
-                 issuingEntityID: "EntityID | None" = None,
-                 collidingEntityID: "EntityID | None" = None,
+                 issuingEntityID: EntityIdentifier | None = None,
+                 collidingEntityID: EntityIdentifier | None = None,
                  eventID: "EventIdentifier | None" = None,
                  collisionType: enum8 = 0,  # [UID 189]
-                 velocity: "Vector3Float | None" = None,
+                 velocity: Vector3Float | None = None,
                  mass: float32 = 0.0,  # in kg
-                 location: "Vector3Float | None" = None):
+                 location: Vector3Float | None = None):
         super(CollisionPdu, self).__init__()
-        self.issuingEntityID = issuingEntityID or EntityID()
+        self.issuingEntityID = issuingEntityID or EntityIdentifier()
         """This field shall identify the entity that is issuing the PDU, and shall be represented by an Entity Identifier record (see 6.2.28)."""
-        self.collidingEntityID = collidingEntityID or EntityID()
+        self.collidingEntityID = collidingEntityID or EntityIdentifier()
         """This field shall identify the entity that has collided with the issuing entity (see 5.3.3.4). This field shall be represented by an Entity Identifier record (see 6.2.28)."""
         self.eventID = eventID or EventIdentifier()
         """This field shall contain an identification generated by the issuing simulation application to associate related collision events. This field shall be represented by an Event Identifier record (see 6.2.34)."""
@@ -4359,13 +3995,13 @@ class RepairResponsePdu(LogisticsFamilyPdu):
     pduType: enum8 = 10  # [UID 4]
 
     def __init__(self,
-                 receivingEntityID: "EntityID | None" = None,
-                 repairingEntityID: "EntityID | None" = None,
+                 receivingEntityID: EntityIdentifier | None = None,
+                 repairingEntityID: EntityIdentifier | None = None,
                  repairResult: enum8 = 0):  # [UID 65]
         super(RepairResponsePdu, self).__init__()
-        self.receivingEntityID = receivingEntityID or EntityID()
+        self.receivingEntityID = receivingEntityID or EntityIdentifier()
         """Entity that requested repairs.  See 6.2.28"""
-        self.repairingEntityID = repairingEntityID or EntityID()
+        self.repairingEntityID = repairingEntityID or EntityIdentifier()
         """Entity that is repairing.  See 6.2.28"""
         self.repairResult = repairResult
         """Result of repair operation"""
@@ -4399,12 +4035,12 @@ class SimulationManagementFamilyPdu(Pdu):
     protocolFamily: enum8 = 5  # [UID 5]
 
     def __init__(self,
-                 originatingEntityID: "EntityID | None" = None,
-                 receivingEntityID: "EntityID | None" = None):
+                 originatingEntityID: EntityIdentifier | None = None,
+                 receivingEntityID: EntityIdentifier | None = None):
         super(SimulationManagementFamilyPdu, self).__init__()
-        self.originatingEntityID = originatingEntityID or EntityID()
+        self.originatingEntityID = originatingEntityID or EntityIdentifier()
         """Entity that is sending message"""
-        self.receivingEntityID = receivingEntityID or EntityID()
+        self.receivingEntityID = receivingEntityID or EntityIdentifier()
         """Entity that is intended to receive message"""
 
     def serialize(self, outputStream):
@@ -4481,8 +4117,8 @@ class LinearObjectStatePdu(SyntheticEnvironmentFamilyPdu):
     pduType: enum8 = 44  # [UID 4]
 
     def __init__(self,
-                 objectID: "EntityID | None" = None,
-                 referencedObjectID: "EntityID | None" = None,
+                 objectID: EntityIdentifier | None = None,
+                 referencedObjectID: EntityIdentifier | None = None,
                  updateNumber: uint16 = 0,
                  forceID: enum8 = 0,  # [UID 6]
                  requesterID: "SimulationAddress | None" = None,
@@ -4490,9 +4126,9 @@ class LinearObjectStatePdu(SyntheticEnvironmentFamilyPdu):
                  objectType: "ObjectType | None" = None,
                  linearSegmentParameters: list["LinearSegmentParameter"] | None = None):
         super(LinearObjectStatePdu, self).__init__()
-        self.objectID = objectID or EntityID()
+        self.objectID = objectID or EntityIdentifier()
         """Object in synthetic environment"""
-        self.referencedObjectID = referencedObjectID or EntityID()
+        self.referencedObjectID = referencedObjectID or EntityIdentifier()
         """Object with which this point object is associated"""
         self.updateNumber = updateNumber
         """unique update number of each state transition of an object"""
@@ -4589,7 +4225,7 @@ class IntercomSignalPdu(RadioCommunicationsFamilyPdu):
     pduType: enum8 = 31  # [UID 4]
 
     def __init__(self,
-                 entityID: "EntityID | ObjectID | UnattachedIdentifier | None" = None,
+                 entityID: "EntityIdentifier | ObjectIdentifier | UnattachedIdentifier | None" = None,
                  communicationsDeviceID: uint16 = 0,
                  encodingScheme: struct16 = 00,
                  tdlType: uint16 = 0,  # [UID 178]
@@ -4597,7 +4233,7 @@ class IntercomSignalPdu(RadioCommunicationsFamilyPdu):
                  samples: uint16 = 0,
                  data: list[bytes] | None = None):
         super(IntercomSignalPdu, self).__init__()
-        self.entityID = entityID or EntityID()
+        self.entityID = entityID or EntityIdentifier()
         self.communicationsDeviceID = communicationsDeviceID
         self.encodingScheme = encodingScheme
         self.tdlType = tdlType
@@ -4677,13 +4313,13 @@ class ResupplyReceivedPdu(LogisticsFamilyPdu):
     pduType: enum8 = 7  # [UID 4]
     
     def __init__(self,
-                 receivingEntityID: "EntityID | None" = None,
-                 supplyingEntityID: "EntityID | None" = None,
+                 receivingEntityID: EntityIdentifier | None = None,
+                 supplyingEntityID: EntityIdentifier | None = None,
                  supplies: list["SupplyQuantity"] | None = None):
         super(ResupplyReceivedPdu, self).__init__()
-        self.receivingEntityID = receivingEntityID or EntityID()
+        self.receivingEntityID = receivingEntityID or EntityIdentifier()
         """Entity that is receiving service.  Shall be represented by Entity Identifier record (see 6.2.28)"""
-        self.supplyingEntityID = supplyingEntityID or EntityID()
+        self.supplyingEntityID = supplyingEntityID or EntityIdentifier()
         """Entity that is supplying.  Shall be represented by Entity Identifier record (see 6.2.28)"""
         self.padding1: uint8 = 0
         self.padding2: uint16 = 0
@@ -4728,12 +4364,12 @@ class WarfareFamilyPdu(Pdu):
     protocolFamily: enum8 = 2  # [UID 5]
 
     def __init__(self,
-                 firingEntityID: "EntityID | None" = None,
-                 targetEntityID: "EntityID | None" = None):
+                 firingEntityID: EntityIdentifier | None = None,
+                 targetEntityID: EntityIdentifier | None = None):
         super(WarfareFamilyPdu, self).__init__()
-        self.firingEntityID = firingEntityID or EntityID()
+        self.firingEntityID = firingEntityID or EntityIdentifier()
         """ID of the entity that shot"""
-        self.targetEntityID = targetEntityID or EntityID()
+        self.targetEntityID = targetEntityID or EntityIdentifier()
         """ID of the entity that is being shot at"""
 
     def serialize(self, outputStream):
@@ -4758,24 +4394,24 @@ class CollisionElasticPdu(EntityInformationFamilyPdu):
     pduType: enum8 = 66  # [UID 4]
 
     def __init__(self,
-                 issuingEntityID: "EntityID | None" = None,
-                 collidingEntityID: "EntityID | None" = None,
+                 issuingEntityID: EntityIdentifier | None = None,
+                 collidingEntityID: EntityIdentifier | None = None,
                  collisionEventID: "EventIdentifier | None" = None,
-                 contactVelocity: "Vector3Float | None" = None,
+                 contactVelocity: Vector3Float | None = None,
                  mass: float32 = 0.0,  # in kg
-                 locationOfImpact: "Vector3Float | None" = None,
+                 locationOfImpact: Vector3Float | None = None,
                  collisionIntermediateResultXX: float32 = 0.0,
                  collisionIntermediateResultXY: float32 = 0.0,
                  collisionIntermediateResultXZ: float32 = 0.0,
                  collisionIntermediateResultYY: float32 = 0.0,
                  collisionIntermediateResultYZ: float32 = 0.0,
                  collisionIntermediateResultZZ: float32 = 0.0,
-                 unitSurfaceNormal: "Vector3Float | None" = None,
+                 unitSurfaceNormal: Vector3Float | None = None,
                  coefficientOfRestitution: float32 = 0.0):
         super(CollisionElasticPdu, self).__init__()
-        self.issuingEntityID = issuingEntityID or EntityID()
+        self.issuingEntityID = issuingEntityID or EntityIdentifier()
         """This field shall identify the entity that is issuing the PDU and shall be represented by an Entity Identifier record (see 6.2.28)"""
-        self.collidingEntityID = collidingEntityID or EntityID()
+        self.collidingEntityID = collidingEntityID or EntityIdentifier()
         """This field shall identify the entity that has collided with the issuing entity. This field shall be a valid identifier of an entity or server capable of responding to the receipt of this Collision-Elastic PDU. This field shall be represented by an Entity Identifier record (see 6.2.28)."""
         self.collisionEventID = collisionEventID or EventIdentifier()
         """This field shall contain an identification generated by the issuing simulation application to associate related collision events. This field shall be represented by an Event Identifier record (see 6.2.34)."""
@@ -4953,12 +4589,12 @@ class SimulationManagementWithReliabilityFamilyPdu(Pdu):
     protocolFamily: enum8 = 10  # [UID 5]
 
     def __init__(self,
-                 originatingEntityID: "EntityID | None" = None,
-                 receivingEntityID: "EntityID | None" = None):
+                 originatingEntityID: EntityIdentifier | None = None,
+                 receivingEntityID: EntityIdentifier | None = None):
         super(SimulationManagementWithReliabilityFamilyPdu, self).__init__()
-        self.originatingEntityID = originatingEntityID or EntityID()
+        self.originatingEntityID = originatingEntityID or EntityIdentifier()
         """Object originating the request"""
-        self.receivingEntityID = receivingEntityID or EntityID()
+        self.receivingEntityID = receivingEntityID or EntityIdentifier()
         """Object with which this point object is associated"""
 
     def serialize(self, outputStream):
@@ -5047,23 +4683,23 @@ class DesignatorPdu(DistributedEmissionsFamilyPdu):
     pduType: enum8 = 24  # [UID 4]
 
     def __init__(self,
-                 designatingEntityID: "EntityID | None" = None,
+                 designatingEntityID: EntityIdentifier | None = None,
                  codeName: enum16 = 0,  # [UID 80]
-                 designatedEntityID: "EntityID | None" = None,
+                 designatedEntityID: EntityIdentifier | None = None,
                  designatorCode: enum16 = 0,  # [UID 81]
                  designatorPower: float32 = 0.0,  # in W
                  designatorWavelength: float32 = 0.0,  # in microns
-                 designatorSpotWrtDesignated: "Vector3Float | None" = None,
-                 designatorSpotLocation: "Vector3Double | None" = None,
+                 designatorSpotWrtDesignated: Vector3Float | None = None,
+                 designatorSpotLocation: WorldCoordinates | None = None,
                  # Dead Reckoning Parameters
                  deadReckoningAlgorithm: enum8 = 0,  # [UID 44]
-                 entityLinearAcceleration: "Vector3Float | None" = None):
+                 entityLinearAcceleration: Vector3Float | None = None):
         super(DesignatorPdu, self).__init__()
-        self.designatingEntityID = designatingEntityID or EntityID()
+        self.designatingEntityID = designatingEntityID or EntityIdentifier()
         """ID of the entity designating"""
         self.codeName = codeName
         """This field shall specify a unique emitter database number assigned to  differentiate between otherwise similar or identical emitter beams within an emitter system."""
-        self.designatedEntityID = designatedEntityID or EntityID()
+        self.designatedEntityID = designatedEntityID or EntityIdentifier()
         """ID of the entity being designated"""
         self.designatorCode = designatorCode
         """This field shall identify the designator code being used by the designating entity"""
@@ -5074,7 +4710,7 @@ class DesignatorPdu(DistributedEmissionsFamilyPdu):
         self.designatorSpotWrtDesignated = designatorSpotWrtDesignated or Vector3Float(
         )
         """designator spot wrt the designated entity"""
-        self.designatorSpotLocation = designatorSpotLocation or Vector3Double()
+        self.designatorSpotLocation = designatorSpotLocation or WorldCoordinates()
         """designator spot wrt the designated entity"""
         self.deadReckoningAlgorithm = deadReckoningAlgorithm
         """Dead reckoning algorithm"""
@@ -5167,20 +4803,20 @@ class EntityStatePdu(EntityInformationFamilyPdu):
     pduType: enum8 = 1  # [UID 4]
 
     def __init__(self,
-                 entityID: "EntityID | None" = None,
+                 entityID: EntityIdentifier | None = None,
                  forceId: enum8 = 0,  # [UID 6]
-                 entityType: "EntityType | None" = None,
-                 alternativeEntityType: "EntityType | None" = None,
-                 entityLinearVelocity: "Vector3Float | None" = None,
-                 entityLocation: "Vector3Double | None" = None,
-                 entityOrientation: "EulerAngles | None" = None,
+                 entityType: EntityType | None = None,
+                 alternativeEntityType: EntityType | None = None,
+                 entityLinearVelocity: Vector3Float | None = None,
+                 entityLocation: WorldCoordinates | None = None,
+                 entityOrientation: EulerAngles | None = None,
                  entityAppearance: uint32 = 0,  # [UID 31-43]
-                 deadReckoningParameters: "DeadReckoningParameters | None" = None,
-                 marking: "EntityMarking | None" = None,
+                 deadReckoningParameters: DeadReckoningParameters | None = None,
+                 marking: EntityMarking | None = None,
                  capabilities: uint32 = 0,  # [UID 55]
-                 variableParameters: list["VariableParameter"] | None = None):
+                 variableParameters: list[VariableParameter] | None = None):
         super(EntityStatePdu, self).__init__()
-        self.entityID = entityID or EntityID()
+        self.entityID = entityID or EntityIdentifier()
         """Unique ID for an entity that is tied to this state information"""
         self.forceId = forceId
         """What force this entity is affiliated with, eg red, blue, neutral, etc"""
@@ -5189,7 +4825,7 @@ class EntityStatePdu(EntityInformationFamilyPdu):
         self.alternativeEntityType = alternativeEntityType or EntityType()
         self.entityLinearVelocity = entityLinearVelocity or Vector3Float()
         """Describes the speed of the entity in the world"""
-        self.entityLocation = entityLocation or Vector3Double()
+        self.entityLocation = entityLocation or WorldCoordinates()
         """describes the location of the entity in the world"""
         self.entityOrientation = entityOrientation or EulerAngles()
         """describes the orientation of the entity, in euler angles"""
@@ -5314,32 +4950,32 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
     pduType: enum8 = 25  # [UID 4]
 
     def __init__(self,
-                 radioReferenceID: "EntityID | ObjectIdentifier | None" = None,
+                 radioReferenceID: EntityIdentifier | ObjectIdentifier | None = None,
                  radioNumber: uint16 = 0,
-                 radioEntityType: "EntityType | None" = None,
+                 radioEntityType: EntityType | None = None,
                  transmitState: enum8 = 0,  # [UID 164]
                  inputSource: enum8 = 0,  # [UID 165]
-                 antennaLocation: "Vector3Double | None" = None,
-                 relativeAntennaLocation: "Vector3Float | None" = None,
+                 antennaLocation: WorldCoordinates | None = None,
+                 relativeAntennaLocation: Vector3Float | None = None,
                  antennaPatternType: enum16 = 0,  # [UID 167]
                  frequency: uint64 = 0,  # in Hz
                  transmitFrequencyBandwidth: float32 = 0.0,  # in Hz
                  power: float32 = 0.0,  # in decibel-milliwatts
-                 modulationType: "ModulationType | None" = None,
+                 modulationType: ModulationType | None = None,
                  cryptoSystem: enum16 = 0,  # [UID 166]
                  cryptoKeyId: struct16 = 0,  # See Table 175
                  modulationParameters: ModulationParametersRecord | None = None,
                  antennaPattern: AntennaPatternRecord | None = None,
                  variableTransmitterParameters: Sequence[VariableTransmitterParametersRecord] | None = None):
         super(TransmitterPdu, self).__init__()
-        self.radioReferenceID = radioReferenceID or EntityID()
+        self.radioReferenceID = radioReferenceID or EntityIdentifier()
         """ID of the entity that is the source of the communication"""
         self.radioNumber = radioNumber
         """particular radio within an entity"""
         self.radioEntityType = radioEntityType or EntityType()  # TODO: validation
         self.transmitState = transmitState
         self.inputSource = inputSource
-        self.antennaLocation = antennaLocation or Vector3Double()
+        self.antennaLocation = antennaLocation or WorldCoordinates()
         self.relativeAntennaLocation = relativeAntennaLocation or Vector3Float(
         )
         self.antennaPatternType = antennaPatternType
@@ -5414,7 +5050,6 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
             vtp.serialize(outputStream)
 
     def parse(self, inputStream: DataInputStream) -> None:
-        """Parse a message. This may recursively call embedded objects."""
         super(TransmitterPdu, self).parse(inputStream)
         self.radioReferenceID.parse(inputStream)
         self.radioNumber = inputStream.read_uint16()
@@ -5473,16 +5108,11 @@ class TransmitterPdu(RadioCommunicationsFamilyPdu):
         else:
             self.antennaPattern = None
         
-        ## TODO: Variable Transmitter Parameters
         for _ in range(0, variableTransmitterParameterCount):
-            recordType = inputStream.read_uint32()
-            if recordType == 3000:  # High Fidelity HAVE QUICK/SATURN Radio
-                vtp = HighFidelityHAVEQUICKRadio()
-                vtp.parse(inputStream)
-            else:  # Unknown VTP record type
-                vtp = UnknownVariableTransmitterParameters()
-                vtp.recordType = recordType
-                vtp.parse(inputStream)
+            vtp = parseStandardVariableRecord(
+                inputStream,
+                VariableTransmitterParametersRecord
+            )
             self.variableTransmitterParameters.append(vtp)
 
 
@@ -5495,12 +5125,12 @@ class ElectromagneticEmissionsPdu(DistributedEmissionsFamilyPdu):
     pduType: enum8 = 23  # [UID 4]
 
     def __init__(self,
-                 emittingEntityID: "EntityID | None" = None,
+                 emittingEntityID: EntityIdentifier | None = None,
                  eventID: "EventIdentifier | None" = None,
                  stateUpdateIndicator: enum8 = 0,  # [UID 77]
                  systems: list["EmissionSystemRecord"] | None = None):
         super(ElectromagneticEmissionsPdu, self).__init__()
-        self.emittingEntityID = emittingEntityID or EntityID()
+        self.emittingEntityID = emittingEntityID or EntityIdentifier()
         """ID of the entity emitting"""
         self.eventID = eventID or EventIdentifier()
         self.stateUpdateIndicator = stateUpdateIndicator
@@ -5610,8 +5240,8 @@ class EmissionSystemRecord:
     def __init__(self,
                  systemDataLength: uint8 = 0,  # length in 32-bit words, 0 if exceed 255
                  emitterSystem: "EmitterSystem | None" = None,
-                 location: "Vector3Float | None" = None,
-                 beamRecords: list["EmissionSystemBeamRecord"] | None = None):
+                 location: Vector3Float | None = None,
+                 beamRecords: list[EmissionSystemBeamRecord] | None = None):
         self.systemDataLength = systemDataLength
         """this field shall specify the length of this emitter system's data in 32-bit words."""
         self.paddingForEmissionsPdu: uint8 = 0
@@ -5655,13 +5285,13 @@ class ResupplyOfferPdu(LogisticsFamilyPdu):
     pduType: enum8 = 6  # [UID 4]
 
     def __init__(self,
-                 receivingEntityID: "EntityID | None" = None,
-                 supplyingEntityID: "EntityID | None" = None,
+                 receivingEntityID: "EntityIdentifier | None" = None,
+                 supplyingEntityID: "EntityIdentifier | None" = None,
                  supplies: list["SupplyQuantity"] | None = None):
         super(ResupplyOfferPdu, self).__init__()
-        self.receivingEntityID = receivingEntityID or EntityID()
+        self.receivingEntityID = receivingEntityID or EntityIdentifier()
         """Field identifies the Entity and respective Entity Record ID that is receiving service (see 6.2.28), Section 7.4.3"""
-        self.supplyingEntityID = supplyingEntityID or EntityID()
+        self.supplyingEntityID = supplyingEntityID or EntityIdentifier()
         """Identifies the Entity and respective Entity ID Record that is supplying  (see 6.2.28), Section 7.4.3"""
         self.padding1: uint8 = 0
         self.padding2: uint16 = 0
@@ -5881,22 +5511,22 @@ class PointObjectStatePdu(SyntheticEnvironmentFamilyPdu):
     pduType: enum8 = 43  # [UID 4]
 
     def __init__(self,
-                 objectID: "EntityID | None" = None,
-                 referencedObjectID: "EntityID | None" = None,
+                 objectID: EntityIdentifier | None = None,
+                 referencedObjectID: EntityIdentifier | None = None,
                  updateNumber: uint16 = 0,
                  forceID: enum8 = 0,  # [UID 6]
                  modifications : enum8 = 0,  # [UID 240]
-                 objectType: "ObjectType | None" = None,
-                 objectLocation: "Vector3Double | None" = None,
-                 objectOrientation: "EulerAngles | None" = None,
+                 objectType: ObjectType | None = None,
+                 objectLocation: WorldCoordinates | None = None,
+                 objectOrientation: EulerAngles | None = None,
                  objectAppearance: struct32 | struct16 = 0,  # [UID 229]
-                 requesterID: "SimulationAddress | None" = None,
-                 receivingID: "SimulationAddress | None" = None):
+                 requesterID: SimulationAddress | None = None,
+                 receivingID: SimulationAddress | None = None):
         super(PointObjectStatePdu, self).__init__()
         # TODO: Validate ObjectID?
-        self.objectID = objectID or EntityID()
+        self.objectID = objectID or EntityIdentifier()
         """Object in synthetic environment"""
-        self.referencedObjectID = referencedObjectID or EntityID()
+        self.referencedObjectID = referencedObjectID or EntityIdentifier()
         """Object with which this point object is associated"""
         self.updateNumber = updateNumber
         """unique update number of each state transition of an object"""
@@ -5906,7 +5536,7 @@ class PointObjectStatePdu(SyntheticEnvironmentFamilyPdu):
         """modifications"""
         self.objectType = objectType or ObjectType()
         """Object type"""
-        self.objectLocation = objectLocation or Vector3Double()
+        self.objectLocation = objectLocation or WorldCoordinates()
         """Object location"""
         self.objectOrientation = objectOrientation or EulerAngles()
         """Object orientation"""
@@ -6326,22 +5956,22 @@ class ArealObjectStatePdu(SyntheticEnvironmentFamilyPdu):
     pduType: enum8 = 45  # [UID 4]
 
     def __init__(self,
-                 objectID: "EntityID | None" = None,
-                 referencedObjectID: "EntityID | None" = None,
+                 objectID: EntityIdentifier | None = None,
+                 referencedObjectID: EntityIdentifier | None = None,
                  updateNumber: uint16 = 0,
                  forceId: enum8 = 0,  # [UID 6]
                  modifications: enum8 = 0,  # [UID 242]
-                 objectType: "ObjectType | None" = None,
+                 objectType: ObjectType | None = None,
                  specificObjectAppearance: struct32 = 0,
                  generalObjectAppearance: struct16 = 0,  # [UID 229]
-                 requesterID: "SimulationAddress | None" = None,
-                 receivingID: "SimulationAddress | None" = None,
-                 objectLocation: list["Vector3Double"] | None = None):
+                 requesterID: SimulationAddress | None = None,
+                 receivingID: SimulationAddress | None = None,
+                 objectLocation: list[WorldCoordinates] | None = None):
         super(ArealObjectStatePdu, self).__init__()
         # TODO: validate object ID?
-        self.objectID = objectID or EntityID()
+        self.objectID = objectID or EntityIdentifier()
         """Object in synthetic environment"""
-        self.referencedObjectID = referencedObjectID or EntityID()
+        self.referencedObjectID = referencedObjectID or EntityIdentifier()
         """Object with which this point object is associated"""
         self.updateNumber = updateNumber
         """unique update number of each state transition of an object"""
@@ -6390,7 +6020,7 @@ class ArealObjectStatePdu(SyntheticEnvironmentFamilyPdu):
         self.requesterID.parse(inputStream)
         self.receivingID.parse(inputStream)
         for idx in range(0, numberOfPoints):
-            element = Vector3Double()
+            element = WorldCoordinates()
             element.parse(inputStream)
             self.objectLocation.append(element)
 
@@ -6469,19 +6099,19 @@ class MinefieldStatePdu(MinefieldFamilyPdu):
                  minefieldID: "MinefieldIdentifier | None" = None,
                  minefieldSequence: uint16 = 0,
                  forceID: enum8 = 0,  # [UID 6]
-                 minefieldType: "EntityType | None" = None,
-                 minefieldLocation: "Vector3Double | None" = None,
-                 minefieldOrientation: "EulerAngles | None" = None,
+                 minefieldType: EntityType | None = None,
+                 minefieldLocation: WorldCoordinates | None = None,
+                 minefieldOrientation: EulerAngles | None = None,
                  appearance: struct16 = 0,  # [UID 190]
                  protocolMode: struct16 = 0,  # See 6.2.69
-                 perimeterPoints: list["Vector2Float"] | None = None,
-                 mineTypes: list["EntityType"] | None = None):
+                 perimeterPoints: list[Vector2Float] | None = None,
+                 mineTypes: list[EntityType] | None = None):
         super(MinefieldStatePdu, self).__init__()
         self.minefieldID = minefieldID or MinefieldIdentifier()
         self.minefieldSequence = minefieldSequence
         self.forceID = forceID
         self.minefieldType = minefieldType or EntityType()
-        self.minefieldLocation = minefieldLocation or Vector3Double()
+        self.minefieldLocation = minefieldLocation or WorldCoordinates()
         """location of center of minefield in world coords"""
         self.minefieldOrientation = minefieldOrientation or EulerAngles()
         self.appearance = appearance
@@ -6697,93 +6327,80 @@ class DirectedEnergyFirePdu(WarfareFamilyPdu):
                  munitionType: "EntityType | None" = None,
                  shotStartTime: "ClockTime | None" = None,
                  cumulativeShotTime: float32 = 0.0,  # in seconds
-                 apertureEmitterLocation: "Vector3Float | None" = None,
+                 apertureEmitterLocation: Vector3Float | None = None,  # in meters
                  apertureDiameter: float32 = 0.0,  # in meters
                  wavelength: float32 = 0.0,  # in meters
-                 peakIrradiance=0.0,
                  pulseRepetitionFrequency: float32 = 0.0,  # in Hz
                  pulseWidth: float32 = 0,  # in seconds
-                 flags: struct16 = 0,  # [UID 313]
+                 flags: DEFireFlags | None = None,  # [UID 313]
                  pulseShape: enum8 = 0,  # [UID 312]
-                 dERecords: list | None = None):
+                 dERecords: list[DamageDescriptionRecord] | None = None):
         super(DirectedEnergyFirePdu, self).__init__()
         # TODO: validate entity type?
         self.munitionType = munitionType or EntityType()
-        """Field shall identify the munition type enumeration for the DE weapon beam, Section 7.3.4"""
         self.shotStartTime = shotStartTime or ClockTime()
-        """Field shall indicate the simulation time at start of the shot, Section 7.3.4"""
         self.cumulativeShotTime = cumulativeShotTime
-        """Field shall indicate the current cumulative duration of the shot, Section 7.3.4"""
         self.apertureEmitterLocation = (apertureEmitterLocation
                                         or Vector3Float())
-        """Field shall identify the location of the DE weapon aperture/emitter, Section 7.3.4"""
         self.apertureDiameter = apertureDiameter
-        """Field shall identify the beam diameter at the aperture/emitter, Section 7.3.4"""
         self.wavelength = wavelength
-        """Field shall identify the emissions wavelength in units of meters, Section 7.3.4"""
-        self.peakIrradiance = peakIrradiance
-        """Field shall identify the current peak irradiance of emissions in units of Watts per square meter, Section 7.3.4"""
+        self.padding1: uint32 = 0
         self.pulseRepetitionFrequency = pulseRepetitionFrequency
-        """field shall identify the current pulse repetition frequency in units of cycles per second (Hertz), Section 7.3.4"""
         self.pulseWidth = pulseWidth
-        """field shall identify the pulse width emissions in units of seconds, Section 7.3.4"""
-        self.flags = flags
-        """16bit Boolean field shall contain various flags to indicate status information needed to process a DE, Section 7.3.4"""
+        self.flags = flags or DEFireFlags()
         self.pulseShape = pulseShape
-        """Field shall identify the pulse shape and shall be represented as an 8-bit enumeration, Section 7.3.4"""
-        self.padding1: uint8 = 0
-        self.padding2: uint32 = 0
-        self.padding3: uint16 = 0
-        self.dERecords = dERecords or []
-        """Fields shall contain one or more DE records, records shall conform to the variable record format (Section6.2.82), Section 7.3.4"""
+        self.padding2: uint8 = 0
+        self.padding3: uint32 = 0
+        self.padding4: uint16 = 0
+        self.dERecords: list[DamageDescriptionRecord] = dERecords or []
 
     @property
     def numberOfDERecords(self) -> uint16:
         return len(self.dERecords)
 
-    def serialize(self, outputStream):
-        """serialize the class"""
+    def serialize(self, outputStream: DataOutputStream) -> None:
         super(DirectedEnergyFirePdu, self).serialize(outputStream)
         self.munitionType.serialize(outputStream)
         self.shotStartTime.serialize(outputStream)
-        outputStream.write_float(self.commulativeShotTime)
+        outputStream.write_float32(self.commulativeShotTime)
         self.apertureEmitterLocation.serialize(outputStream)
-        outputStream.write_float(self.apertureDiameter)
-        outputStream.write_float(self.wavelength)
-        outputStream.write_float(self.peakIrradiance)
-        outputStream.write_float(self.pulseRepetitionFrequency)
-        outputStream.write_int(self.pulseWidth)
-        outputStream.write_int(self.flags)
-        outputStream.write_byte(self.pulseShape)
-        outputStream.write_unsigned_byte(self.padding1)
-        outputStream.write_unsigned_int(self.padding2)
-        outputStream.write_unsigned_short(self.padding3)
-        outputStream.write_unsigned_short(self.numberOfDERecords)
-        for anObj in self.dERecords:
-            anObj.serialize(outputStream)
+        outputStream.write_float32(self.apertureDiameter)
+        outputStream.write_float32(self.wavelength)
+        outputStream.write_uint32(self.padding1)
+        outputStream.write_float32(self.pulseRepetitionFrequency)
+        outputStream.write_float32(self.pulseWidth)
+        self.flags.serialize(outputStream)
+        outputStream.write_uint8(self.pulseShape)
+        outputStream.write_uint8(self.padding2)
+        outputStream.write_uint32(self.padding3)
+        outputStream.write_uint16(self.padding4)
+        outputStream.write_uint16(self.numberOfDERecords)
+        for record in self.dERecords:
+            record.serialize(outputStream)
 
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
+    def parse(self, inputStream: DataInputStream) -> None:
         super(DirectedEnergyFirePdu, self).parse(inputStream)
         self.munitionType.parse(inputStream)
         self.shotStartTime.parse(inputStream)
-        self.commulativeShotTime = inputStream.read_float()
+        self.commulativeShotTime = inputStream.read_float32()
         self.apertureEmitterLocation.parse(inputStream)
-        self.apertureDiameter = inputStream.read_float()
-        self.wavelength = inputStream.read_float()
-        self.peakIrradiance = inputStream.read_float()
-        self.pulseRepetitionFrequency = inputStream.read_float()
-        self.pulseWidth = inputStream.read_int()
-        self.flags = inputStream.read_int()
-        self.pulseShape = inputStream.read_byte()
-        self.padding1 = inputStream.read_unsigned_byte()
-        self.padding2 = inputStream.read_unsigned_int()
-        self.padding3 = inputStream.read_unsigned_short()
-        numberOfDERecords = inputStream.read_unsigned_short()
-        for idx in range(0, numberOfDERecords):
-            element = null()
-            element.parse(inputStream)
-            self.dERecords.append(element)
+        self.apertureDiameter = inputStream.read_float32()
+        self.wavelength = inputStream.read_float32()
+        self.padding1 = inputStream.read_uint32()
+        self.pulseRepetitionFrequency = inputStream.read_float32()
+        self.pulseWidth = inputStream.read_float32()
+        self.flags.parse(inputStream)
+        self.pulseShape = inputStream.read_uint8()
+        self.padding2 = inputStream.read_uint8()
+        self.padding3 = inputStream.read_uint32()
+        self.padding4 = inputStream.read_uint16()
+        numberOfDERecords = inputStream.read_uint16()
+        for _ in range(0, numberOfDERecords):
+            vtp = parseStandardVariableRecord(
+                inputStream,
+                DamageDescriptionRecord
+            )
+            self.dERecords.append(vtp)
 
 
 class DetonationPdu(WarfareFamilyPdu):
@@ -6796,21 +6413,21 @@ class DetonationPdu(WarfareFamilyPdu):
     pduType: enum8 = 3  # [UID 4]
 
     def __init__(self,
-                 explodingEntityID: "EntityID | None" = None,
-                 eventID: "EventIdentifier | None" = None,
-                 velocity: "Vector3Float | None" = None,
-                 location: "Vector3Double | None" = None,
-                 descriptor: "MunitionDescriptor | None" = None,
-                 locationInEntityCoordinates: "Vector3Float | None" = None,
+                 explodingEntityID: EntityIdentifier | None = None,
+                 eventID: EventIdentifier | None = None,
+                 velocity: Vector3Float | None = None,
+                 location: WorldCoordinates | None = None,
+                 descriptor: MunitionDescriptor | None = None,
+                 locationInEntityCoordinates: Vector3Float | None = None,
                  detonationResult: enum8 = 0,  # [UID 62]
-                 variableParameters: list["VariableParameter"] | None = None):
+                 variableParameters: list[VariableParameter] | None = None):
         super(DetonationPdu, self).__init__()
-        self.explodingEntityID = explodingEntityID or EntityID()
+        self.explodingEntityID = explodingEntityID or EntityIdentifier()
         """ID of the expendable entity, Section 7.3.3"""
         self.eventID = eventID or EventIdentifier()
         self.velocity = velocity or Vector3Float()
         """velocity of the munition immediately before detonation/impact, Section 7.3.3"""
-        self.location = location or Vector3Double(
+        self.location = location or WorldCoordinates(
         )
         """location of the munition detonation, the expendable detonation, Section 7.3.3"""
         self.descriptor = descriptor or MunitionDescriptor()
@@ -7019,47 +6636,45 @@ class EntityDamageStatusPdu(WarfareFamilyPdu):
     """Section 7.3.5
     
     Shall be used to communicate detailed damage information sustained by an
-    entity regardless of the source of the damage. COMPLETE
+    entity regardless of the source of the damage.
     """
     pduType: enum8 = 69  # [UID 4]
 
     def __init__(self,
-                 damagedEntityID: "EntityID | None" = None,
-                 damageDescriptionRecords=None):
+                 damagedEntityID: EntityIdentifier | None = None,
+                 damageDescriptions: list[DamageDescriptionRecord] | None = None):
         super(EntityDamageStatusPdu, self).__init__()
-        self.damagedEntityID = damagedEntityID or EntityID()
-        """Field shall identify the damaged entity (see 6.2.28), Section 7.3.4 COMPLETE"""
+        self.damagedEntityID = damagedEntityID or EntityIdentifier()
         self.padding1: uint16 = 0
         self.padding2: uint16 = 0
         # TODO: Look into using StandardVariableSpecification to compose this
-        self.damageDescriptionRecords = damageDescriptionRecords or []
-        """Fields shall contain one or more Damage Description records (see 6.2.17) and may contain other Standard Variable records, Section 7.3.5"""
+        self.damageDescriptions: list[DamageDescriptionRecord] = damageDescriptions or []
 
     @property
-    def numberOfDamageDescriptions(self) -> uint16:
-        return len(self.damageDescriptionRecords)
+    def damageDescriptionCount(self) -> uint16:
+        return len(self.damageDescriptions)
 
-    def serialize(self, outputStream):
-        """serialize the class"""
+    def serialize(self, outputStream: DataOutputStream) -> None:
         super(EntityDamageStatusPdu, self).serialize(outputStream)
         self.damagedEntityID.serialize(outputStream)
-        outputStream.write_unsigned_short(self.padding1)
-        outputStream.write_unsigned_short(self.padding2)
-        outputStream.write_unsigned_short(self.numberOfDamageDescriptions)
-        for anObj in self.damageDescriptionRecords:
-            anObj.serialize(outputStream)
+        outputStream.write_uint16(self.padding1)
+        outputStream.write_uint16(self.padding2)
+        outputStream.write_uint16(self.damageDescriptionCount)
+        for record in self.damageDescriptions:
+            record.serialize(outputStream)
 
-    def parse(self, inputStream):
-        """Parse a message. This may recursively call embedded objects."""
+    def parse(self, inputStream: DataInputStream) -> None:
         super(EntityDamageStatusPdu, self).parse(inputStream)
         self.damagedEntityID.parse(inputStream)
-        self.padding1 = inputStream.read_unsigned_short()
-        self.padding2 = inputStream.read_unsigned_short()
-        numberOfDamageDescriptions = inputStream.read_unsigned_short()
-        for idx in range(0, numberOfDamageDescriptions):
-            element = null()
-            element.parse(inputStream)
-            self.damageDescriptionRecords.append(element)
+        self.padding1 = inputStream.read_uint16()
+        self.padding2 = inputStream.read_uint16()
+        damageDescriptionCount = inputStream.read_uint16()
+        for _ in range(0, damageDescriptionCount):
+            record = parseStandardVariableRecord(
+                inputStream,
+                DamageDescriptionRecord
+            )
+            self.damageDescriptions.append(record)
 
 
 class FirePdu(WarfareFamilyPdu):
@@ -7071,21 +6686,21 @@ class FirePdu(WarfareFamilyPdu):
     pduType: enum8 = 2  # [UID 4]
 
     def __init__(self,
-                 munitionExpendableID: "EntityID | None" = None,
-                 eventID: "EventIdentifier | None" = None,
+                 munitionExpendableID: EntityIdentifier | None = None,
+                 eventID: EventIdentifier | None = None,
                  fireMissionIndex: uint32 = 0,
-                 location: "Vector3Double | None" = None,
-                 descriptor: "MunitionDescriptor | None" = None,
-                 velocity: "Vector3Float | None" = None,
+                 location: WorldCoordinates | None = None,
+                 descriptor: MunitionDescriptor | None = None,
+                 velocity: Vector3Float | None = None,
                  range_: float32 = 0.0):  # in meters
         super(FirePdu, self).__init__()
-        self.munitionExpendableID = munitionExpendableID or EntityID()
+        self.munitionExpendableID = munitionExpendableID or EntityIdentifier()
         """This field shall specify the entity identification of the fired munition or expendable. This field shall be represented by an Entity Identifier record (see 6.2.28)."""
         self.eventID = eventID or EventIdentifier()
         """This field shall contain an identification generated by the firing entity to associate related firing and detonation events. This field shall be represented by an Event Identifier record (see 6.2.34)."""
         self.fireMissionIndex = fireMissionIndex
         """This field shall identify the fire mission (see 5.4.3.3). This field shall be representedby a 32-bit unsigned integer."""
-        self.location = location or Vector3Double(
+        self.location = location or WorldCoordinates(
         )
         """This field shall specify the location, in world coordinates, from which the munition was launched, and shall be represented by a World Coordinates record (see 6.2.97)."""
         self.descriptor = descriptor or MunitionDescriptor()
@@ -7128,7 +6743,7 @@ class ReceiverPdu(RadioCommunicationsFamilyPdu):
     def __init__(self,
                  receiverState: enum16 = 0,  # [UID 179]
                  receivedPower: float32 = 0.0,  # in decibel milliwatts
-                 transmitterEntityID: "EntityID | ObjectIdentifier | UnattachedIdentifier | None" = None,
+                 transmitterEntityID: EntityIdentifier | ObjectIdentifier | UnattachedIdentifier | None = None,
                  transmitterRadioId: uint16 = 0):
         super(ReceiverPdu, self).__init__()
         self.receiverState = receiverState
@@ -7136,7 +6751,7 @@ class ReceiverPdu(RadioCommunicationsFamilyPdu):
         self.padding1: uint16 = 0
         self.receivedPower = receivedPower
         """received power"""
-        self.transmitterEntityID = transmitterEntityID or EntityID()
+        self.transmitterEntityID = transmitterEntityID or EntityIdentifier()
         """ID of transmitter"""
         self.transmitterRadioId = transmitterRadioId
         """ID of transmitting radio"""
@@ -7170,8 +6785,8 @@ class UaPdu(DistributedEmissionsFamilyPdu):
     pduType: enum8 = 29  # [UID 4]
 
     def __init__(self,
-                 emittingEntityID: "EntityID | None" = None,
-                 eventID: "EventIdentifier | None" = None,
+                 emittingEntityID: EntityIdentifier | None = None,
+                 eventID: EventIdentifier | None = None,
                  stateChangeIndicator: enum8 = 0,  # [UID 143]
                  passiveParameterIndex: enum16 = 0,  # [UID 148]
                  propulsionPlantConfiguration: struct8 = 0,  # [UID 149]
@@ -7179,7 +6794,7 @@ class UaPdu(DistributedEmissionsFamilyPdu):
                  apaData: list | None = None,
                  emitterSystems: list | None = None):
         super(UaPdu, self).__init__()
-        self.emittingEntityID = emittingEntityID or EntityID()
+        self.emittingEntityID = emittingEntityID or EntityIdentifier()
         """ID of the entity that is the source of the emission"""
         self.eventID = eventID or EventIdentifier()
         """ID of event"""
@@ -7268,19 +6883,19 @@ class IntercomControlPdu(RadioCommunicationsFamilyPdu):
     def __init__(self,
                  controlType: enum8 = 0,  # [UID 180]
                  communicationsChannelType: struct8 = 0,  # [UID 416], [UID 181]
-                 sourceEntityID: "EntityID | UnattachedIdentifier | None" = None,
+                 sourceEntityID: "EntityIdentifier | UnattachedIdentifier | None" = None,
                  sourceCommunicationsDeviceID: uint16 = 0,
                  sourceLineID: uint8 = 0,
                  transmitPriority: uint8 = 0,
                  transmitLineState: enum8 = 0,  # [UID 183]
                  command: enum8 = 0,  # [UID 182]
-                 masterEntityID: "EntityID | UnattachedIdentifier | None" = None,
+                 masterEntityID: "EntityIdentifier | UnattachedIdentifier | None" = None,
                  masterCommunicationsDeviceID: uint16 = 0,
                  intercomParameters: "IntercomCommunicationsParameters | None" = None):
         super(IntercomControlPdu, self).__init__()
         self.controlType = controlType
         self.communicationsChannelType = communicationsChannelType
-        self.sourceEntityID = sourceEntityID or EntityID()
+        self.sourceEntityID = sourceEntityID or EntityIdentifier()
         self.sourceCommunicationsDeviceID = sourceCommunicationsDeviceID
         """The specific intercom device being simulated within an entity."""
         self.sourceLineID = sourceLineID
@@ -7291,7 +6906,7 @@ class IntercomControlPdu(RadioCommunicationsFamilyPdu):
         """current transmit state of the line"""
         self.command = command
         """detailed type requested."""
-        self.masterEntityID = masterEntityID or EntityID()
+        self.masterEntityID = masterEntityID or EntityIdentifier()
         """eid of the entity that has created this intercom channel."""
         self.masterCommunicationsDeviceID = masterCommunicationsDeviceID
         """specific intercom device that has created this intercom channel"""
@@ -7349,7 +6964,7 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
     pduType: enum8 = 26  # [UID 4]
 
     def __init__(self,
-                 entityID: "EntityID | ObjectIdentifier | UnattachedIdentifier | None" = None,
+                 entityID: EntityIdentifier | ObjectIdentifier | UnattachedIdentifier | None = None,
                  radioID: uint16 = 0,
                  encodingScheme: struct16 = 0,  # (Table 177), [UID 271], [UID 270]
                  tdlType: enum16 = 0,  # [UID 178]
@@ -7357,7 +6972,7 @@ class SignalPdu(RadioCommunicationsFamilyPdu):
                  samples: uint16 = 0,
                  data: list[bytes] | None = None):
         super(SignalPdu, self).__init__()
-        self.entityID = entityID or EntityID()
+        self.entityID = entityID or EntityIdentifier()
         self.radioID = radioID
         self.encodingScheme = encodingScheme
         self.tdlType = tdlType
@@ -7442,14 +7057,14 @@ class SeesPdu(DistributedEmissionsFamilyPdu):
     pduType: enum8 = 30  # [UID 4]
 
     def __init__(self,
-                 originatingEntityID: "EntityID | None" = None,
+                 originatingEntityID: EntityIdentifier | None = None,
                  infraredSignatureRepresentationIndex: uint16 = 0,
                  acousticSignatureRepresentationIndex: uint16 = 0,
                  radarCrossSectionSignatureRepresentationIndex: uint16 = 0,
                  propulsionSystemData: list | None = None,
                  vectoringSystemData: list | None = None):
         super(SeesPdu, self).__init__()
-        self.orginatingEntityID = originatingEntityID or EntityID()
+        self.orginatingEntityID = originatingEntityID or EntityIdentifier()
         self.infraredSignatureRepresentationIndex = infraredSignatureRepresentationIndex
         self.acousticSignatureRepresentationIndex = acousticSignatureRepresentationIndex
         self.radarCrossSectionSignatureRepresentationIndex = radarCrossSectionSignatureRepresentationIndex
@@ -7643,14 +7258,14 @@ class MinefieldResponseNackPdu(MinefieldFamilyPdu):
     pduType: enum8 = 40  # [UID 4]
 
     def __init__(self,
-                 minefieldID: "EntityID | None" = None,
-                 requestingEntityID: "EntityID | None" = None,
+                 minefieldID: EntityIdentifier | None = None,
+                 requestingEntityID: EntityIdentifier | None = None,
                  requestID: uint32 = 0,
                  missingPduSequenceNumbers: list[uint8] | None = None):
         super(MinefieldResponseNackPdu, self).__init__()
         # TODO: validate EntityID?
-        self.minefieldID = minefieldID or EntityID()
-        self.requestingEntityID = requestingEntityID or EntityID()
+        self.minefieldID = minefieldID or EntityIdentifier()
+        self.requestingEntityID = requestingEntityID or EntityIdentifier()
         self.requestID = requestID
         self.missingPduSequenceNumbers = missingPduSequenceNumbers or []
         """PDU sequence numbers that were missing"""
@@ -7743,16 +7358,16 @@ class IsPartOfPdu(EntityManagementFamilyPdu):
     pduType: enum8 = 36  # [UID 4]
 
     def __init__(self,
-                 originatingEntityID: "EntityID | None" = None,
-                 receivingEntityID: "EntityID | None" = None,
+                 originatingEntityID: EntityIdentifier | None = None,
+                 receivingEntityID: EntityIdentifier | None = None,
                  relationship: "Relationship | None" = None,
-                 partLocation: "Vector3Float | None" = None,
+                 partLocation: Vector3Float | None = None,
                  namedLocationID: "NamedLocationIdentification | None" = None,
                  partEntityType: "EntityType | None" = None):
         super(IsPartOfPdu, self).__init__()
-        self.orginatingEntityID = originatingEntityID or EntityID()
+        self.orginatingEntityID = originatingEntityID or EntityIdentifier()
         """ID of entity originating PDU"""
-        self.receivingEntityID = receivingEntityID or EntityID()
+        self.receivingEntityID = receivingEntityID or EntityIdentifier()
         """ID of entity receiving PDU"""
         self.relationship = relationship or Relationship()
         """relationship of joined parts"""
@@ -7797,15 +7412,15 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
                  aggregateType: "AggregateType | None" = None,
                  formation: enum32 = 0,
                  aggregateMarking: "AggregateMarking | None" = None,
-                 dimensions: "Vector3Float | None" = None,
-                 orientation: "EulerAngles | None" = None,
-                 centerOfMass: "Vector3Float | None" = None,
-                 velocity: "Vector3Double | None" = None,
-                 aggregateIDs: list["AggregateIdentifier"] | None = None,
-                 entityIDs: list["EntityIdentifier"] | None = None,
-                 silentAggregateSystems: list["SilentAggregateSystem"] | None = None,
-                 silentEntitySystems: list["SilentEntitySystem"] | None = None,
-                 variableDatumRecords: list["VariableDatum"] | None = None):
+                 dimensions: Vector3Float | None = None,
+                 orientation: EulerAngles | None = None,
+                 centerOfMass: Vector3Float | None = None,
+                 velocity: WorldCoordinates | None = None,
+                 aggregateIDs: list[AggregateIdentifier] | None = None,
+                 entityIDs: list[EntityIdentifier] | None = None,
+                 silentAggregateSystems: list[SilentAggregateSystem] | None = None,
+                 silentEntitySystems: list[SilentEntitySystem] | None = None,
+                 variableDatumRecords: list[VariableDatum] | None = None):
         super(AggregateStatePdu, self).__init__()
         """Identifier of the aggregate issuing the PDU"""
         self.aggregateID = aggregateID or AggregateIdentifier()
@@ -7822,7 +7437,7 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
         self.orientation = orientation or EulerAngles()
         self.centerOfMass = centerOfMass or Vector3Float()
         """Aggregates linear velocity. The coordinate system is dependent on the dead reckoning algorithm"""
-        self.velocity = velocity or Vector3Double()
+        self.velocity = velocity or WorldCoordinates()
         """Identify subaggregates that are transmitting Aggregate State PDUs"""
         self.aggregateIDs = aggregateIDs or []
         """Constituent entities transmitting Entity State PDUs"""
@@ -7904,7 +7519,7 @@ class AggregateStatePdu(EntityManagementFamilyPdu):
             element.parse(inputStream)
             self.aggregateIDs.append(element)
         for idx in range(0, numberOfEntityIDs):
-            element = EntityID()
+            element = EntityIdentifier()
             element.parse(inputStream)
             self.entityIDs.append(element)
         for idx in range(0, numberOfSilentAggregateSystems):
