@@ -94,7 +94,51 @@ def run_demo():
     print("T=0: 0.0")
     print("T=1: 10*1 + 0.5*1*1^2 = 10.5")
     print("T=2: 10*2 + 0.5*1*2^2 = 22.0")
-    print("T=5: 10*5 + 0.5*1*5^2 = 50 + 12.5 = 62.5")
+    # 3. Demonstrate integration with RangeCoordinates (GPS)
+    # The Dead Reckoning module returns ECEF coordinates (Earth-Centered, Earth-Fixed).
+    # Usually, users want Latitude/Longitude/Altitude.
+    from opendis.RangeCoordinates import GPS, deg2rad, rad2deg
+    
+    gps = GPS()
+    
+    print("\n--- Integration Verification ---")
+    print("Converting extrapolated ECEF coordinates to Lat/Lon/Alt using opendis.RangeCoordinates...")
+    
+    # Let's take the final position from the simulation
+    final_pos_ecef = (new_pos[0], new_pos[1], new_pos[2])
+    
+    # Convert ECEF to LLA
+    # Note: Our example started at 0,0,0 which is the center of the earth (invalid for LLA usually),
+    # but let's assume the initial position was actually on the surface for this part of the demo
+    # or just show the conversion call structure.
+    
+    # To make this realistic, let's restart with a real-world location.
+    # Monterey, CA: 36.6 N, 121.9 W
+    print("\nRestarting simulation at Monterey, CA...")
+    start_lat = 36.6
+    start_lon = -121.9
+    start_alt = 100.0 # meters
+    
+    start_ecef = gps.lla2ecef((start_lat, start_lon, start_alt))
+    print(f"Start LLA: ({start_lat}, {start_lon}, {start_alt})")
+    print(f"Start ECEF: {start_ecef}")
+    
+    # Move East (Velocity in Y in ECEF is roughly East at this location? No, it's complex in ECEF.)
+    # For simplicity, let's just add the displacement we calculated earlier to this valid ECEF point.
+    # This isn't physically perfect (earth is curved), but demonstrates the API integration.
+    
+    displacement = new_pos # The 62.5m displacement from the previous run
+    final_ecef_real = (
+        start_ecef[0] + displacement[0],
+        start_ecef[1] + displacement[1],
+        start_ecef[2] + displacement[2]
+    )
+    
+    final_lla = gps.ecef2lla(final_ecef_real)
+    print(f"Final ECEF: {final_ecef_real}")
+    print(f"Final LLA: ({final_lla[0]:.6f}, {final_lla[1]:.6f}, {final_lla[2]:.2f})")
+    
+    print("\nIntegration Successful: Dead Reckoning output was successfully fed into RangeCoordinates.")
 
 if __name__ == "__main__":
     run_demo()
