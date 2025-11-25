@@ -22,9 +22,9 @@ class TestTransmitterPdu(unittest.TestCase):
         #self.assertEqual(0, pdu.timestamp)
         self.assertEqual(104, pdu.length)
 
-        self.assertEqual(1677, pdu.radioReferenceID.siteID)
-        self.assertEqual(1678, pdu.radioReferenceID.applicationID)
-        self.assertEqual(169, pdu.radioReferenceID.entityID )
+        self.assertEqual(1677, pdu.radioReferenceID.simulationAddress.site)
+        self.assertEqual(1678, pdu.radioReferenceID.simulationAddress.application)
+        self.assertEqual(169, pdu.radioReferenceID.entityNumber)
         self.assertEqual(1, pdu.radioNumber)
         self.assertEqual(2, pdu.transmitState)
         self.assertEqual(10000000000, pdu.frequency)
