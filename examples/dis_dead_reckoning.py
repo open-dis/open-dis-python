@@ -10,8 +10,8 @@ over a period of time.
 
 import time
 import numpy as np
-from opendis.dis7 import EntityStatePdu, Vector3Float, Vector3Double
-from opendis.DeadReckoning import DeadReckoning
+from opendis.dis7 import EntityStatePdu, Vector3Float
+from opendis import DeadReckoning
 
 def run_demo():
     # 1. Create a mock PDU (as if received from the network)
@@ -44,19 +44,23 @@ def run_demo():
     pdu.deadReckoningParameters.entityAngularVelocity.z = 0.0
 
     # Extract numpy arrays for the DR function
-    initial_pos = np.array([pdu.entityLocation.x, pdu.entityLocation.y, pdu.entityLocation.z])
-    velocity = np.array([pdu.entityLinearVelocity.x, pdu.entityLinearVelocity.y, pdu.entityLinearVelocity.z])
-    acceleration = np.array([
+    # Note: With the new API, we can pass lists or tuples directly if we wanted to,
+    # but since we are extracting from PDU objects, we'll stick with what we have or use lists.
+    # The API will convert them to numpy arrays internally.
+    
+    initial_pos = [pdu.entityLocation.x, pdu.entityLocation.y, pdu.entityLocation.z]
+    velocity = [pdu.entityLinearVelocity.x, pdu.entityLinearVelocity.y, pdu.entityLinearVelocity.z]
+    acceleration = [
         pdu.deadReckoningParameters.entityLinearAcceleration.x,
         pdu.deadReckoningParameters.entityLinearAcceleration.y,
         pdu.deadReckoningParameters.entityLinearAcceleration.z
-    ])
-    orientation = np.array([pdu.entityOrientation.psi, pdu.entityOrientation.theta, pdu.entityOrientation.phi])
-    angular_velocity = np.array([
+    ]
+    orientation = [pdu.entityOrientation.psi, pdu.entityOrientation.theta, pdu.entityOrientation.phi]
+    angular_velocity = [
         pdu.deadReckoningParameters.entityAngularVelocity.x,
         pdu.deadReckoningParameters.entityAngularVelocity.y,
         pdu.deadReckoningParameters.entityAngularVelocity.z
-    ])
+    ]
 
     print("--- Dead Reckoning Demonstration ---")
     print(f"Initial Position: {initial_pos}")

@@ -1,12 +1,12 @@
 import unittest
 import numpy as np
 import math
-from opendis.DeadReckoning import DeadReckoning
+from opendis import DeadReckoning
 
 class TestDeadReckoning(unittest.TestCase):
 
     def setUp(self):
-        self.dr = DeadReckoning()
+        # self.dr = DeadReckoning() # Removed class
         self.zero_pos = np.array([0.0, 0.0, 0.0])
         self.zero_vel = np.array([0.0, 0.0, 0.0])
         self.zero_acc = np.array([0.0, 0.0, 0.0])
@@ -14,7 +14,7 @@ class TestDeadReckoning(unittest.TestCase):
         self.zero_ang_vel = np.array([0.0, 0.0, 0.0])
 
     def test_static(self):
-        pos, ori = self.dr.drm_static(self.zero_pos, self.zero_ori)
+        pos, ori = DeadReckoning.drm_static(self.zero_pos, self.zero_ori)
         np.testing.assert_array_equal(pos, self.zero_pos)
         np.testing.assert_array_equal(ori, self.zero_ori)
 
@@ -22,7 +22,7 @@ class TestDeadReckoning(unittest.TestCase):
         # Move 10m/s in X for 1 second
         vel = np.array([10.0, 0.0, 0.0])
         dt = 1.0
-        pos, ori = self.dr.drm_fpw(self.zero_pos, vel, dt, self.zero_ori)
+        pos, ori = DeadReckoning.drm_fpw(self.zero_pos, vel, dt, self.zero_ori)
         
         expected_pos = np.array([10.0, 0.0, 0.0])
         np.testing.assert_array_equal(pos, expected_pos)
@@ -37,7 +37,7 @@ class TestDeadReckoning(unittest.TestCase):
         # r corresponds to d_psi (roughly)
         
         dt = 1.0
-        pos, ori = self.dr.drm_rpw(self.zero_pos, self.zero_vel, dt, self.zero_ori, ang_vel)
+        pos, ori = DeadReckoning.drm_rpw(self.zero_pos, self.zero_vel, dt, self.zero_ori, ang_vel)
         
         # Expected: Yaw (psi) increases by pi/2
         expected_ori = np.array([math.pi/2, 0.0, 0.0])
@@ -49,7 +49,7 @@ class TestDeadReckoning(unittest.TestCase):
         # Accelerate 1m/s^2 in X for 2 seconds
         acc = np.array([1.0, 0.0, 0.0])
         dt = 2.0
-        pos, ori = self.dr.drm_rvw(self.zero_pos, self.zero_vel, acc, dt, self.zero_ori, self.zero_ang_vel)
+        pos, ori = DeadReckoning.drm_rvw(self.zero_pos, self.zero_vel, acc, dt, self.zero_ori, self.zero_ang_vel)
         
         # d = 0.5 * a * t^2 = 0.5 * 1 * 4 = 2.0
         expected_pos = np.array([2.0, 0.0, 0.0])
@@ -60,7 +60,7 @@ class TestDeadReckoning(unittest.TestCase):
         # Body aligned with World. Velocity in Body X should be Velocity in World X.
         vel_body = np.array([10.0, 0.0, 0.0])
         dt = 1.0
-        pos, ori = self.dr.drm_fpb(self.zero_pos, vel_body, dt, self.zero_ori)
+        pos, ori = DeadReckoning.drm_fpb(self.zero_pos, vel_body, dt, self.zero_ori)
         
         expected_pos = np.array([10.0, 0.0, 0.0])
         np.testing.assert_array_almost_equal(pos, expected_pos)
@@ -73,12 +73,24 @@ class TestDeadReckoning(unittest.TestCase):
         vel_body = np.array([10.0, 0.0, 0.0])
         dt = 1.0
         
-        pos, new_ori = self.dr.drm_fpb(self.zero_pos, vel_body, dt, ori)
+        pos, new_ori = DeadReckoning.drm_fpb(self.zero_pos, vel_body, dt, ori)
         
         expected_pos = np.array([0.0, 10.0, 0.0]) # Moved in Y
         
         np.testing.assert_array_almost_equal(pos, expected_pos)
         np.testing.assert_array_almost_equal(new_ori, ori)
+
+    def test_input_flexibility(self):
+        # Test passing lists instead of numpy arrays
+        pos_list = [0.0, 0.0, 0.0]
+        vel_list = [10.0, 0.0, 0.0]
+        ori_list = [0.0, 0.0, 0.0]
+        dt = 1.0
+        
+        pos, ori = DeadReckoning.drm_fpw(pos_list, vel_list, dt, ori_list)
+        
+        expected_pos = np.array([10.0, 0.0, 0.0])
+        np.testing.assert_array_equal(pos, expected_pos)
 
 if __name__ == '__main__':
     unittest.main()
