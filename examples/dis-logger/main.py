@@ -52,7 +52,7 @@ class DISMessageInfo:
                 except Exception:
                     break
 
-            self.entityID = pdu.entityID.entityID
+            self.entityID = pdu.entityID.entityNumber
             self.marking = marking_string
 
     def __str__(self):
