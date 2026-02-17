@@ -112,6 +112,10 @@ class GPS:
 
     wgs84 = WGS84()
 
+    _IDENTITY_3X3 = array([[1., 0., 0.], 
+                          [0., 1., 0.], 
+                          [0., 0., 1.]])
+
     def ecef2lla(self, ecef, tolerance=1e-9):
         """Convert Earth-centered, Earth-fixed coordinates to lat, lon, alt.
         Input: ecef - (x, y, z) in (m, m, m)
@@ -516,8 +520,6 @@ class GPS:
               the rotation.
         """
 
-        n_v_t = normal_vec.transpose()
-
         n_x = array([[      0  , -normal_vec[2], normal_vec[1] ],
                      [normal_vec[2] ,       0  , -normal_vec[0]],
                      [-normal_vec[1], normal_vec[0] ,   0      ]
@@ -525,11 +527,9 @@ class GPS:
                    )
 
 
-        I = identity(3)
-
         nnt = normal_vec * self.transpose(normal_vec)
 
-        return (1 - cos(theta)) * nnt + cos(theta) * I + sin(theta) * n_x
+        return (1 - cos(theta)) * nnt + cos(theta) * self._IDENTITY_3X3 + sin(theta) * n_x
 
 
     def transpose(self, arr):
