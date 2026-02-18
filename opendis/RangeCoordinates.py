@@ -112,9 +112,7 @@ class GPS:
 
     wgs84 = WGS84()
 
-    _IDENTITY_3X3 = array([[1., 0., 0.], 
-                          [0., 1., 0.], 
-                          [0., 0., 1.]])
+    _IDENTITY_3X3 = identity(3)
 
     def ecef2lla(self, ecef, tolerance=1e-9):
         """Convert Earth-centered, Earth-fixed coordinates to lat, lon, alt.
