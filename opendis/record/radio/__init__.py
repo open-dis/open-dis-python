@@ -480,6 +480,8 @@ class HighFidelityHAVEQUICKRadio(VariableTransmitterParametersRecord):
     
     def serialize(self, outputStream: DataOutputStream) -> None:
         super().serialize(outputStream)
+        outputStream.write_uint32(self.recordType)
+        outputStream.write_uint16(self.recordLength)
         outputStream.write_uint16(self.padding1)
         self.netId.serialize(outputStream)
         outputStream.write_uint8(self.todTransmitIndicator)
