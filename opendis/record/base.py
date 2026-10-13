@@ -82,10 +82,11 @@ class StandardVariableRecord(VariableRecord):
 
     @abstractmethod
     def serialize(self, outputStream: DataOutputStream) -> None:
-        """Serialize the record to the output stream."""
-        super().serialize(outputStream)
-        outputStream.write_uint32(self.recordType)
-        outputStream.write_uint32(self.recordLength)
+        """Serialize the record to the output stream.
+
+        The record header (recordType u32 + recordLength u16, see 6.2.83)
+        is written by each subclass before its own fields.
+        """
 
     @abstractmethod
     def parse(self,  # pyright: ignore [reportIncompatibleMethodOverride]
