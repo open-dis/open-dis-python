@@ -15,6 +15,7 @@ from .record import (
     DEFireFlags,
     WorldCoordinates,
     EntityIdentifier,
+    EntityID,
     EventIdentifier,
     SimulationAddress,
     BeamAntennaPattern,

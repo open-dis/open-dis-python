@@ -23,6 +23,7 @@ __all__ = [
     "Vector3Float",
     "WorldCoordinates",
     "EntityIdentifier",
+    "EntityID",
     "EulerAngles",
     "SimulationAddress",
     "EventIdentifier",
@@ -52,6 +53,39 @@ class EntityIdentifier(base.Record):
     def parse(self, inputStream: DataInputStream) -> None:
         self.simulationAddress.parse(inputStream)
         self.entityNumber = inputStream.read_uint16()
+
+    # Legacy EntityID field names, kept for backwards compatibility with
+    # pre-1.1 code and other open-dis implementations. They delegate to the
+    # fields above and do not change the wire format.
+    @property
+    def siteID(self) -> uint16:
+        return self.simulationAddress.site
+
+    @siteID.setter
+    def siteID(self, value: uint16) -> None:
+        self.simulationAddress.site = value
+
+    @property
+    def applicationID(self) -> uint16:
+        return self.simulationAddress.application
+
+    @applicationID.setter
+    def applicationID(self, value: uint16) -> None:
+        self.simulationAddress.application = value
+
+    @property
+    def entityID(self) -> uint16:
+        return self.entityNumber
+
+    @entityID.setter
+    def entityID(self, value: uint16) -> None:
+        self.entityNumber = value
+
+
+# Legacy name for EntityIdentifier (the standard's own shorthand for the
+# §6.2.28 record is "Entity ID"); kept as an alias for backwards
+# compatibility.
+EntityID = EntityIdentifier
 
 
 class EulerAngles(base.Record):
