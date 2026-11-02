@@ -21,7 +21,7 @@ classifiers=[
 
 
 [tool.poetry.group.dev.dependencies]
-black = ">=24.0.0"
+black = ">=26.10.1"
 isort = ">=5.13.2"
 commitizen = ">=3.13.0"
 flake8 = ">=7.0.0"
